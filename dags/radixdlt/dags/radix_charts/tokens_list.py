@@ -1,3 +1,5 @@
+import logging
+
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta
@@ -23,27 +25,30 @@ dag = DAG('radix_charts_tokens_list',
 
 
 def fetch_tokens():
-    # Fetch tokens from API
     api_endpoint = Config.RADIX_CHARTS_TOKENS_PRICE_LIST
     response = requests.get(api_endpoint, get_headers())
     tokens = response.json()['data']
-
+    logging.info(tokens)
     return tokens
 
 
 def insert_tokens(**kwargs):
     tokens = kwargs['ti'].xcom_pull(task_ids='fetch_tokens')
 
-    # Connect to PostgreSQL
     conn = get_postgres_connection()
     cursor = conn.cursor()
 
-    # Insert tokens into the PostgreSQL table if they don't already exist
-    for token in tokens:
-        cursor.execute("SELECT * FROM tokens WHERE token = %s", (token,))
+    for resource_address in tokens.keys():
+        cursor.execute("SELECT * FROM tokens WHERE resource_address = %s", (resource_address,))
         existing_token = cursor.fetchone()
         if not existing_token:
-            cursor.execute("INSERT INTO tokens (token) VALUES (%s)", (token,))
+            cursor.execute(
+                "INSERT INTO tokens ("
+                "resource_address, symbol, name) "
+                "VALUES (%s, %s, %s)", (
+                resource_address,
+                tokens[resource_address]["symbol"],
+                tokens[resource_address]["name"]))
 
     conn.commit()
     cursor.close()
