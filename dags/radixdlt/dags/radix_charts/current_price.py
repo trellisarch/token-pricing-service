@@ -9,12 +9,12 @@ from airflow.decorators import task
 from radixdlt.config.config import Config
 from radixdlt.lib.http import get_headers
 
-with DAG(dag_id="radix_charts",
+with DAG(dag_id="radix_charts_current_price",
          start_date=datetime(2023, 12, 17),
          schedule="0 0 * * *") as dag:
 
     @task()
-    def get_radix_tokens():
+    def get_tokens_current_price():
         token_list = requests.get(Config.RADIX_CHARTS_TOKENS_PRICE_LIST,
                                   headers=get_headers()).json()["data"]
         logging.info(token_list)
@@ -59,4 +59,4 @@ with DAG(dag_id="radix_charts",
         #     except psycopg2.Error as e:
         #         print("Error occurred while inserting data:", e)
 
-    get_radix_tokens()
+    get_tokens_current_price()

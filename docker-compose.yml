@@ -98,18 +98,20 @@ services:
       retries: 5
       start_period: 5s
     restart: always
-  postgres_radix:
+  postgres:
     image: postgres:13
     environment:
-      POSTGRES_USER: radix
-      POSTGRES_PASSWORD: radix
-      POSTGRES_DB: radix_data
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
     healthcheck:
-      test: [ "CMD", "pg_isready", "-U", "radix", "-d", "radix_data" ]
+      test: [ "CMD", "pg_isready", "-U", "postgres", "-d", "postgres" ]
       interval: 10s
       retries: 5
       start_period: 5s
     restart: always
+    ports:
+      - 5432:5432
   redis:
     image: redis:latest
     expose:
