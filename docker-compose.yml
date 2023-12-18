@@ -86,13 +86,6 @@ x-airflow-common:
       condition: service_healthy
 
 services:
-  migration:
-    build:
-      context: .
-      dockerfile: ./migrations/Dockerfile
-    depends_on:
-      postgres_radix:
-        condition: service_healthy
   postgres_airflow:
     image: postgres:13
     environment:
