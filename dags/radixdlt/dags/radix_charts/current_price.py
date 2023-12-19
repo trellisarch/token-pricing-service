@@ -18,7 +18,7 @@ default_args = {
 dag = DAG('radix_charts_current_price',
           default_args=default_args,
           description='DAG to fetch tokens price and save to PostgreSQL',
-          schedule_interval='0 0 * * * ',  # Runs every 15 minutes
+          schedule_interval='*/15 * * * *',
           )
 
 
@@ -26,7 +26,7 @@ def fetch_tokens_and_save_price(**kwargs):
     conn = get_postgres_connection()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT resource_address FROM tokens")
+    cursor.execute("SELECT resource_address FROM token")
     tokens = cursor.fetchall()
 
     current_price_endpoint = Config.RADIX_CHARTS_TOKEN_PRICE_CURRENT
