@@ -9,7 +9,7 @@ This project employs Apache Airflow to gather data from multiple APIs such as Co
 
 ## Workflow Diagram
 
-![Workflow Diagram](.resources/radix-airflow.png)
+![Workflow Diagram](resources/radix-airflow.png)
 
 ## Components
 
