@@ -6,4 +6,5 @@ RUN pip install -r requirements.txt
 COPY app/ /app
 WORKDIR /
 
-ENTRYPOINT uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+ENTRYPOINT uvicorn app.main:app --host 0.0.0.0 --port 8000
+
