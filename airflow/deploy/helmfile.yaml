@@ -8,6 +8,12 @@ releases:
     chart: apache-airflow/airflow
     version: 1.11.0
     values:
+      - images:
+          airflow:
+            repository: radixdlt/airflow
+            tag: sha-46ccb37
+      - registry:
+          secretName: docker-hub-dev
       - ingress:
           enabled: true
           annotations:
