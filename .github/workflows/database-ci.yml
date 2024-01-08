@@ -1,0 +1,68 @@
+name: CI database
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'database/**'
+      - ".github/workflows/database-ci.yml"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'database/**'
+      - ".github/workflows/database-ci.yml"
+  release:
+    types: [published]
+
+permissions:
+  id-token: write
+  pull-requests: write
+  contents: read
+  deployments: write
+  packages: write
+
+jobs:
+
+  tags:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
+        with:
+          fetch-depth: 0
+      - name: Docker tags
+        id: docker-tags-token-price-service
+        uses: docker/metadata-action@57396166ad8aefe6098280995947635806a0e6ea
+        with:
+          images: |
+            docker.io/radixdlt/token-price-service
+          tags: |
+            type=sha,event=pr
+            type=sha,event=branch
+            type=semver,pattern={{version}}
+
+  build:
+    needs: 
+    - tags
+    uses: radixdlt/public-iac-resuable-artifacts/.github/workflows/docker-build.yml@main
+    with:
+      runs_on: ubuntu-latest
+      image_registry: "docker.io"
+      image_organization: "radixdlt"
+      image_name: "airflow-migration"
+      tags: |
+          type=sha,event=pr
+          type=sha,event=branch
+          type=semver,pattern={{version}}
+      context: "database"
+      dockerfile: "database/Dockerfile"
+      platforms: "linux/amd64"
+      provenance: "false"
+      scan_image: false
+      snyk_target_ref: ${{ github.ref_name }}
+    secrets:
+      workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDP }}
+      service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+      role_to_assume: ${{ secrets.DOCKERHUB_RELEASER_ROLE }}
+
