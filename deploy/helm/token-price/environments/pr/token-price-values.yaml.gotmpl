@@ -1,0 +1,24 @@
+image: 
+  tag: {{ .StateValues.ci.tag }}
+
+autoscaling:
+  enabled: false
+
+metrics:
+  enabled: false
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+  hosts:
+    - host: token-price-pr-{{ .StateValues.ci.prNumber }}.rdx-works-main.extratools.works
+      paths:
+        - path: /
+          pathType: Prefix
+
+envs:
+  DB_HOST: "postgres-postgresql"
+  DB_NAME: "token-price"
+  DB_USER: "postgres"
+  DB_PASSWORD: "secret@123"

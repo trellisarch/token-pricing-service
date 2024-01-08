@@ -1,0 +1,66 @@
+replicaCount: 1
+
+image:
+  repository: docker.io/radixdlt/token-price-service
+  pullPolicy: IfNotPresent
+
+imagePullSecrets:
+  - name: dockerhub-dev
+
+nameOverride: "token-price"
+fullnameOverride: "token-price"
+
+docker:
+  secrets:
+    name: docker.io/radixdlt
+
+metrics:
+  enabled: false
+  port: 5990
+  serviceMonitor:
+    enabled: false
+    interval: 60s
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: "token-price"
+
+podAnnotations: {}
+
+podSecurityContext: {}
+
+securityContext: {}
+
+service:
+  type: ClusterIP
+  port: 80
+  containerPort: 8000
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+  hosts: []
+
+resources:
+  limits:
+    memory: 500Mi
+  requests:
+    cpu: 100m
+    memory: 250Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+affinity: {}
+
+env:
+
+secrets: []

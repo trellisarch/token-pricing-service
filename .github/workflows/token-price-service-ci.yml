@@ -2,8 +2,21 @@ name: CI token price service
 
 on:
   push:
+    branches:
+      - main
     paths:
       - 'consumers/token-price-service/**'
+      - 'deploy/helm/token-price/**'
+      - ".github/workflows/console-ci.yaml"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'consumers/token-price-service/**'
+      - 'deploy/helm/token-price/**'
+      - ".github/workflows/console-ci.yaml"
+  release:
+    types: [published]
 
 permissions:
   id-token: write
@@ -48,7 +61,6 @@ jobs:
             type=sha,event=branch
             type=semver,pattern={{version}}
 
-
   build:
     needs: 
     - tags
@@ -73,3 +85,68 @@ jobs:
       service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
       role_to_assume: ${{ secrets.DOCKERHUB_RELEASER_ROLE }}
 
+  deploy_pull_request:
+    if: ${{ github.event.pull_request }}
+    name: "Deploy PR"
+    uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@v0.13.0
+    needs:
+      - tags
+      - build
+    with:
+      env_name: pr
+      hierarchical_namespace: token-price-ci-pr
+      namespace: token-price-pr-${{ github.event.number }}
+      create_subns: true
+      restart_pods: false
+      aws_region: eu-west-2
+      role_to_assume: 'arn:aws:iam::308190735829:role/gh-token-price-pr-deployer'
+      eks_cluster: rdx-works-main-dev
+      helm_folder: "deploy/helm/token-price"
+      helmfile_extra_vars: >-
+        ci.tag=${{ fromJSON(needs.tags.outputs.token-price-json).labels['org.opencontainers.image.version'] }},
+        ci.prNumber=${{ github.event.number }},
+        ci.useLocalDb=true
+      app_name: 'token-price'
+      step_name: 'deploy-pr'
+
+  deploy_dev:
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    name: "Deploy DEV"
+    uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@v0.13.0
+    needs:
+      - tags
+      - build
+    with:
+      env_name: dev
+      namespace: token-price-dev
+      create_subns: false
+      restart_pods: false
+      aws_region: eu-west-2
+      role_to_assume: 'arn:aws:iam::308190735829:role/gh-token-price-dev-deployer'
+      eks_cluster: rdx-works-main-dev
+      helm_folder: "deploy/helm/token-price"
+      helmfile_extra_vars: >-
+        ci.tag=${{ fromJSON(needs.tags.outputs.token-price-json).labels['org.opencontainers.image.version'] }}
+      app_name: 'token-price'
+      step_name: 'deploy-dev'
+
+  deploy_prod:
+    if: ${{ github.event_name == 'release' && github.event.release.prerelease == false }}
+    name: "Deploy PROD"
+    uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@v0.13.0
+    needs:
+      - tags
+      - build
+    with:
+      env_name: prod
+      namespace: token-price-prod
+      create_subns: false
+      restart_pods: false
+      aws_region: eu-west-2
+      role_to_assume: 'arn:aws:iam::821496737932:role/gh-token-price-prod-deployer'
+      eks_cluster: rtlj-prod
+      helm_folder: "deploy/helm/token-price"
+      helmfile_extra_vars: >-
+        ci.tag=${{ fromJSON(needs.tags.outputs.token-price-json).labels['org.opencontainers.image.version'] }}
+      app_name: 'token-price'
+      step_name: 'deploy-prod'
