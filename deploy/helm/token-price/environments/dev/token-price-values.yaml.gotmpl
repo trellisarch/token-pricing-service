@@ -1,0 +1,34 @@
+image: 
+  tag: {{ .StateValues.ci.tag }}
+
+autoscaling:
+  enabled: false
+
+metrics:
+  enabled: false
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+  hosts:
+    - host: token-price-dev.rdx-works-main.extratools.works
+      paths:
+        - path: /
+          pathType: Prefix
+
+envs:
+  DB_HOST: "token-price-dev-rds.rdx-works-main.internal"
+  DB_NAME: "token-price"
+
+secrets:
+  - name: rds-username
+    variable: "DB_USER"
+    path: "rdx-works-main/eks/token-price/dev/postgres-creds"
+    secretProperty: "postgresqlUsername"
+    secretName: "database-username"
+  - name: rds-password
+    variable: "DB_PASSWORD"
+    path: "rdx-works-main/eks/token-price/dev/postgres-creds"
+    secretProperty: "postgresql-password"
+    secretName: "database-password"

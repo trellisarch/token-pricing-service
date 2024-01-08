@@ -1,0 +1,8 @@
+alertmanager:
+  env: "dev"
+  nameOverride: "token-price-amcfg"
+  slackConfig:
+    channel: "feed--alerts-token-price-dev"
+  secrets:
+    region: eu-west-2
+    name: "rdx-works-main-dev/eks/token-price/alertmanager-integration-keys"
