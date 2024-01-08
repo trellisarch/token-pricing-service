@@ -1,6 +1,5 @@
-FROM apache/airflow:2.0.2
+FROM apache/airflow
 
-USER root
-COPY --chown=airflow:root ./dags/ \${AIRFLOW_HOME}/dags/
+COPY ./dags/ /opt/airflow/dags
 
 USER airflow
