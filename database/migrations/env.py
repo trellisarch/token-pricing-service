@@ -12,8 +12,8 @@ DB_USER = getenv("DB_USER", "postgres")
 DB_PASSWORD = getenv("DB_PASSWORD", "postgres")
 DB_NAME = getenv("DB_NAME", "postgres")
 config.set_main_option(
-    'sqlalchemy.url',
-    f'postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:5432/{DB_NAME}')
+    "sqlalchemy.url", f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:5432/{DB_NAME}"
+)
 
 target_metadata = Base.metadata
 
@@ -33,15 +33,12 @@ def run_migrations_offline():
 def run_migrations_online():
     connectable = engine_from_config(
         config.get_section(config.config_ini_section),
-        prefix='sqlalchemy.',
+        prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection,
-            target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()
