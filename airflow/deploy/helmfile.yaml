@@ -14,7 +14,7 @@ releases:
             tag: sha-4ea6cd3
       - registry:
           secretName: docker-hub-dev
-      - dagProcessor:
+      - workers:
           extraInitContainers:
             - name: db-migrations
               image: radixdlt/airflow-migration:sha-87a5403
@@ -24,10 +24,7 @@ releases:
         - name: DB_USER
           value: "postgres"
         - name: DB_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: airflow-postgresql
-              key: postgres-password
+          value: "postgres"
         - name: DB_NAME
           value: "postgres"
       - ingress:
