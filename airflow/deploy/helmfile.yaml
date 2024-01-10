@@ -18,15 +18,18 @@ releases:
           extraInitContainers:
             - name: db-migrations
               image: radixdlt/airflow-migration:sha-87a5403
-              env:
-                - name: DB_HOST
-                  value: "airflow-postgresql"
-                - name: DB_USER
-                  value: "postgres"
-                - name: DB_PASSWORD
-                  value: "postgres"
-                - name: DB_NAME
-                  value: "postgres"
+      - env:
+        - name: DB_HOST
+          value: "airflow-postgresql"
+        - name: DB_USER
+          value: "postgres"
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: airflow-postgresql
+              key: postgres-password
+        - name: DB_NAME
+          value: "postgres"
       - ingress:
           enabled: true
           annotations:
