@@ -1,0 +1,15 @@
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+  hosts:
+    - host: airflow.rdx-works-main.extratools.works
+      paths:
+        - path: /
+          pathType: Prefix
+
+
+registry:
+  secretName: docker-hub-dev
+
+env:

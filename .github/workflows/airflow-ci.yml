@@ -60,3 +60,23 @@ jobs:
       service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
       role_to_assume: ${{ secrets.DOCKERHUB_RELEASER_ROLE }}
 
+##TODO: modify vars
+  deploy-dev:
+    if:  github.ref == 'refs/heads/develop'
+    uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@v0.13.0
+    needs:
+      - build
+    with:
+      app_name: airflow
+      step_name: airflow-dev
+      env_name: dev
+      namespace: airflow-dev
+      create_subns: false
+      aws_region: eu-west-2
+      role_to_assume: arn:aws:iam::123730156073:role/gh-instabridge2-dev-deployer
+      eks_cluster: rdx-works-main-dev
+      helmfile_extra_vars: >-
+        ci.tag=${{ needs.setup-tags.outputs.instabridge-tag }},
+        ci.environment=dev,
+        ci.HF_CREATE_NAMESPACES=false,
+        ci.useLocalDb=false

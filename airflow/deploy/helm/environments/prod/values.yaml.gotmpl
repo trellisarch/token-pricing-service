@@ -1,0 +1,16 @@
+env:
+  ASPNETCORE_URLS: "http://*:80"
+  PrometheusMetricsPort: "1235"
+  INSTABRIDGE_SPA_Config__ClientServer: "https://instabridge-compliance-dev.metaverse-dev.extratools.works"
+  INSTABRIDGE_SPA_Config__ApiServer: "https://instabridge-dev-api.metaverse-dev.extratools.works"
+  INSTABRIDGE_SPA_Config__PostLogoutUrl: "https://instabridge-compliance-dev.metaverse-dev.extratools.works"
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+  hosts:
+    - host: instabridge-compliance-dev.metaverse-dev.extratools.works
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
