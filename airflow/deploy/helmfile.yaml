@@ -11,9 +11,13 @@ releases:
       - images:
           airflow:
             repository: radixdlt/airflow
-            tag: sha-46ccb37
+            tag: sha-4ea6cd3
       - registry:
           secretName: docker-hub-dev
+      - dagProcessor:
+          extraInitContainers:
+            - name: db-migrations
+              image: radixdlt/airflow-migration:sha-87a5403
       - ingress:
           enabled: true
           annotations:
