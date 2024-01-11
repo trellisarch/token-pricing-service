@@ -2,18 +2,24 @@ from fastapi import APIRouter, Body, HTTPException
 from app.config.config import Config
 from app.logger.log import get_logger
 from app.models.token_price import get_latest_price
-from app.schemas.token_price import TokenPrice
+from app.schemas.token_price import (
+    TokenPricesResponse,
+    TokenPricesRequest,
+    TokenPrice,
+    LsuPrice,
+)
+
 from app.utils.lsus import get_lsu_redemption_values
 
 logger = get_logger()
 price_router = APIRouter()
 
 
-@price_router.post("/tokens", response_model=list[TokenPrice])
-async def get_tokens_prices(data: dict = Body(...)):
-    currency = data.get("currency")
-    tokens = data.get("tokens", [])
-    lsus = data.get("lsus", [])
+@price_router.post("/tokens", response_model=TokenPricesResponse)
+async def get_tokens_prices(data: TokenPricesRequest = Body(...)):
+    currency = data.currency
+    tokens = data.tokens
+    lsus = data.lsus
 
     if currency not in Config.SUPPORTED_CURRENCIES:
         raise HTTPException(
@@ -32,8 +38,11 @@ async def get_tokens_prices(data: dict = Body(...)):
                 status_code=400,
                 detail=f"Resource: {resource_address} does not have a price",
             )
+    lsus_prices = get_lsu_redemption_values(addresses=lsus)
+    logger.info(lsus_prices)
+    token_price_response = TokenPricesResponse(
+        tokens=[TokenPrice(**token_price.__dict__) for token_price in token_prices],
+        lsus=[LsuPrice(**lsu_price.__dict__) for lsu_price in lsus_prices],
+    )
 
-    logger.info(token_prices)
-    for resource_address in lsus:
-        token_prices.append(get_lsu_redemption_values(resource_address))
-    return token_prices
+    return token_price_response

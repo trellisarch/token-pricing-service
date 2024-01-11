@@ -1,14 +1,26 @@
 from datetime import datetime
-from pydantic import BaseModel
+from typing import Optional, List
+
+from pydantic import BaseModel, Field
 
 
 class TokenPrice(BaseModel):
     resource_address: str
     usd_price: float
     last_updated_at: datetime
-    error: str
+
+
+class LsuPrice(BaseModel):
+    resource_address: str
+    xrd_redemption_value: float
 
 
 class TokenPricesResponse(BaseModel):
-    tokens: list[TokenPrice]
-    lsus: list[TokenPrice]
+    tokens: Optional[list[TokenPrice]] = Field(default=None)
+    lsus: Optional[list[LsuPrice]] = Field(default=None)
+
+
+class TokenPricesRequest(BaseModel):
+    currency: str
+    lsus: Optional[List[str]] = []
+    tokens: Optional[List[str]] = []

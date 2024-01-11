@@ -19,7 +19,6 @@ class TokenPrice(Base):
 
 class LsuPrice:
     resource_address: str
-    usd_price: float
     xrd_redemption_value: float
 
     def __init__(self, resource_address: str, xrd_redemption_value: float):
@@ -27,7 +26,7 @@ class LsuPrice:
         self.xrd_redemption_value = xrd_redemption_value
 
 
-def get_latest_price(resource_address: str) -> float:
+def get_latest_price(resource_address: str) -> TokenPrice:
     latest_price = (
         get_session()
         .query(TokenPrice)

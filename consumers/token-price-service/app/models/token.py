@@ -1,9 +1,5 @@
-from time import sleep
-
 from sqlalchemy import Column, Integer, String, func, and_
 from sqlalchemy.orm import relationship
-
-from app.logger.log import get_logger
 from app.models.base import Base, get_session
 from app.models.token_price import TokenPrice
 
