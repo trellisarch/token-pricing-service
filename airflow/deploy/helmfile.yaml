@@ -11,9 +11,31 @@ releases:
       - images:
           airflow:
             repository: radixdlt/airflow
-            tag: sha-46ccb37
+            tag: sha-4ea6cd3
       - registry:
           secretName: docker-hub-dev
+      - workers:
+          extraInitContainers:
+            - name: db-migrations
+              image: radixdlt/airflow-migration:sha-87a5403
+              env:
+                - name: DB_HOST
+                  value: "airflow-postgresql"
+                - name: DB_USER
+                  value: "postgres"
+                - name: DB_PASSWORD
+                  value: "postgres"
+                - name: DB_NAME
+                  value: "token_price"
+      - env:
+          - name: DB_HOST
+            value: "airflow-postgresql"
+          - name: DB_USER
+            value: "postgres"
+          - name: DB_PASSWORD
+            value: "postgres"
+          - name: DB_NAME
+            value: "token_price"
       - ingress:
           enabled: true
           annotations:
