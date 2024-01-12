@@ -38,3 +38,17 @@ releases:
     chart: ./airflow
     values:
       - environments/{{ .Environment.Name }}/values.yaml
+
+  - name: postgres
+    chart:  bitnami/postgresql
+    installed: {{ .StateValues | get "ci.useLocalDb" "true" }}
+    version: 12.1.5
+    values:
+      - auth:
+          postgresPassword: secret
+          database: {{ .Environment.Name }}
+      - primary:
+          persistence:
+            enabled: false
+        image:
+          tag: 11.14.0-debian-10-r0
