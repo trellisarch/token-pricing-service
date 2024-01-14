@@ -8,7 +8,6 @@ from app.schemas.token_price import (
     TokenPrice,
     LsuPrice,
 )
-
 from app.utils.lsus import get_lsu_redemption_values
 
 logger = get_logger()
@@ -21,7 +20,7 @@ async def get_tokens_prices(data: TokenPricesRequest = Body(...)):
     tokens = data.tokens
     lsus = data.lsus
 
-    if currency not in Config.SUPPORTED_CURRENCIES:
+    if currency.upper() not in Config.SUPPORTED_CURRENCIES:
         raise HTTPException(
             status_code=400,
             detail=f"Currency: {currency} not supported. Supported currencies: "
