@@ -11,13 +11,13 @@ releases:
       - images:
           airflow:
             repository: radixdlt/airflow
-            tag: sha-4ea6cd3
+            tag: sha-cd80983
       - registry:
           secretName: docker-hub-dev
       - workers:
           extraInitContainers:
             - name: db-migrations
-              image: radixdlt/airflow-migration:sha-87a5403
+              image: radixdlt/airflow-migration:sha-30d31b8
               env:
                 - name: DB_HOST
                   value: "airflow-postgresql"
