@@ -12,6 +12,7 @@ class TokenPrice(BaseModel):
 class LsuPrice(BaseModel):
     resource_address: str
     xrd_redemption_value: float
+    usd_price: float
 
 
 class TokenPricesResponse(BaseModel):

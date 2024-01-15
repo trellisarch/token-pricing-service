@@ -7,3 +7,4 @@ class Token(BaseModel):
     symbol: str
     name: str
     price: float
+    currency: str
