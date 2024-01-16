@@ -2,8 +2,18 @@ name: CI airflow
 
 on:
   push:
+    branches:
+      - main
+      - develop
     paths:
       - 'airflow/**'
+  pull_request:
+    branches:
+      - develop
+    paths:
+      - 'airflow/**'
+  release:
+    types: [published]
 
 permissions:
   id-token: write
@@ -11,30 +21,40 @@ permissions:
   contents: read
   deployments: write
   packages: write
-
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: consumers/airflow-service
+    steps:
+      - uses: actions/checkout@v3
+      - uses: psf/black@stable
+        with:
+          options: "--check --verbose"
+          src: "consumers/airflow-service/app"
 
   tags:
+    needs: lint
     runs-on: ubuntu-latest
     outputs:
-      token-price-tags: ${{ steps.docker-tags-token-price-service.outputs.tags }}
-      token-price-labels: ${{ steps.docker-tags-token-price-service.outputs.labels }}
-      token-price-json: ${{ steps.docker-tags-token-price-service.outputs.json }}
+      airflow-tags: ${{ steps.docker-tags-airflow-service.outputs.tags }}
+      airflow-labels: ${{ steps.docker-tags-airflow-service.outputs.labels }}
+      airflow-json: ${{ steps.docker-tags-airflow-service.outputs.json }}
     steps:
       - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
         with:
           fetch-depth: 0
       - name: Docker tags
-        id: docker-tags-token-price-service
+        id: docker-tags-airflow-service
         uses: docker/metadata-action@57396166ad8aefe6098280995947635806a0e6ea
         with:
           images: |
-            docker.io/radixdlt/token-price-service
+            docker.io/radixdlt/airflow-service
           tags: |
             type=sha,event=pr
             type=sha,event=branch
             type=semver,pattern={{version}}
-
 
   build:
     needs: 
@@ -60,3 +80,73 @@ jobs:
       service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
       role_to_assume: ${{ secrets.DOCKERHUB_RELEASER_ROLE }}
 
+  deploy-dev:
+    if:  github.ref == 'refs/heads/develop'
+    uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@v0.13.0
+    needs:
+      - tags
+      - build
+    with:
+      app_name: airflow
+      step_name: airflow-dev
+      env_name: dev
+      namespace: airflow-dev
+      create_subns: false
+      aws_region: eu-west-2
+      role_to_assume: arn:aws:iam::308190735829:role/gh-airflow-dev-deployer
+      eks_cluster: rdx-works-main-dev
+      helmfile_extra_vars: >-
+        ci.tag=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
+        ci.environment=dev,
+        ci.HF_CREATE_NAMESPACES=false,
+        ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
+        ci.AIRFLOW_IMAGE_REPO=${{ needs.setup-tags.outputs.airflow-repository }},
+        ci.useLocalDb=false
+
+  deploy_pull_request_only_db:
+    if: ${{ github.event.pull_request }} && contains(github.event.pull_request.labels.*.name, 'deploy-db') && !contains(github.event.pull_request.labels.*.name, 'deploy-airflow')
+    name: "Deploy PR only DB"
+    uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@v0.13.0
+    needs:
+      - tags
+      - build
+    with:
+      env_name: pr
+      hierarchical_namespace: airflow-ci-pr
+      namespace: airflow-pr-${{ github.event.number }}
+      create_subns: true
+      restart_pods: false
+      aws_region: eu-west-2
+      role_to_assume: 'arn:aws:iam::308190735829:role/gh-airflow-pr-deployer'
+      eks_cluster: rdx-works-main-dev
+      helm_folder: "airflow/deploy/helm/airflow"
+      helmfile_extra_vars: >-
+        ci.tag=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
+        ci.prNumber=${{ github.event.number }},
+        ci.useLocalDb=true
+      app_name: 'airflow'
+      step_name: 'deploy-pr'
+
+  deploy_pull_request_airflow:
+    if: ${{ github.event.pull_request }} && contains(github.event.pull_request.labels.*.name, 'deploy-airflow')
+    name: "Deploy PR airflow"
+    uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@v0.13.0
+    needs:
+      - tags
+      - build
+    with:
+      env_name: pr
+      hierarchical_namespace: airflow-ci-pr
+      namespace: airflow-pr-${{ github.event.number }}
+      create_subns: true
+      restart_pods: false
+      aws_region: eu-west-2
+      role_to_assume: 'arn:aws:iam::308190735829:role/gh-airflow-pr-deployer'
+      eks_cluster: rdx-works-main-dev
+      helm_folder: "airflow/deploy/helm/airflow"
+      helmfile_extra_vars: >-
+        ci.tag=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
+        ci.prNumber=${{ github.event.number }},
+        ci.useLocalDb=true
+      app_name: 'airflow'
+      step_name: 'deploy-pr'
