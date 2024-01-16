@@ -1,4 +1,6 @@
 from fastapi import APIRouter
+
+from app.config.currency import Currency
 from app.logger.log import get_logger
 from app.models.token import fetch_tokens_with_latest_price
 from app.schemas.token import Token
@@ -20,6 +22,7 @@ async def get_tokens():
             "symbol": token_obj.symbol,
             "name": token_obj.name,
             "price": price_obj.usd_price,
+            "currency": Currency.USD,
         }
         mapped_token = Token(**token_data)
         mapped_tokens.append(mapped_token)

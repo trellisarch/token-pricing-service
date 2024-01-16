@@ -1,7 +1,10 @@
+import logging
+
 import requests
 
 from app.config.config import Config
 from app.logger.log import get_logger
+from app.models.token import get_price_for_resource_address
 from app.models.token_price import LsuPrice
 from app.utils.request import get_headers
 
@@ -101,8 +104,13 @@ def get_lsu_redemption_values(addresses=[]):
                 "Check that all addresses used are LSU resource addresses"
             )
             return {}
-
+    xrd_price = get_price_for_resource_address(Config.XRD_RESOURCE_ADDRESS)
+    logging.info(f"Lattest xrd price: {xrd_price}")
     return [
-        LsuPrice(key, float(value["xrdRedemptionValue"]))
+        LsuPrice(
+            resource_address=key,
+            xrd_redemption_value=float(value["xrdRedemptionValue"]),
+            xrd_price=xrd_price,
+        )
         for key, value in lsu_redemption_values.items()
     ]

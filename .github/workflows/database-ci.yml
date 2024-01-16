@@ -4,12 +4,14 @@ on:
   push:
     branches:
       - main
+      - develop
     paths:
       - 'database/**'
       - ".github/workflows/database-ci.yml"
   pull_request:
     branches:
       - main
+      - develop
     paths:
       - 'database/**'
       - ".github/workflows/database-ci.yml"

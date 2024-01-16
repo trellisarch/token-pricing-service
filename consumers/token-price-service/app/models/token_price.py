@@ -20,10 +20,14 @@ class TokenPrice(Base):
 class LsuPrice:
     resource_address: str
     xrd_redemption_value: float
+    usd_price: float
 
-    def __init__(self, resource_address: str, xrd_redemption_value: float):
+    def __init__(
+        self, resource_address: str, xrd_redemption_value: float, xrd_price: float
+    ):
         self.resource_address = resource_address
         self.xrd_redemption_value = xrd_redemption_value
+        self.usd_price = xrd_price * self.xrd_redemption_value
 
 
 def get_latest_price(resource_address: str) -> TokenPrice:

@@ -6,13 +6,13 @@ from datetime import datetime, timedelta
 import requests
 
 from radixdlt.config.config import Config
-from radixdlt.lib.http import get_headers
+from radixdlt.lib.http import get_radix_charts_headers
 from radixdlt.lib.psql import get_postgres_connection
 
 default_args = {
     "owner": "airflow",
     "depends_on_past": False,
-    "start_date": datetime(2023, 12, 18),
+    "start_date": datetime(2024, 1, 14),
     "retries": 1,
     "retry_delay": timedelta(minutes=5),
 }
@@ -27,7 +27,7 @@ dag = DAG(
 
 def fetch_tokens():
     api_endpoint = Config.RADIX_CHARTS_TOKENS_PRICE_LIST
-    response = requests.get(api_endpoint, get_headers())
+    response = requests.get(api_endpoint, get_radix_charts_headers())
     tokens = response.json()["data"]
     logging.info(tokens)
     return tokens

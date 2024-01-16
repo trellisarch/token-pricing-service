@@ -1,6 +1,5 @@
 from datetime import datetime
 from typing import Optional, List
-
 from pydantic import BaseModel, Field
 
 
@@ -13,6 +12,7 @@ class TokenPrice(BaseModel):
 class LsuPrice(BaseModel):
     resource_address: str
     xrd_redemption_value: float
+    usd_price: float
 
 
 class TokenPricesResponse(BaseModel):

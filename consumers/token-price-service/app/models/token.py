@@ -15,6 +15,19 @@ class Token(Base):
     prices = relationship("TokenPrice", back_populates="token")
 
 
+def get_price_for_resource_address(resource_address) -> TokenPrice:
+    session = get_session()
+    token = session.query(Token).filter_by(resource_address=resource_address).first()
+    if token:
+        prices = token.prices
+        if prices:
+            return prices[0].usd_price
+        else:
+            return None
+    else:
+        return None
+
+
 def fetch_tokens_with_latest_price():
     session = get_session()
     subq = (
