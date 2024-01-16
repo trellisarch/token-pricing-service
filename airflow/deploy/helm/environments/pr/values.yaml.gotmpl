@@ -1,9 +1,15 @@
 env:
-  ASPNETCORE_URLS: "http://*:80"
-  PrometheusMetricsPort: "1235"
-  INSTABRIDGE_SPA_Config__ClientServer: "https://instabridge-compliance-dev.metaverse-dev.extratools.works"
-  INSTABRIDGE_SPA_Config__ApiServer: "https://instabridge-dev-api.metaverse-dev.extratools.works"
-  INSTABRIDGE_SPA_Config__PostLogoutUrl: "https://instabridge-compliance-dev.metaverse-dev.extratools.works"
+  - name: DB_HOST
+    value: "airflow-postgresql"
+  - name: DB_USER
+    value: "postgres"
+  - name: DB_PASSWORD
+    value: "secret"
+  - name: DB_NAME
+    value: "token_price"
+
+postgresql:
+  enabled: true
 
 ingress:
   enabled: true
@@ -14,3 +20,4 @@ ingress:
       paths:
         - path: /
           pathType: ImplementationSpecific
+

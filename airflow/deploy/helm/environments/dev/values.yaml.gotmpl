@@ -8,6 +8,16 @@ ingress:
         - path: /
           pathType: Prefix
 
+postgres:
+  secrets:
+    credentials: rdx-works-main/airflow/postgres-dev-formatted
+pgbouncer:
+  enabled: true
+postgresql:
+  enabled: false
+
+data:
+  metadataSecretName: postgres-secrets
 
 registry:
   secretName: docker-hub-dev
@@ -25,12 +35,3 @@ workers:
           value: "postgres"
         - name: DB_NAME
           value: "token_price"
-env:
-  - name: DB_HOST
-    value: "airflow-postgresql"
-  - name: DB_USER
-    value: "postgres"
-  - name: DB_PASSWORD
-    value: "postgres"
-  - name: DB_NAME
-    value: "token_price"
