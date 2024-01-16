@@ -25,7 +25,7 @@ registry:
 workers:
   extraInitContainers:
     - name: db-migrations
-      image: radixdlt/airflow-migration:sha-87a5403
+      image: radixdlt/airflow-migration:{{ .Values.image.tag }}
       env:
         - name: DB_HOST
           value: "airflow-postgresql"

@@ -30,7 +30,7 @@ releases:
     values:
       - images:
           airflow:
-            tag: {{ .StateValues.ci.AIRFLOW_IMAGE_TAG }}
+            tag: {{ .Values.image.tag }}
             repository: {{ .StateValues.ci.AIRFLOW_IMAGE_REPO }}
       - environments/{{ .Environment.Name }}/values.yaml
 
