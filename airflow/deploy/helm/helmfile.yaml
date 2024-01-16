@@ -31,7 +31,7 @@ releases:
       - images:
           airflow:
             tag: {{ .Values.image.tag }}
-            repository: {{ .StateValues.ci.AIRFLOW_IMAGE_REPO }}
+            repository: {{ .Values.image.repository }}
       - environments/{{ .Environment.Name }}/values.yaml
 
   - name: airflow-resources

@@ -26,6 +26,10 @@ workers:
   extraInitContainers:
     - name: db-migrations
       image: radixdlt/airflow-migration:{{ .Values.image.tag }}
+      registry:
+        secretName: docker-hub-dev
+      data:
+        metadataSecretName: postgres-secrets
       env:
         - name: DB_HOST
           value: "airflow-postgresql"
