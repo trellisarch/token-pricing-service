@@ -7,10 +7,19 @@ ingress:
       paths:
         - path: /
           pathType: Prefix
+            backend:
+              service:
+                name: airflow-webserver
+                port:
+                  number: 8080
 
 postgres:
   secrets:
-    credentials: rdx-works-main/airflow/postgres-dev-formatted
+    name: rdx-works-main/airflow/postgres-dev-formatted
+docker:
+  secrets:
+    region: eu-west-1
+    name: docker.io/radixdlt
 pgbouncer:
   enabled: true
 postgresql:
@@ -19,13 +28,16 @@ postgresql:
 data:
   metadataSecretName: postgres-secrets
 
+localDB:
+  enabled: false
+
 registry:
   secretName: docker-hub-dev
 
 workers:
   extraInitContainers:
     - name: db-migrations
-      image: radixdlt/airflow-migration:{{ .Values.image.tag }}
+      image: radixdlt/airflow-migration:sha-d82cc59
       registry:
         secretName: docker-hub-dev
       data:
@@ -38,4 +50,4 @@ workers:
         - name: DB_PASSWORD
           value: "postgres"
         - name: DB_NAME
-          value: "token_price"
+          value: "postgres"

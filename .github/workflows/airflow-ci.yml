@@ -10,6 +10,7 @@ on:
   pull_request:
     branches:
       - develop
+      - main
     paths:
       - 'airflow/**'
   release:
@@ -29,10 +30,10 @@ jobs:
         working-directory: consumers/airflow-service
     steps:
       - uses: actions/checkout@v3
-      - uses: psf/black@stable
-        with:
-          options: "--check --verbose"
-          src: "consumers/airflow-service/app"
+      # - uses: psf/black@stable
+      #   with:
+      #     options: "--check --verbose"
+      #     src: "consumers/airflow-service/app"
 
   tags:
     needs: lint
@@ -103,34 +104,34 @@ jobs:
         ci.AIRFLOW_IMAGE_REPO=${{ needs.setup-tags.outputs.airflow-repository }},
         ci.useLocalDb=false
 
-  deploy_pull_request_only_db:
-    if: ${{ github.event.pull_request }} && contains(github.event.pull_request.labels.*.name, 'deploy-db') && !contains(github.event.pull_request.labels.*.name, 'deploy-airflow')
-    name: "Deploy PR only DB"
-    uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@v0.13.0
-    needs:
-      - tags
-      - build
-    with:
-      env_name: pr
-      hierarchical_namespace: airflow-ci-pr
-      namespace: airflow-pr-${{ github.event.number }}
-      create_subns: true
-      restart_pods: false
-      aws_region: eu-west-2
-      role_to_assume: 'arn:aws:iam::308190735829:role/gh-airflow-pr-deployer'
-      eks_cluster: rdx-works-main-dev
-      helm_folder: "airflow/deploy/helm/airflow"
-      helmfile_extra_vars: >-
-        ci.tag=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
-        ci.prNumber=${{ github.event.number }},
-        ci.useLocalDb=true
-      app_name: 'airflow'
-      step_name: 'deploy-pr'
+  # deploy_pull_request_only_db:
+  #   if: ${{ github.event.pull_request }} && !contains(github.event.pull_request.labels.*.name, 'deploy-airflow') ##&& contains(github.event.pull_request.labels.*.name, 'deploy-db')
+  #   name: "Deploy PR only DB"
+  #   uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@v0.13.0
+  #   needs:
+  #     - tags
+  #     - build
+  #   with:
+  #     env_name: pr
+  #     hierarchical_namespace: airflow-ci-pr
+  #     namespace: airflow-pr-${{ github.event.number }}
+  #     create_subns: true
+  #     restart_pods: false
+  #     aws_region: eu-west-2
+  #     role_to_assume: 'arn:aws:iam::308190735829:role/gh-airflow-pr-deployer'
+  #     eks_cluster: rdx-works-main-dev
+  #     helm_folder: "airflow/deploy/helm"
+  #     helmfile_extra_vars: >-
+  #       ci.tag=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
+  #       ci.prNumber=${{ github.event.number }},
+  #       ci.useLocalDb=true
+  #     app_name: 'airflow'
+  #     step_name: 'deploy-pr'
 
   deploy_pull_request_airflow:
     if: ${{ github.event.pull_request }} && contains(github.event.pull_request.labels.*.name, 'deploy-airflow')
     name: "Deploy PR airflow"
-    uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@v0.13.0
+    uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@v0.15.0
     needs:
       - tags
       - build
@@ -138,15 +139,17 @@ jobs:
       env_name: pr
       hierarchical_namespace: airflow-ci-pr
       namespace: airflow-pr-${{ github.event.number }}
+      helm_command: "apply"
       create_subns: true
       restart_pods: false
       aws_region: eu-west-2
       role_to_assume: 'arn:aws:iam::308190735829:role/gh-airflow-pr-deployer'
       eks_cluster: rdx-works-main-dev
-      helm_folder: "airflow/deploy/helm/airflow"
+      helm_folder: "airflow/deploy/helm"
       helmfile_extra_vars: >-
         ci.tag=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.prNumber=${{ github.event.number }},
+        ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.useLocalDb=true
       app_name: 'airflow'
       step_name: 'deploy-pr'

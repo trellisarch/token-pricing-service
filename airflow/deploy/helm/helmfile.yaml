@@ -1,6 +1,6 @@
 helmDefaults:
   verify: false
-  wait: true
+  wait: false
   timeout: 600
   recreatePods: false
   force: false
@@ -10,6 +10,8 @@ repositories:
     url: https://charts.bitnami.com/bitnami
   - name: stable
     url: https://charts.helm.sh/stable
+  - name: apache-airflow
+    url: https://airflow.apache.org
   - name: rdx-works
     url: https://raw.githubusercontent.com/radixdlt/helm-charts/master/
     username: {{ requiredEnv "HELM_GH_USER" }}
@@ -18,23 +20,19 @@ environments:
   dev: {}
   pr: {}
   prod: {}
-
-repositories:
-  - name: apache-airflow
-    url: https://airflow.apache.org
-
 releases:
   - name: airflow
     chart: apache-airflow/airflow
     version: 1.11.0
     values:
+      - airflowVersion: "2.0.2"
       - images:
           airflow:
-            tag: {{ .Values.image.tag }}
-            repository: {{ .Values.image.repository }}
-      - environments/{{ .Environment.Name }}/values.yaml
-
+            repository: radixdlt/airflow
+            tag: {{ .StateValues.ci.AIRFLOW_IMAGE_TAG }}
+      - environments/{{ .Environment.Name }}/values.yaml.gotmpl
+    set:
   - name: airflow-resources
-    chart: ./airflow
+    chart: ./airflow-resources
     values:
-      - environments/{{ .Environment.Name }}/values.yaml
+      - environments/{{ .Environment.Name }}/values.yaml.gotmpl

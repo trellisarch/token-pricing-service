@@ -5,7 +5,11 @@ ingress:
   annotations:
     kubernetes.io/ingress.class: nginx
   hosts:
-    - host: instabridge-compliance-dev.metaverse-dev.extratools.works
+    - host: airflow.rdx-works-main.extratools.works
       paths:
         - path: /
           pathType: ImplementationSpecific
+docker:
+  secrets:
+    region: eu-west-1
+    name: docker.io/radixdlt
