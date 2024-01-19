@@ -11,6 +11,11 @@ ingress:
       paths:
         - path: /
           pathType: Prefix
+          backend:
+              service:
+                name: airflow-webserver
+                port:
+                  number: 8080
 
 registry:
   secretName: docker-hub-dev
