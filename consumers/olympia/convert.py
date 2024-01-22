@@ -1,11 +1,18 @@
 import csv
 import argparse
+import logging
+import os
+from os.path import dirname, abspath, join
 from datetime import datetime
 from radix_engine_toolkit import (
     OlympiaAddress,
     derive_virtual_account_address_from_olympia_account_address,
     derive_resource_address_from_olympia_resource_address
 )
+
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 def convert_account_address():
@@ -26,12 +33,14 @@ def convert_account_address():
         row['babylon_address'] = babylon_address.as_str()
 
     timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
-    lookup_table_path = f'resources/olympia_babylon_addresses_{timestamp}.csv'
+    lookup_table_path = f'output/olympia_babylon_addresses_{timestamp}.csv'
     with open(lookup_table_path, 'w', newline='') as file:
         fieldnames = data[0].keys()
         csv_writer = csv.DictWriter(file, fieldnames=fieldnames)
         csv_writer.writeheader()
         csv_writer.writerows(data)
+    logging.info(
+        f"Conversion successfully completed. Output saved to: {lookup_table_path}")
 
 
 def convert_resources_address():
@@ -58,6 +67,17 @@ def convert_resources_address():
         csv_writer = csv.DictWriter(file, fieldnames=fieldnames)
         csv_writer.writeheader()
         csv_writer.writerows(data)
+    logging.info(
+        f"Conversion successfully completed. Output saved to: {lookup_table_path}")
+
+
+def create_output_directory():
+    output_directory = join(dirname(abspath(__file__)), "output")
+    if not os.path.exists(output_directory):
+        os.makedirs(output_directory)
+        logging.info(f"Directory '{output_directory}' created.")
+    else:
+        logging.info(f"Directory '{output_directory}' already exists.")
 
 
 def main():
@@ -68,13 +88,14 @@ def main():
                         help='Convert Olympia resource addresses to Babylon addresses')
 
     args = parser.parse_args()
-
     if args.accounts:
+        logging.info("Converting accounts")
         convert_account_address()
     elif args.resources:
+        logging.info("Converting resources")
         convert_resources_address()
     else:
-        print("Please specify either --accounts or --resources")
+        logging.info("Please specify either --accounts or --resources")
 
 
 if __name__ == "__main__":
