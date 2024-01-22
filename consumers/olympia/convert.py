@@ -1,12 +1,15 @@
 import csv
+import argparse
+from datetime import datetime
 from radix_engine_toolkit import (
     OlympiaAddress,
-    derive_virtual_account_address_from_olympia_account_address
+    derive_virtual_account_address_from_olympia_account_address,
+    derive_resource_address_from_olympia_resource_address
 )
 
 
-def convert():
-    csv_file_path = 'resources/olympia_addresses.csv'
+def convert_account_address():
+    csv_file_path = 'resources/olympia_accounts_addresses.csv'
     with open(csv_file_path, 'r') as file:
         csv_reader = csv.DictReader(file)
         data = list(csv_reader)
@@ -19,10 +22,11 @@ def convert():
             network_id=1,
             olympia_account_address=olympia_address
         )
- 
+
         row['babylon_address'] = babylon_address.as_str()
 
-    lookup_table_path = 'resources/olympia_babylon_addresses.csv'
+    timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+    lookup_table_path = f'resources/olympia_babylon_addresses_{timestamp}.csv'
     with open(lookup_table_path, 'w', newline='') as file:
         fieldnames = data[0].keys()
         csv_writer = csv.DictWriter(file, fieldnames=fieldnames)
@@ -30,5 +34,48 @@ def convert():
         csv_writer.writerows(data)
 
 
+def convert_resources_address():
+    csv_file_path = 'resources/olympia_resources_addresses.csv'
+    with open(csv_file_path, 'r') as file:
+        csv_reader = csv.DictReader(file)
+        data = list(csv_reader)
+
+    data[0]['babylon_resource_address'] = 'babylon_resource_address'
+
+    for row in data[1:]:  # Skip the header row
+        olympia_resource_address = OlympiaAddress(row["rri"])
+        babylon_resource_address = derive_resource_address_from_olympia_resource_address(
+            network_id=1,
+            olympia_resource_address=olympia_resource_address
+        )
+
+        row['babylon_resource_address'] = babylon_resource_address.as_str()
+
+    timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+    lookup_table_path = f'resources/olympia_babylon_resources_{timestamp}.csv'
+    with open(lookup_table_path, 'w', newline='') as file:
+        fieldnames = data[0].keys()
+        csv_writer = csv.DictWriter(file, fieldnames=fieldnames)
+        csv_writer.writeheader()
+        csv_writer.writerows(data)
+
+
+def main():
+    parser = argparse.ArgumentParser(description='Convert Olympia addresses or resources to Babylon addresses.')
+    parser.add_argument('--accounts', action='store_true',
+                        help='Convert Olympia account addresses to Babylon addresses')
+    parser.add_argument('--resources', action='store_true',
+                        help='Convert Olympia resource addresses to Babylon addresses')
+
+    args = parser.parse_args()
+
+    if args.accounts:
+        convert_account_address()
+    elif args.resources:
+        convert_resources_address()
+    else:
+        print("Please specify either --accounts or --resources")
+
+
 if __name__ == "__main__":
-    convert()
+    main()
