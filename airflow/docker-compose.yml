@@ -50,7 +50,7 @@ x-airflow-common:
   # In order to add custom dependencies or upgrade provider packages you can use your extended image.
   # Comment the image line, place your Dockerfile in the directory where you placed the docker-compose.yaml
   # and uncomment the "build" line below, Then run `docker-compose build` to build the images.
-  image: ${AIRFLOW_IMAGE_NAME:-apache/airflow:2.7.3}
+  image: local-airflow
   # build: .
   environment:
     &airflow-common-env
@@ -86,6 +86,13 @@ x-airflow-common:
       condition: service_healthy
 
 services:
+  migrations:
+    image: migrations
+    environment:
+      DB_HOST: airflow-postgresql
+      DB_NAME: dags
+      DB_USER: postgres
+      DB_PASSWORD: postgres
   postgres_airflow:
     image: postgres:13
     environment:
@@ -98,12 +105,12 @@ services:
       retries: 5
       start_period: 5s
     restart: always
-  postgres:
+  airflow-postgresql:
     image: postgres:13
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
+      POSTGRES_DB: dags
     healthcheck:
       test: [ "CMD", "pg_isready", "-U", "postgres", "-d", "postgres" ]
       interval: 10s

@@ -10,7 +10,7 @@ from radixdlt.models.radix_charts.token import Token
 default_args = {
     "owner": "airflow",
     "depends_on_past": False,
-    "start_date": datetime(2024, 1, 14),
+    "start_date": datetime(2024, 1, 22),
     "retries": 1,
     "retry_delay": timedelta(minutes=5),
 }
@@ -25,7 +25,9 @@ dag = DAG(
 
 def fetch_tokens():
     api_endpoint = Config.RADIX_CHARTS_TOKENS_PRICE_LIST
-    response = requests.get(api_endpoint, get_radix_charts_headers())
+    logging.info(get_radix_charts_headers())
+    response = requests.get(api_endpoint, headers=get_radix_charts_headers())
+    logging.info(response.text)
     tokens = response.json()["data"]
     logging.info(tokens)
     return tokens

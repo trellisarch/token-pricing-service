@@ -1,24 +1,22 @@
-from sqlalchemy import Column, String
+from sqlalchemy import Column, String, Integer
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from radixdlt.lib.psql import get_postgres_connection
+from radixdlt.models.base import get_session
 
 Base = declarative_base()
 
 
 class Token(Base):
     __tablename__ = 'tokens'
-    resource_address = Column(String, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    resource_address = Column(String, unique=True, nullable=False)
     symbol = Column(String)
     name = Column(String)
 
     @classmethod
     def insert_tokens(cls, tokens):
-        engine = get_postgres_connection()
-        Base.metadata.create_all(engine)
-        Session = sessionmaker(bind=engine)
-        session = Session()
-
+        session = get_session()
         for resource_address, token_data in tokens.items():
             existing_token = session.query(cls).filter_by(resource_address=resource_address).first()
             if not existing_token:
