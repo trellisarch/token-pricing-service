@@ -1,12 +1,8 @@
-import logging
-
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta
-import requests
-from radixdlt.config.config import Config
-from radixdlt.lib.http import get_radix_charts_headers
 from radixdlt.lib.psql import get_postgres_connection
+from radixdlt.models.radix_charts.token_price import TokenPrice
 
 default_args = {
     "owner": "airflow",
@@ -31,34 +27,7 @@ def fetch_tokens_and_save_price(**kwargs):
     cursor.execute("SELECT resource_address FROM token")
     tokens = cursor.fetchall()
 
-    current_price_endpoint = Config.RADIX_CHARTS_TOKEN_PRICE_CURRENT
-    chunked_tokens = [tokens[i : i + 30] for i in range(0, len(tokens), 30)]
-
-    for chunk in chunked_tokens:
-        addresses = ",".join(token[0] for token in chunk)
-
-        params = {"resource_addresses": addresses}
-        response = requests.get(url=current_price_endpoint,
-                                params=params,
-                                headers=get_radix_charts_headers())
-        price_data = response.json()["data"]
-        logging.info(price_data)
-
-        for resource_address in price_data.keys():
-            cursor.execute(
-                "INSERT INTO token_prices (resource_address, usd_price,"
-                "usd_market_cap, usd_vol_24h, last_updated_at)"
-                "VALUES (%s, %s, %s, %s, %s)",
-                (
-                    resource_address,
-                    price_data[resource_address]["usd_price"],
-                    price_data[resource_address]["usd_market_cap"],
-                    price_data[resource_address]["usd_vol_24h"],
-                    datetime.fromtimestamp(
-                        price_data[resource_address]["last_updated_at"]
-                    ),
-                ),
-            )
+    TokenPrice.fetch_and_save_prices(tokens)
 
     conn.commit()
     cursor.close()
@@ -72,4 +41,4 @@ fetch_tokens_price_task = PythonOperator(
     dag=dag,
 )
 
-fetch_tokens_and_save_price
+fetch_tokens_price_task

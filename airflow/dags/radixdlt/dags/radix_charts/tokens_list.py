@@ -1,13 +1,11 @@
 import logging
-
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta
 import requests
-
 from radixdlt.config.config import Config
 from radixdlt.lib.http import get_radix_charts_headers
-from radixdlt.lib.psql import get_postgres_connection
+from radixdlt.models.radix_charts.token import Token
 
 default_args = {
     "owner": "airflow",
@@ -35,30 +33,7 @@ def fetch_tokens():
 
 def insert_tokens(**kwargs):
     tokens = kwargs["ti"].xcom_pull(task_ids="fetch_tokens")
-
-    conn = get_postgres_connection()
-    cursor = conn.cursor()
-
-    for resource_address in tokens.keys():
-        cursor.execute(
-            "SELECT * FROM tokens WHERE resource_address = %s", (resource_address,)
-        )
-        existing_token = cursor.fetchone()
-        if not existing_token:
-            cursor.execute(
-                "INSERT INTO tokens ("
-                "resource_address, symbol, name) "
-                "VALUES (%s, %s, %s)",
-                (
-                    resource_address,
-                    tokens[resource_address]["symbol"],
-                    tokens[resource_address]["name"],
-                ),
-            )
-
-    conn.commit()
-    cursor.close()
-    conn.close()
+    Token.insert_tokens(tokens)
 
 
 fetch_tokens_task = PythonOperator(
