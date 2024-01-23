@@ -3,19 +3,21 @@ ingress:
   annotations:
     kubernetes.io/ingress.class: nginx
   hosts:
-    - host: airflow.rdx-works-main.extratools.works
+    - host: airflow-dev.rdx-works-main.extratools.works
       paths:
         - path: /
           pathType: Prefix
-            backend:
-              service:
-                name: airflow-webserver
-                port:
-                  number: 8080
+          backend:
+            service:
+              name: airflow-webserver
+              port:
+                number: 8080
 
 postgres:
+  formatted:
+    name: rdx-works-main-dev/airflow/postgres-dev-string
   secrets:
-    name: rdx-works-main/airflow/postgres-dev-formatted
+    name: rdx-works-main-dev/airflow/postgres-dev
 docker:
   secrets:
     region: eu-west-1
@@ -26,28 +28,10 @@ postgresql:
   enabled: false
 
 data:
-  metadataSecretName: postgres-secrets
+  metadataSecretName: postgres-secrets-formatted
 
 localDB:
   enabled: false
 
 registry:
   secretName: docker-hub-dev
-
-workers:
-  extraInitContainers:
-    - name: db-migrations
-      image: radixdlt/airflow-migration:sha-d82cc59
-      registry:
-        secretName: docker-hub-dev
-      data:
-        metadataSecretName: postgres-secrets
-      env:
-        - name: DB_HOST
-          value: "airflow-postgresql"
-        - name: DB_USER
-          value: "postgres"
-        - name: DB_PASSWORD
-          value: "postgres"
-        - name: DB_NAME
-          value: "postgres"

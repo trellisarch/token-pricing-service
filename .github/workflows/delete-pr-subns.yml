@@ -8,7 +8,7 @@ jobs:
   delete-pr-subns:
     uses: radixdlt/iac-resuable-artifacts/.github/workflows/delete-pr-subns.yml@v0.11.0
     with:
-      project_name: airflow-ci-pr
+      project_pr_namespace: airflow-ci-pr
       project_pr_subnamespace: airflow-pr
       pull_request_number: ${{ github.event.pull_request.number }}
       aws_region: eu-west-2

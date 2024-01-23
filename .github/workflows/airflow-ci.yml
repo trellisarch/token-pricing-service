@@ -11,11 +11,8 @@ on:
     branches:
       - develop
       - main
-    paths:
-      - 'airflow/**'
   release:
     types: [published]
-
 permissions:
   id-token: write
   pull-requests: write
@@ -83,53 +80,62 @@ jobs:
 
   deploy-dev:
     if:  github.ref == 'refs/heads/develop'
-    uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@v0.13.0
+    uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@v0.15.0
     needs:
       - tags
       - build
     with:
-      app_name: airflow
-      step_name: airflow-dev
+      app_name: 'airflow'
+      step_name: 'deploy-airflow-dev'
       env_name: dev
       namespace: airflow-dev
+      helm_command: "apply"
       create_subns: false
+      restart_pods: false
       aws_region: eu-west-2
       role_to_assume: arn:aws:iam::308190735829:role/gh-airflow-dev-deployer
       eks_cluster: rdx-works-main-dev
+      helm_folder: "airflow/deploy/helm"
       helmfile_extra_vars: >-
         ci.tag=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.environment=dev,
         ci.HF_CREATE_NAMESPACES=false,
         ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.AIRFLOW_IMAGE_REPO=${{ needs.setup-tags.outputs.airflow-repository }},
+        ci.onlyDB=false,
         ci.useLocalDb=false
 
-  # deploy_pull_request_only_db:
-  #   if: ${{ github.event.pull_request }} && !contains(github.event.pull_request.labels.*.name, 'deploy-airflow') ##&& contains(github.event.pull_request.labels.*.name, 'deploy-db')
-  #   name: "Deploy PR only DB"
-  #   uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@v0.13.0
-  #   needs:
-  #     - tags
-  #     - build
-  #   with:
-  #     env_name: pr
-  #     hierarchical_namespace: airflow-ci-pr
-  #     namespace: airflow-pr-${{ github.event.number }}
-  #     create_subns: true
-  #     restart_pods: false
-  #     aws_region: eu-west-2
-  #     role_to_assume: 'arn:aws:iam::308190735829:role/gh-airflow-pr-deployer'
-  #     eks_cluster: rdx-works-main-dev
-  #     helm_folder: "airflow/deploy/helm"
-  #     helmfile_extra_vars: >-
-  #       ci.tag=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
-  #       ci.prNumber=${{ github.event.number }},
-  #       ci.useLocalDb=true
-  #     app_name: 'airflow'
-  #     step_name: 'deploy-pr'
+## Only deploys in case deploy-db label is tagged
+  deploy_pull_request_only_db:
+    if: ${{ github.event.label.name == 'deploy-db' }}
+    name: "Deploy PR only DB"
+    uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@v0.15.0
+    needs:
+      - tags
+      - build
+    with:
+      env_name: pr
+      hierarchical_namespace: airflow-ci-pr
+      namespace: airflow-pr-${{ github.event.number }}
+      helm_command: "apply"
+      create_subns: true
+      restart_pods: false
+      aws_region: eu-west-2
+      role_to_assume: 'arn:aws:iam::308190735829:role/gh-airflow-pr-deployer'
+      eks_cluster: rdx-works-main-dev
+      helm_folder: "airflow/deploy/helm"
+      helmfile_extra_vars: >-
+        ci.tag=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
+        ci.prNumber=${{ github.event.number }},
+        ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
+        ci.onlyDB=true,
+        ci.useLocalDb=true
+      app_name: 'airflow'
+      step_name: 'deploy-pr'
 
+## Only deploys in case deploy-airflow label is tagged
   deploy_pull_request_airflow:
-    if: ${{ github.event.pull_request }} && contains(github.event.pull_request.labels.*.name, 'deploy-airflow')
+    if: contains(github.event.pull_request.labels.*.name, 'deploy-airflow')
     name: "Deploy PR airflow"
     uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@v0.15.0
     needs:
@@ -150,6 +156,7 @@ jobs:
         ci.tag=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.prNumber=${{ github.event.number }},
         ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
+        ci.onlyDB=false,
         ci.useLocalDb=true
       app_name: 'airflow'
       step_name: 'deploy-pr'
