@@ -35,3 +35,9 @@ workers:
           value: "postgres"
         - name: DB_NAME
           value: "dags"
+
+secrets:
+  - name: radix-charts-api-key
+    secretName: "radix-charts-api-key"
+    path: rdx-works-main-dev/airflow/radix-charts-api-key  
+    secretProperty: api_key

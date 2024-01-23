@@ -13,11 +13,6 @@ ingress:
               port:
                 number: 8080
 
-postgres:
-  formatted:
-    name: rdx-works-main-dev/airflow/postgres-dev-string
-  secrets:
-    name: rdx-works-main-dev/airflow/postgres-dev
 docker:
   secrets:
     region: eu-west-1
@@ -35,3 +30,13 @@ localDB:
 
 registry:
   secretName: docker-hub-dev
+
+secrets:
+  - name: radix-charts-api-key
+    secretName: radix-charts-api-key
+    path: rdx-works-main-dev/airflow/radix-charts-api-key  
+    secretProperty: api_key
+  - name: postgres-secrets-formatted
+    secretName: connection
+    path: rdx-works-main-dev/airflow/postgres-dev-string  
+    secretProperty: connection

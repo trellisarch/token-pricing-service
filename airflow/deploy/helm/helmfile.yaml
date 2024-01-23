@@ -30,6 +30,10 @@ releases:
           airflow:
             repository: radixdlt/airflow
             tag: {{ .StateValues.ci.AIRFLOW_IMAGE_TAG }}
+      - secret:
+          - envName: "RADIX_CHARTS_AUTHORIZATION_TOKEN"
+            secretName: "radix-charts-api-key"
+            secretKey: "radix-charts-api-key"
       - environments/{{ .Environment.Name }}/values.yaml.gotmpl
     set:
   - name: airflow-resources
