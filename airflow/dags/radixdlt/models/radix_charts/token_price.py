@@ -3,18 +3,17 @@ import logging
 import requests
 from sqlalchemy import Column, String, Float, DateTime
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
 from datetime import datetime
 
 from radixdlt.config.config import Config
 from radixdlt.lib.http import get_radix_charts_headers
-from radixdlt.lib.psql import get_postgres_connection
+from radixdlt.models.base import get_session
 
 Base = declarative_base()
 
 
-class TokenPrice(Base):
-    __tablename__ = 'token_prices'
+class RadixTokenPrice(Base):
+    __tablename__ = 'radix_token_prices'
     resource_address = Column(String, primary_key=True)
     usd_price = Column(Float)
     usd_market_cap = Column(Float)
@@ -23,21 +22,20 @@ class TokenPrice(Base):
 
     @classmethod
     def fetch_and_save_prices(cls, tokens):
-        engine = get_postgres_connection()
-        Base.metadata.create_all(engine)
-        Session = sessionmaker(bind=engine)
-        session = Session()
-
+        session = get_session()
         current_price_endpoint = Config.RADIX_CHARTS_TOKEN_PRICE_CURRENT
         chunked_tokens = [tokens[i: i + 30] for i in range(0, len(tokens), 30)]
 
         for chunk in chunked_tokens:
             addresses = ",".join(token[0] for token in chunk)
 
+            logging.info(addresses)
             params = {"resource_addresses": addresses}
             response = requests.get(url=current_price_endpoint,
                                     params=params,
                                     headers=get_radix_charts_headers())
+            logging.info(response.text)
+            logging.info(get_radix_charts_headers())
             price_data = response.json()["data"]
             logging.info(price_data)
 

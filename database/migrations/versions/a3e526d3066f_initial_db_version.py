@@ -18,7 +18,7 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade():
     op.create_table(
-        "tokens",
+        "radix_tokens",
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("resource_address", sa.String(), nullable=True),
         sa.Column("symbol", sa.String(), nullable=True),
@@ -27,7 +27,7 @@ def upgrade():
     )
 
     op.create_table(
-        "token_prices",
+        "radix_token_prices",
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("resource_address", sa.String(), nullable=True),
         sa.Column("usd_price", sa.Float(), nullable=True),
@@ -37,12 +37,12 @@ def upgrade():
         sa.Column("token_id", sa.Integer(), nullable=True),
         sa.ForeignKeyConstraint(
             ["token_id"],
-            ["tokens.id"],
+            ["radix_tokens.id"],
         ),
         sa.PrimaryKeyConstraint("id"),
     )
 
 
 def downgrade():
-    op.drop_table("token_prices")
-    op.drop_table("tokens")
+    op.drop_table("radix_token_prices")
+    op.drop_table("radix_tokens")

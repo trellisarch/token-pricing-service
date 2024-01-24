@@ -1,14 +1,12 @@
 from sqlalchemy import Column, String, Integer
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-from radixdlt.lib.psql import get_postgres_connection
 from radixdlt.models.base import get_session
 
 Base = declarative_base()
 
 
-class Token(Base):
-    __tablename__ = 'tokens'
+class RadixToken(Base):
+    __tablename__ = 'radix_tokens'
     id = Column(Integer, primary_key=True, autoincrement=True)
     resource_address = Column(String, unique=True, nullable=False)
     symbol = Column(String)
@@ -29,3 +27,9 @@ class Token(Base):
 
         session.commit()
         session.close()
+
+
+    @classmethod
+    def list_tokens(cls):
+        session = get_session()
+        return session.query(cls.resource_address).distinct().all()

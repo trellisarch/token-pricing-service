@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 import requests
 from radixdlt.config.config import Config
 from radixdlt.lib.http import get_radix_charts_headers
-from radixdlt.models.radix_charts.token import Token
+from radixdlt.models.radix_charts.token import RadixToken
 
 default_args = {
     "owner": "airflow",
@@ -19,7 +19,7 @@ dag = DAG(
     "radix_charts_tokens_list",
     default_args=default_args,
     description="DAG to insert tokens into PostgreSQL",
-    schedule_interval="@daily",
+    schedule_interval=None,
 )
 
 
@@ -35,7 +35,7 @@ def fetch_tokens():
 
 def insert_tokens(**kwargs):
     tokens = kwargs["ti"].xcom_pull(task_ids="fetch_tokens")
-    Token.insert_tokens(tokens)
+    RadixToken.insert_tokens(tokens)
 
 
 fetch_tokens_task = PythonOperator(

@@ -1,8 +1,9 @@
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta
-from radixdlt.lib.psql import get_postgres_connection
-from radixdlt.models.radix_charts.token_price import TokenPrice
+
+from radixdlt.models.radix_charts.token import RadixToken
+from radixdlt.models.radix_charts.token_price import RadixTokenPrice
 
 default_args = {
     "owner": "airflow",
@@ -16,22 +17,13 @@ dag = DAG(
     "radix_charts_current_price",
     default_args=default_args,
     description="DAG to fetch tokens price and save to PostgreSQL",
-    schedule_interval="* * * * *",
+    schedule_interval=None,
 )
 
 
 def fetch_tokens_and_save_price(**kwargs):
-    conn = get_postgres_connection()
-    cursor = conn.cursor()
-
-    cursor.execute("SELECT resource_address FROM token")
-    tokens = cursor.fetchall()
-
-    TokenPrice.fetch_and_save_prices(tokens)
-
-    conn.commit()
-    cursor.close()
-    conn.close()
+    tokens = RadixToken.list_tokens()
+    RadixTokenPrice.fetch_and_save_prices(tokens)
 
 
 fetch_tokens_price_task = PythonOperator(
