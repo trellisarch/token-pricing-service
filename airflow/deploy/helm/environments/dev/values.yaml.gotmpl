@@ -40,3 +40,14 @@ secrets:
     secretName: connection
     path: rdx-works-main-dev/airflow/postgres-dev-string  
     secretProperty: connection
+
+workers:
+  extraInitContainers:
+    - name: db-migrations
+      image: radixdlt/airflow-migration:{{ .StateValues.ci.AIRFLOW_IMAGE_TAG }}
+      env:
+        - name DB_URI
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secrets-formatted
+              key: connection
