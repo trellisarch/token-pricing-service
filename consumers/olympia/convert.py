@@ -1,4 +1,3 @@
-import csv
 import argparse
 import logging
 import os
@@ -75,6 +74,36 @@ def convert_resources_address():
         f"Conversion successfully completed. Output saved to: {lookup_table_path}")
 
 
+def convert_validators_addresses():
+    validators_df = pd.read_csv('resources/validators_addresses.csv')
+    olympia_babylon_df = pd.read_csv('resources/olympia_babylon_validators_addresses.csv')
+
+    merged_df = pd.merge(
+        validators_df, olympia_babylon_df,
+        left_on='address',
+        right_on='Olympia Address',
+        how='inner')
+
+    result_df = merged_df[['id',
+                           'address',
+                           'Babylon Address',
+                           'from_state_version',
+                           'Name',
+                           'Public Key at Genesis',
+                           'Stake at migration time']]
+
+    result_df.columns = ['olympia_gateway_id',
+                         'olympia_address',
+                         'babylon_address',
+                         'first_seen_at_olympia_state_version',
+                         'initial_babylon_name',
+                         'initial_babylon_public_key',
+                         'initial_babylon_xrd_staked']
+
+    timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+    result_df.to_csv(f'combined_validators_{timestamp}.csv', index=False)
+
+
 def create_output_directory():
     output_directory = join(dirname(abspath(__file__)), "output")
     if not os.path.exists(output_directory):
@@ -103,4 +132,4 @@ def main():
 
 
 if __name__ == "__main__":
-    convert_resources_address()
+    main()
