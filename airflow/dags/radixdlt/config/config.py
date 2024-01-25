@@ -13,4 +13,4 @@ class Config:
     ENCODED_PASSWORD = quote_plus(POSTGRES_PASSWORD)
     POSTGRES_DB = getenv("DB_NAME", "dags")
     POSTGRES_PORT = getenv("DB_PORT", 5432)
-    DB_URI = f"postgresql://{POSTGRES_USER}:{ENCODED_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
+    DB_URI = getenv("DB_URI")
