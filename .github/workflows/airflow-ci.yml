@@ -102,6 +102,30 @@ jobs:
       service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
       role_to_assume: ${{ secrets.DOCKERHUB_RELEASER_ROLE }}
 
+  build-token-price-service:
+    needs:
+    - tags
+    uses: radixdlt/public-iac-resuable-artifacts/.github/workflows/docker-build.yml@main
+    with:
+      runs_on: ubuntu-latest
+      image_registry: "docker.io"
+      image_organization: "radixdlt"
+      image_name: "airflow-migration"
+      tags: |
+          type=sha,event=pr
+          type=sha,event=branch
+          type=semver,pattern={{version}}
+      context: "consumers/token-price-service"
+      dockerfile: "consumers/token-price-service/Dockerfile"
+      platforms: "linux/amd64"
+      provenance: "false"
+      scan_image: false
+      snyk_target_ref: ${{ github.ref_name }}
+    secrets:
+      workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDP }}
+      service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+      role_to_assume: ${{ secrets.DOCKERHUB_RELEASER_ROLE }}
+
   deploy-dev:
     if:  github.ref == 'refs/heads/develop'
     uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@v0.15.0
