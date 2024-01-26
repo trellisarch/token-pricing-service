@@ -124,7 +124,7 @@ jobs:
       service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
       role_to_assume: ${{ secrets.DOCKERHUB_RELEASER_ROLE }}
 
-  deploy-dev:
+  deploy-airflow-dev:
     if:  github.ref == 'refs/heads/develop'
     uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@v0.15.0
     needs:
@@ -151,6 +151,26 @@ jobs:
         ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.onlyDB=false,
         ci.useLocalDb=false
+
+  deploy-token-price-service-dev:
+    if: github.ref == 'refs/heads/develop'
+    uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@v0.13.0
+    needs:
+      - tags
+      - build-token-price-service
+    with:
+      env_name: dev
+      namespace: token-price-dev
+      create_subns: false
+      restart_pods: false
+      aws_region: eu-west-2
+      role_to_assume: 'arn:aws:iam::308190735829:role/gh-token-price-dev-deployer'
+      eks_cluster: rdx-works-main-dev
+      helm_folder: "deploy/helm/token-price"
+      helmfile_extra_vars: >-
+        ci.tag=${{ fromJSON(needs.tags.outputs.token-price-json).labels['org.opencontainers.image.version'] }}
+      app_name: 'token-price'
+      step_name: 'deploy-dev'
 
 ## Only deploys in case deploy-db label is tagged
   deploy_pull_request_only_db:
