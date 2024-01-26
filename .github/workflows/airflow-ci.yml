@@ -168,7 +168,7 @@ jobs:
       eks_cluster: rdx-works-main-dev
       helm_folder: "deploy/helm/token-price"
       helmfile_extra_vars: >-
-        ci.tag=${{ fromJSON(needs.tags.outputs.token-price-json).labels['org.opencontainers.image.version'] }}
+        ci.tag=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }}
       app_name: 'token-price'
       step_name: 'deploy-dev'
 

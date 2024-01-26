@@ -18,15 +18,11 @@ ingress:
           pathType: Prefix
 
 envs:
-  DB_HOST: "token-price-dev-rds.rdx-works-main.internal"
-  DB_NAME: "token-price"
+  DB_HOST: "airflow-dev.cluster-cd2yqpprgk5z.eu-west-2.rds.amazonaws.com"
+  DB_NAME: "dags"
+  DB_USER: "postgres"
 
 secrets:
-  - name: rds-username
-    variable: "DB_USER"
-    path: "rdx-works-main/eks/token-price/dev/postgres-creds"
-    secretProperty: "postgresqlUsername"
-    secretName: "database-username"
   - name: rds-password
     variable: "DB_PASSWORD"
     path: "rdx-works-main/eks/token-price/dev/postgres-creds"
