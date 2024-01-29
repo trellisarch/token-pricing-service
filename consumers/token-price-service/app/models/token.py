@@ -5,7 +5,7 @@ from app.models.token_price import TokenPrice
 
 
 class Token(Base):
-    __tablename__ = "tokens"
+    __tablename__ = "radix_tokens"
 
     id = Column(Integer, primary_key=True)
     resource_address = Column(String, unique=True)
