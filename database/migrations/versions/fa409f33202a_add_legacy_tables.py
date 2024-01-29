@@ -15,7 +15,7 @@ import pandas as pd
 
 # revision identifiers, used by Alembic.
 revision: str = 'fa409f33202a'
-down_revision: Union[str, None] = '18e94aa2cc1e'
+down_revision: Union[str, None] = 'ba068adc3bf8'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
