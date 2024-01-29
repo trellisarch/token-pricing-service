@@ -112,7 +112,7 @@ jobs:
       step_name: 'deploy-pr'
 
   deploy_dev:
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
     name: "Deploy DEV"
     uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@v0.13.0
     needs:
