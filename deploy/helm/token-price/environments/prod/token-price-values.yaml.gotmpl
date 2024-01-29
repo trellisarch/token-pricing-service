@@ -12,7 +12,7 @@ metrics:
   enabled: false
 
 env:
-  DB_HOST: "token-price-prod-rds.rtlj-prod.internal"
+  DB_HOST: "airflow-dags-prod-rds.rdx-works-main-prod.internal"
   DB_NAME: "token-price"
 
 ingress:
@@ -20,7 +20,7 @@ ingress:
   annotations:
     kubernetes.io/ingress.class: nginx
   hosts:
-    - host: token-price-prod.rtlj-prod.extratools.works
+    - host: token-price-prod.rdx-works-main-prod.extratools.works
       paths:
         - path: /
           pathType: Prefix
@@ -28,11 +28,11 @@ ingress:
 secrets:
   - name: rds-username
     variable: "DB_USER"
-    path: "rtlj-prod/eks/token-price/prod/postgres-creds"
+    path: "rdx-works-main-prod/eks/token-price/prod/postgres-creds"
     secretProperty: "postgresqlUsername"
     secretName: "database-username"
   - name: rds-password
     variable: "DB_PASSWORD"
-    path: "rtlj-prod/eks/token-price/prod/postgres-creds"
+    path: "rdx-works-main-prod/eks/token-price/prod/postgres-creds"
     secretProperty: "postgresql-password"
     secretName: "database-password"
