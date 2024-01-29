@@ -28,11 +28,11 @@ ingress:
 secrets:
   - name: rds-username
     variable: "DB_USER"
-    path: "rdx-works-main-prod/eks/token-price/prod/postgres-creds"
+    path: "rdx-works-main-prod/airflow/airflow-dags/postgres-prod"
     secretProperty: "postgresqlUsername"
     secretName: "database-username"
   - name: rds-password
     variable: "DB_PASSWORD"
-    path: "rdx-works-main-prod/eks/token-price/prod/postgres-creds"
+    path: "rdx-works-main-prod/airflow/airflow-dags/postgres-prod"
     secretProperty: "postgresql-password"
     secretName: "database-password"
