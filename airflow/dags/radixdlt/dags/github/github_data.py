@@ -4,22 +4,24 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 from github import Github
 from radixdlt.config.config import Config
-from radixdlt.models.github.github_model import GithubAccountsData, GithubRepositoriesData
+from radixdlt.models.github.github_model import (
+    GithubAccountsData,
+    GithubRepositoriesData,
+)
 
 # DAG configuration
 default_args = {
-    'owner': 'airflow',
-    'depends_on_past': False,
-    'start_date': datetime(2024, 1, 16),
+    "owner": "airflow",
+    "depends_on_past": False,
+    "start_date": datetime(2024, 1, 16),
     "retries": 1,
     "retry_delay": timedelta(minutes=5),
 }
 
-dag = DAG('github', default_args=default_args, schedule_interval='0 0 * * 1')
+dag = DAG("github", default_args=default_args, schedule_interval="0 0 * * 1")
 
 
 def get_github_user(user_name):
-
     try:
         # Set up your GitHub API credentials
         github_token = Config.GITHUB_TOKEN
@@ -34,18 +36,16 @@ def get_github_user(user_name):
 
 
 def get_github_repo(user_name, repo_name):
-    
     conn = None
     cursor = None
 
     try:
-
         # Set up your GitHub API credentials
         github_token = Config.GITHUB_TOKEN
         github_client = Github(github_token)
 
         repo_response = github_client.get_repo(user_name + "/" + repo_name)
-        
+
         GithubRepositoriesData.fetch_and_save_data(user_name, repo_name, repo_response)
 
     except Exception as e:
@@ -59,6 +59,7 @@ def repo_task(user_name, repo_name):
         python_callable=lambda: get_github_repo(user_name, repo_name),
         dag=dag,
     )
+
 
 # Define the PythonOperators
 github_user_task = PythonOperator(
@@ -101,5 +102,3 @@ github_user_task >> github_repo_task14
 github_user_task >> github_repo_task15
 github_user_task >> github_repo_task16
 github_user_task >> github_repo_task17
-
-

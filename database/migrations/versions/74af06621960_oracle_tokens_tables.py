@@ -5,6 +5,7 @@ Revises: fa409f33202a
 Create Date: 2024-01-29 16:09:44.630635
 
 """
+
 from typing import Sequence, Union
 
 from alembic import op
@@ -12,8 +13,8 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = '74af06621960'
-down_revision: Union[str, None] = 'fa409f33202a'
+revision: str = "74af06621960"
+down_revision: Union[str, None] = "fa409f33202a"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
