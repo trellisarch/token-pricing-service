@@ -5,10 +5,10 @@ from app.models.base import Base, get_session
 
 
 class TokenPrice(Base):
-    __tablename__ = "token_prices"
+    __tablename__ = "radix_token_prices"
 
     id = Column(Integer, primary_key=True)
-    resource_address = Column(String, ForeignKey("tokens.resource_address"))
+    resource_address = Column(String, ForeignKey("radix_tokens.resource_address"))
     usd_price = Column(Float)
     usd_market_cap = Column(Float)
     usd_vol_24h = Column(Float)

@@ -21,6 +21,11 @@ environments:
   pr: {}
   prod: {}
 releases:
+  - name: airflow-resources
+    chart: ./airflow-resources
+    values:
+      - environments/{{ .Environment.Name }}/values.yaml.gotmpl
+      - environments/{{ .Environment.Name }}/secrets.yaml.gotmpl
   - name: airflow
     chart: apache-airflow/airflow
     version: 1.11.0
@@ -30,13 +35,6 @@ releases:
           airflow:
             repository: radixdlt/airflow
             tag: {{ .StateValues.ci.AIRFLOW_IMAGE_TAG }}
-      - secret:
-          - envName: "RADIX_CHARTS_AUTHORIZATION_TOKEN"
-            secretName: "radix-charts-api-key"
-            secretKey: "radix-charts-api-key"
       - environments/{{ .Environment.Name }}/values.yaml.gotmpl
+      - environments/{{ .Environment.Name }}/secrets.yaml.gotmpl
     set:
-  - name: airflow-resources
-    chart: ./airflow-resources
-    values:
-      - environments/{{ .Environment.Name }}/values.yaml.gotmpl

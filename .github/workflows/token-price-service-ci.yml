@@ -112,7 +112,7 @@ jobs:
       step_name: 'deploy-pr'
 
   deploy_dev:
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
     name: "Deploy DEV"
     uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@v0.13.0
     needs:
@@ -146,7 +146,7 @@ jobs:
       restart_pods: false
       aws_region: eu-west-2
       role_to_assume: 'arn:aws:iam::821496737932:role/gh-token-price-prod-deployer'
-      eks_cluster: rtlj-prod
+      eks_cluster: rdx-works-main-prod
       helm_folder: "deploy/helm/token-price"
       helmfile_extra_vars: >-
         ci.tag=${{ fromJSON(needs.tags.outputs.token-price-json).labels['org.opencontainers.image.version'] }}

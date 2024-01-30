@@ -5,8 +5,6 @@ on:
     branches:
       - main
       - develop
-    paths:
-      - 'airflow/**'
   pull_request:
     branches:
       - develop
@@ -54,7 +52,7 @@ jobs:
             type=sha,event=branch
             type=semver,pattern={{version}}
 
-  build:
+  build-airflow:
     needs: 
     - tags
     uses: radixdlt/public-iac-resuable-artifacts/.github/workflows/docker-build.yml@main
@@ -78,12 +76,37 @@ jobs:
       service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
       role_to_assume: ${{ secrets.DOCKERHUB_RELEASER_ROLE }}
 
-  deploy-dev:
+  build-airflow-migrations:
+    needs: 
+    - tags
+    uses: radixdlt/public-iac-resuable-artifacts/.github/workflows/docker-build.yml@main
+    with:
+      runs_on: ubuntu-latest
+      image_registry: "docker.io"
+      image_organization: "radixdlt"
+      image_name: "airflow-migration"
+      tags: |
+          type=sha,event=pr
+          type=sha,event=branch
+          type=semver,pattern={{version}}
+      context: "database"
+      dockerfile: "database/Dockerfile"
+      platforms: "linux/amd64"
+      provenance: "false"
+      scan_image: false
+      snyk_target_ref: ${{ github.ref_name }}
+    secrets:
+      workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDP }}
+      service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+      role_to_assume: ${{ secrets.DOCKERHUB_RELEASER_ROLE }}
+
+  deploy-airflow-dev:
     if:  github.ref == 'refs/heads/develop'
     uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@v0.15.0
     needs:
       - tags
-      - build
+      - build-airflow
+      - build-airflow-migrations
     with:
       app_name: 'airflow'
       step_name: 'deploy-airflow-dev'
@@ -101,7 +124,7 @@ jobs:
         ci.environment=dev,
         ci.HF_CREATE_NAMESPACES=false,
         ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
-        ci.AIRFLOW_IMAGE_REPO=${{ needs.setup-tags.outputs.airflow-repository }},
+        ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.onlyDB=false,
         ci.useLocalDb=false
 
@@ -112,7 +135,8 @@ jobs:
     uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@v0.15.0
     needs:
       - tags
-      - build
+      - build-airflow
+      - build-airflow-migrations
     with:
       env_name: pr
       hierarchical_namespace: airflow-ci-pr
@@ -128,6 +152,7 @@ jobs:
         ci.tag=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.prNumber=${{ github.event.number }},
         ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
+        ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.onlyDB=true,
         ci.useLocalDb=true
       app_name: 'airflow'
@@ -140,7 +165,8 @@ jobs:
     uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@v0.15.0
     needs:
       - tags
-      - build
+      - build-airflow
+      - build-airflow-migrations
     with:
       env_name: pr
       hierarchical_namespace: airflow-ci-pr
@@ -156,6 +182,7 @@ jobs:
         ci.tag=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.prNumber=${{ github.event.number }},
         ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
+        ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.onlyDB=false,
         ci.useLocalDb=true
       app_name: 'airflow'
