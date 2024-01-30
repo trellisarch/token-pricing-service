@@ -37,4 +37,5 @@ releases:
             tag: {{ .StateValues.ci.AIRFLOW_IMAGE_TAG }}
       - environments/{{ .Environment.Name }}/values.yaml.gotmpl
       - environments/{{ .Environment.Name }}/secrets.yaml.gotmpl
-    set:
+    needs:
+      - airflow-resources
