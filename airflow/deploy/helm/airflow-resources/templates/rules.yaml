@@ -10,16 +10,16 @@ spec:
   - name: Airflow
     rules:
     - alert: AirflowTaskFailure
-        expr: airflow_task_failure_count > 0
-        for: 5m
-        labels:
-          severity: warning
-          tier: application
-          application: airflow
-        annotations:
-          summary: "Airflow task failed: {{ "{{$labels.task_name}}" }}"
-          description: "Task '{{ "{{$labels.task_name}}" }}' in DAG '{{ "{{$labels.dag_id}}" }}' failed."
-          runbook_url: https://runbooks.extratools.works
+      expr: airflow_task_failure_count > 0
+      for: 5m
+      labels:
+        severity: warning
+        tier: application
+        application: airflow
+      annotations:
+        summary: "Airflow task failed: {{ "{{$labels.task_name}}" }}"
+        description: "Task '{{ "{{$labels.task_name}}" }}' in DAG '{{ "{{$labels.dag_id}}" }}' failed."
+        runbook_url: https://runbooks.extratools.works
 
     - alert: AirflowDAGFailure
       expr: airflow_dag_failure_count > 0
