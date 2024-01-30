@@ -6,8 +6,6 @@ on:
       - main
       - develop
     paths:
-      - 'database/**'
-      - ".github/workflows/database-ci.yml"
   pull_request:
     branches:
       - main
