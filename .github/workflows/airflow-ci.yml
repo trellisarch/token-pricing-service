@@ -127,7 +127,7 @@ jobs:
         ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.INSTALL_DB=${{ false }},
         ci.INSTALL_AIRFLOW=${{ true }},
-        ci.INSTALL_TOKEN_SERVICE=${{ true }}
+        ci.INSTALL_TOKEN_SERVICE=${{ false }}
 
   deploy-airflow-prod:
     if:  github.ref == 'refs/heads/main'
@@ -157,7 +157,7 @@ jobs:
         ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.INSTALL_DB=${{ false }},
         ci.INSTALL_AIRFLOW=${{ true }},
-        ci.INSTALL_TOKEN_SERVICE=${{ true }}
+        ci.INSTALL_TOKEN_SERVICE=${{ false }}
 
   deploy_pull_request_airflow:
     if: ${{ github.event.pull_request }}
