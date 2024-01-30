@@ -64,7 +64,7 @@ def process_quotes():
                f'quotes/latest?symbol={base}&convert={quote}')
         headers = {
             'Accepts': 'application/json',
-            'X-CMC_PRO_API_KEY': f'{Config.COIN_MARKET_CAP_TOKEN}'
+            'X-CMC_PRO_API_KEY': f'{Config.COINMARKETCAP_DEV_API_KEY}'
         }
 
         cmc_price = requests.get(
