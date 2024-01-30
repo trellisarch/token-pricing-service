@@ -24,11 +24,13 @@ environments:
   prod: {}
 releases:
   - name: airflow-resources
+    installed: {{ .StateValues | get "ci.INSTALL_AIRFLOW" "false" }}
     chart: ./airflow-resources
     values:
       - environments/{{ .Environment.Name }}/values.yaml.gotmpl
       - environments/{{ .Environment.Name }}/secrets.yaml.gotmpl
   - name: airflow
+    installed: {{ .StateValues | get "ci.INSTALL_AIRFLOW" "false" }}
     chart: apache-airflow/airflow
     version: 1.11.0
     values:
@@ -41,13 +43,14 @@ releases:
       - environments/{{ .Environment.Name }}/secrets.yaml.gotmpl
     set:
   - name: token-price
+    installed: {{ .StateValues | get "ci.INSTALL_TOKEN_SERVICE" "false" }}
     chart: ./token-price
     values:
       - environments/{{ .Environment.Name }}/token-price-values.yaml.gotmpl
 
   - name: postgres
     chart: bitnami/postgresql
-    installed: {{ .StateValues | get "ci.useLocalDb" "false" }}
+    installed: {{ .StateValues | get "ci.INSTALL_DB" "false" }}
     version: 12.1.5
     values:
       - auth:
