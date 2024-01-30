@@ -1,4 +1,4 @@
-name: CI airflow
+name: Airflow Continuous Integration
 
 on:
   push:
