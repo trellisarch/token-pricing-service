@@ -1,0 +1,77 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: airflow
+  labels:
+    release: prometheus-operator
+spec:
+  groups:
+  - name: Airflow
+    rules:
+    - alert: AirflowTaskFailure
+        expr: airflow_task_failure_count > 0
+        for: 5m
+        labels:
+          severity: warning
+          tier: application
+          application: airflow
+        annotations:
+          summary: "Airflow task failed: {{ $labels.task_name }}"
+          description: "Task '{{ $labels.task_name }}' in DAG '{{ $labels.dag_id }}' failed."
+          runbook_url: https://runbooks.extratools.works
+
+    - alert: AirflowDAGFailure
+      expr: airflow_dag_failure_count > 0
+      for: 10m
+      labels:
+        severity: warning
+        tier: application
+        application: airflow
+      annotations:
+        summary: "Airflow DAG failed: {{ $labels.dag_id }}"
+        description: "DAG '{{ $labels.dag_id }}' failed."
+
+    - alert: AirflowDAGImportErrors
+      expr: airflow_dag_processing_import_errors > 0
+      for: 10m
+      labels:
+        severity: warning
+        tier: application
+        application: airflow
+      annotations:
+        summary: "Airflow DAG import errors on DAG {{ $labels.dag_id }}"
+        description: "DAG '{{ $labels.dag_id }}' import errored."
+
+    - alert: AirflowSlowDAGProcessing
+      expr: airflow_dag_processing_last_duration{quantile="0.9"} > 10
+      for: 5m
+      labels:
+        severity: warning
+        tier: application
+        application: airflow
+      annotations:
+        summary: "Slow DAG processing on {{ $labels.dag_id }}"
+        description: "DAG '{{ $labels.dag_id }}' processing time is over 10secs."
+
+    - alert: AirflowHighOperatorFailures
+      expr: rate(airflow_operator_failures[1m]) > 5
+      for: 5m
+      labels:
+        severity: warning
+        tier: application
+        application: airflow
+      annotations:
+        summary: "High rate of operator failures"
+        description: "Airflow operator reports more than 5 failures/sec"
+
+    - alert: AirflowSlowTasks
+      expr: airflow_task_duration{quantile="0.9"} > 120
+      for: 5m
+      labels:
+        severity: warning
+        tier: application
+        application: airflow
+      annotations:
+        summary: "Slow Airflow task execution for {{ $labels.dag_id }} {{ $labels.task_id }}"
+        description: "Task execution time is over 120 seconds on the 90th percentile"
