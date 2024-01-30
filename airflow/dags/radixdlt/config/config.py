@@ -7,14 +7,7 @@ class Config:
     RADIX_CHARTS_TOKEN_PRICE_CURRENT = "https://api.radixapi.net/v1/token/price/current"
     RADIX_CHARTS_AUTHORIZATION_TOKEN = getenv("RADIX_CHARTS_AUTHORIZATION_TOKEN")
 
-    POSTGRES_HOST = getenv("DB_HOST", "airflow-postgresql")
-    POSTGRES_USER = getenv("DB_USER", "postgres")
-    POSTGRES_PASSWORD = getenv("DB_PASSWORD", "postgres")
-    ENCODED_PASSWORD = quote_plus(POSTGRES_PASSWORD)
-    POSTGRES_DB = getenv("DB_NAME", "dags")
-    POSTGRES_PORT = getenv("DB_PORT", 5432)
-    DB_URI = f"postgresql://{POSTGRES_USER}:{ENCODED_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
-
+    DB_URI = getenv("DB_URI")
     NETWORK_ID = getenv("NETWORK_ID", 2)
     NETWORK_GATEWAY = getenv("NETWORK_GATEWAY", "https://stokenet.radixdlt.com/transaction/submit")
     COINMARKETCAP_DEV_API_KEY = getenv("COINMARKETCAP_DEV_API_KEY")
