@@ -182,8 +182,8 @@ jobs:
         ci.prNumber=${{ github.event.number }},
         ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
-        ci.INSTALL_DB=${{ contains(github.event.pull_request.labels.*.name, 'deploy-db' || contains(github.event.pull_request.labels.*.name, 'deploy-airflow' || contains(github.event.pull_request.labels.*.name, 'deploy-token-service' }},
-        ci.INSTALL_AIRFLOW=${{ contains(github.event.pull_request.labels.*.name, 'deploy-airflow' }},
-        ci.INSTALL_TOKEN_SERVICE=${{ contains(github.event.pull_request.labels.*.name, 'deploy-token-service' }}
+        ci.INSTALL_DB=${{ contains(github.event.pull_request.labels.*.name, 'deploy-db') || contains(github.event.pull_request.labels.*.name, 'deploy-airflow') || contains(github.event.pull_request.labels.*.name, 'deploy-token-service') }},
+        ci.INSTALL_AIRFLOW=${{ contains(github.event.pull_request.labels.*.name, 'deploy-airflow') }},
+        ci.INSTALL_TOKEN_SERVICE=${{ contains(github.event.pull_request.labels.*.name, 'deploy-token-service') }}
       app_name: 'airflow'
       step_name: 'deploy-pr'
