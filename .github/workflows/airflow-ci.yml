@@ -9,6 +9,8 @@ on:
     branches:
       - develop
       - main
+    types:
+      - synchronize
   release:
     types: [published]
 permissions:
