@@ -1,11 +1,12 @@
 #!/bin/bash
-set -x
+set -e
 
 # Extracting components from DB_URI
-DB_USERNAME=$(echo $DB_URI | awk -F[/:] '{print $4}')
-DB_PASSWORD=$(echo $DB_URI | awk -F[@/] '{print $3}')
-DB_HOST=$(echo $DB_URI | awk -F[@/] '{print $4}')
-DB_NAME=$(echo $DB_URI | awk -F[/] '{print $NF}' | awk -F[?] '{print $1}')
+DB_USER=$(echo $DB_URI | awk -F'[:@/]' '{print $4}')
+DB_PASSWORD=$(echo $DB_URI | awk -F'[:@/]' '{print $5}')
+DB_HOST=$(echo $DB_URI | awk -F'[:@/]' '{print $6}')
+DB_PORT=$(echo $DB_URI | awk -F'[:@/]' '{print $7}')
+DB_NAME=$(echo $DB_URI | awk -F'[:@/]' '{print $8}')
 
 DB_USERNAME="postgres"
 DB_NAME="dags"
