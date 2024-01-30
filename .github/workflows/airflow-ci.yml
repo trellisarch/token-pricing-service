@@ -98,11 +98,11 @@ jobs:
       eks_cluster: rdx-works-main-dev
       helm_folder: "airflow/deploy/helm"
       helmfile_extra_vars: >-
-        ci.tag=${{ fromJSON(needs.build-airflow.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
+        ci.tag=${{ fromJSON(needs.build-airflow.outputs.json).labels['org.opencontainers.image.version'] }},
         ci.environment=dev,
         ci.HF_CREATE_NAMESPACES=false,
-        ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.build-airflow.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
-        ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.build-airflow.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
+        ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.build-airflow.outputs.json).labels['org.opencontainers.image.version'] }},
+        ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.build-airflow.outputs.json).labels['org.opencontainers.image.version'] }},
         ci.onlyDB=false,
         ci.useLocalDb=false
 
@@ -126,10 +126,10 @@ jobs:
       eks_cluster: rdx-works-main-dev
       helm_folder: "airflow/deploy/helm"
       helmfile_extra_vars: >-
-        ci.tag=${{ fromJSON(needs.build-airflow.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
+        ci.tag=${{ fromJSON(needs.build-airflow.outputs.json).labels['org.opencontainers.image.version'] }},
         ci.prNumber=${{ github.event.number }},
-        ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.build-airflow.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
-        ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.build-airflow.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
+        ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.build-airflow.outputs.json).labels['org.opencontainers.image.version'] }},
+        ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.build-airflow.outputs.json).labels['org.opencontainers.image.version'] }},
         ci.onlyDB=true,
         ci.useLocalDb=true
       app_name: 'airflow'
@@ -155,10 +155,10 @@ jobs:
       eks_cluster: rdx-works-main-dev
       helm_folder: "airflow/deploy/helm"
       helmfile_extra_vars: >-
-        ci.tag=${{ fromJSON(needs.build-airflow.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
+        ci.tag=${{ fromJSON(needs.build-airflow.outputs.json).labels['org.opencontainers.image.version'] }},
         ci.prNumber=${{ github.event.number }},
-        ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.build-airflow.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
-        ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.build-airflow.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
+        ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.build-airflow.outputs.json).labels['org.opencontainers.image.version'] }},
+        ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.build-airflow.outputs.json).labels['org.opencontainers.image.version'] }},
         ci.onlyDB=false,
         ci.useLocalDb=true
       app_name: 'airflow'
