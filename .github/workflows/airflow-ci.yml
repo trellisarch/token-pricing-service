@@ -9,6 +9,11 @@ on:
     branches:
       - develop
       - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - labeled
   release:
     types: [published]
 permissions:
@@ -30,31 +35,7 @@ jobs:
       #     options: "--check --verbose"
       #     src: "consumers/airflow-service/app"
 
-  tags:
-    needs: lint
-    runs-on: ubuntu-latest
-    outputs:
-      airflow-tags: ${{ steps.docker-tags-airflow-service.outputs.tags }}
-      airflow-labels: ${{ steps.docker-tags-airflow-service.outputs.labels }}
-      airflow-json: ${{ steps.docker-tags-airflow-service.outputs.json }}
-    steps:
-      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
-        with:
-          fetch-depth: 0
-      - name: Docker tags
-        id: docker-tags-airflow-service
-        uses: docker/metadata-action@57396166ad8aefe6098280995947635806a0e6ea
-        with:
-          images: |
-            docker.io/radixdlt/airflow-service
-          tags: |
-            type=sha,event=pr
-            type=sha,event=branch
-            type=semver,pattern={{version}}
-
   build-airflow:
-    needs: 
-    - tags
     uses: radixdlt/public-iac-resuable-artifacts/.github/workflows/docker-build.yml@main
     with:
       runs_on: ubuntu-latest
@@ -77,8 +58,6 @@ jobs:
       role_to_assume: ${{ secrets.DOCKERHUB_RELEASER_ROLE }}
 
   build-airflow-migrations:
-    needs: 
-    - tags
     uses: radixdlt/public-iac-resuable-artifacts/.github/workflows/docker-build.yml@main
     with:
       runs_on: ubuntu-latest
@@ -104,7 +83,6 @@ jobs:
     if:  github.ref == 'refs/heads/develop'
     uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@v0.15.0
     needs:
-      - tags
       - build-airflow
       - build-airflow-migrations
     with:
@@ -120,12 +98,11 @@ jobs:
       eks_cluster: rdx-works-main-dev
       helm_folder: "airflow/deploy/helm"
       helmfile_extra_vars: >-
-        ci.tag=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
+        ci.tag=${{ fromJSON(needs.build-airflow.outputs.json).labels['org.opencontainers.image.version'] }},
         ci.environment=dev,
         ci.HF_CREATE_NAMESPACES=false,
-        ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
-        ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
-        ci.onlyDB=false,
+        ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.build-airflow.outputs.json).labels['org.opencontainers.image.version'] }},
+        ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.build-airflow.outputs.json).labels['org.opencontainers.image.version'] }},
         ci.useLocalDb=false
 
 ## Only deploys in case deploy-db label is tagged
@@ -134,7 +111,6 @@ jobs:
     name: "Deploy PR only DB"
     uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@v0.15.0
     needs:
-      - tags
       - build-airflow
       - build-airflow-migrations
     with:
@@ -147,13 +123,12 @@ jobs:
       aws_region: eu-west-2
       role_to_assume: 'arn:aws:iam::308190735829:role/gh-airflow-pr-deployer'
       eks_cluster: rdx-works-main-dev
-      helm_folder: "airflow/deploy/helm"
+      helm_folder: "deploy/helm/token-price"
       helmfile_extra_vars: >-
-        ci.tag=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
+        ci.tag=${{ fromJSON(needs.build-airflow.outputs.json).labels['org.opencontainers.image.version'] }},
         ci.prNumber=${{ github.event.number }},
-        ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
-        ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
-        ci.onlyDB=true,
+        ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.build-airflow.outputs.json).labels['org.opencontainers.image.version'] }},
+        ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.build-airflow.outputs.json).labels['org.opencontainers.image.version'] }},
         ci.useLocalDb=true
       app_name: 'airflow'
       step_name: 'deploy-pr'
@@ -164,7 +139,6 @@ jobs:
     name: "Deploy PR airflow"
     uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@v0.15.0
     needs:
-      - tags
       - build-airflow
       - build-airflow-migrations
     with:
@@ -179,11 +153,9 @@ jobs:
       eks_cluster: rdx-works-main-dev
       helm_folder: "airflow/deploy/helm"
       helmfile_extra_vars: >-
-        ci.tag=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
+        ci.tag=${{ fromJSON(needs.build-airflow.outputs.json).labels['org.opencontainers.image.version'] }},
         ci.prNumber=${{ github.event.number }},
-        ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
-        ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
-        ci.onlyDB=false,
-        ci.useLocalDb=true
+        ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.build-airflow.outputs.json).labels['org.opencontainers.image.version'] }},
+        ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.build-airflow.outputs.json).labels['org.opencontainers.image.version'] }}
       app_name: 'airflow'
       step_name: 'deploy-pr'
