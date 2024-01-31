@@ -38,7 +38,7 @@ releases:
       - images:
           airflow:
             repository: radixdlt/airflow
-            tag: {{ .StateValues.ci.AIRFLOW_IMAGE_TAG }}
+            tag: {{ .StateValues.ci.tag }}
       - environments/{{ .Environment.Name }}/values.yaml.gotmpl
       - environments/{{ .Environment.Name }}/secrets.yaml.gotmpl
     set:
