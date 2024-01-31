@@ -9,6 +9,11 @@ on:
     branches:
       - develop
       - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - labeled
   release:
     types: [published]
 permissions:
@@ -73,6 +78,30 @@ jobs:
       service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
       role_to_assume: ${{ secrets.DOCKERHUB_RELEASER_ROLE }}
 
+  build-token-service:
+    needs: 
+    - tags
+    uses: radixdlt/public-iac-resuable-artifacts/.github/workflows/docker-build.yml@main
+    with:
+      runs_on: ubuntu-latest
+      image_registry: "docker.io"
+      image_organization: "radixdlt"
+      image_name: "token-price-service"
+      tags: |
+          type=sha,event=pr
+          type=sha,event=branch
+          type=semver,pattern={{version}}
+      context: "consumers/token-price-service"
+      dockerfile: "consumers/token-price-service/Dockerfile"
+      platforms: "linux/amd64"
+      provenance: "false"
+      scan_image: false
+      snyk_target_ref: ${{ github.ref_name }}
+    secrets:
+      workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDP }}
+      service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+      role_to_assume: ${{ secrets.DOCKERHUB_RELEASER_ROLE }}
+
   build-airflow-migrations:
     needs: 
     - tags
@@ -105,6 +134,7 @@ jobs:
       - tags
       - build-airflow
       - build-airflow-migrations
+      - build-token-service
     with:
       app_name: 'airflow'
       step_name: 'deploy-airflow-dev'
@@ -121,11 +151,10 @@ jobs:
         ci.tag=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.environment=dev,
         ci.HF_CREATE_NAMESPACES=false,
-        ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.INSTALL_DB=${{ false }},
         ci.INSTALL_AIRFLOW=${{ true }},
-        ci.INSTALL_TOKEN_SERVICE=${{ false }}
+        ci.INSTALL_TOKEN_SERVICE=${{ true }}
 
   deploy-airflow-prod:
     if:  github.ref == 'refs/heads/main'
@@ -135,6 +164,7 @@ jobs:
       - tags
       - build-airflow
       - build-airflow-migrations
+      - build-token-service
     with:
       app_name: 'airflow'
       step_name: 'deploy-airflow-prod'
@@ -151,11 +181,10 @@ jobs:
         ci.tag=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.environment=dev,
         ci.HF_CREATE_NAMESPACES=false,
-        ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.INSTALL_DB=${{ false }},
         ci.INSTALL_AIRFLOW=${{ true }},
-        ci.INSTALL_TOKEN_SERVICE=${{ false }}
+        ci.INSTALL_TOKEN_SERVICE=${{ true }}
 
   deploy_pull_request_airflow:
     if: ${{ github.event.pull_request }}
@@ -165,6 +194,7 @@ jobs:
       - tags
       - build-airflow
       - build-airflow-migrations
+      - build-token-service
     with:
       env_name: pr
       hierarchical_namespace: airflow-ci-pr
@@ -179,7 +209,6 @@ jobs:
       helmfile_extra_vars: >-
         ci.tag=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.prNumber=${{ github.event.number }},
-        ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.INSTALL_DB=${{ contains(github.event.pull_request.labels.*.name, 'deploy-db') || contains(github.event.pull_request.labels.*.name, 'deploy-airflow') || contains(github.event.pull_request.labels.*.name, 'deploy-token-service') }},
         ci.INSTALL_AIRFLOW=${{ contains(github.event.pull_request.labels.*.name, 'deploy-airflow') }},
