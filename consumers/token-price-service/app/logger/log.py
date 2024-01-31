@@ -15,7 +15,7 @@ def get_logger() -> Logger:
 
         logger = logging.getLogger("pricing_service")
         if not logger.hasHandlers():
-            logger.setLevel(logging.DEBUG)
+            logger.setLevel(logging.INFO)
             logging.config.dictConfig(log_config)
             return logger
         else:

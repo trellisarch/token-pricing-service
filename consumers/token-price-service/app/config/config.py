@@ -11,7 +11,7 @@ class Config:
     POSTGRES_DB = os.environ.get("DB_NAME", "postgres")
     POSTGRES_PORT = os.environ.get("DB_PORT", 5432)
     DB_URI = f"postgresql://{POSTGRES_USER}:{ENCODED_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
-    LOG_LEVEL = os.environ.get("LOG_LEVEL", "DEBUG")
+    LOG_LEVEL = os.environ.get("LOG_LEVEL", "ERROR")
     LOG_CONFIG_PATH = os.environ.get("LOG_CONFIG_PATH", "logging.json")
     RADIX_CHARTS_API = os.environ.get("RADIX_CHARTS_API", "https://api.radixapi.net")
     RADIX_CHARTS_MAX_TOKENS_PER_REQUEST = 30
