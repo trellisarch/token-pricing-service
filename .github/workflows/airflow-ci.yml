@@ -182,12 +182,11 @@ jobs:
       helm_folder: "deploy/helm/airflow"
       helmfile_extra_vars: >-
         ci.tag=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
-        ci.environment=dev,
+        ci.environment=prod,
         ci.HF_CREATE_NAMESPACES=false,
         ci.INSTALL_DB=${{ false }},
         ci.INSTALL_AIRFLOW=${{ true }},
         ci.INSTALL_TOKEN_SERVICE=${{ true }},
-        ci.prNumber=${{ github.event.number }},
         ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.onlyDB=true,
