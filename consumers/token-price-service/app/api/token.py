@@ -26,6 +26,5 @@ async def get_tokens():
         }
         mapped_token = Token(**token_data)
         mapped_tokens.append(mapped_token)
-
-    logger.info(mapped_tokens)
+    logger.debug(mapped_tokens)
     return mapped_tokens

@@ -15,21 +15,43 @@ repositories:
     url: https://raw.githubusercontent.com/radixdlt/helm-charts/master/
     username: {{ requiredEnv "HELM_GH_USER" }}
     password: {{ requiredEnv "HELM_GH_PASS" }}
-
+  - name: apache-airflow
+    url: https://airflow.apache.org
 environments:
   default: {}
   dev: {}
   pr: {}
   prod: {}
 releases:
+  - name: airflow-resources
+    installed: {{ .StateValues | get "ci.INSTALL_AIRFLOW" "false" }}
+    chart: ./airflow-resources
+    values:
+      - environments/{{ .Environment.Name }}/values.yaml.gotmpl
+      - environments/{{ .Environment.Name }}/secrets.yaml.gotmpl
+  - name: airflow
+    installed: {{ .StateValues | get "ci.INSTALL_AIRFLOW" "false" }}
+    chart: apache-airflow/airflow
+    version: 1.11.0
+    values:
+      - airflowVersion: "2.8.1"
+      - images:
+          airflow:
+            repository: radixdlt/airflow
+            tag: {{ .StateValues.ci.tag }}
+      - environments/{{ .Environment.Name }}/values.yaml.gotmpl
+      - environments/{{ .Environment.Name }}/secrets.yaml.gotmpl
+    needs:
+      - airflow-resources
   - name: token-price
+    installed: {{ .StateValues | get "ci.INSTALL_TOKEN_SERVICE" "false" }}
     chart: ./token-price
     values:
       - environments/{{ .Environment.Name }}/token-price-values.yaml.gotmpl
 
   - name: postgres
     chart: bitnami/postgresql
-    installed: {{ .StateValues | get "ci.useLocalDb" "false" }}
+    installed: {{ .StateValues | get "ci.INSTALL_DB" "false" }}
     version: 12.1.5
     values:
       - auth:

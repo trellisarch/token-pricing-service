@@ -22,7 +22,6 @@ dag = DAG("github", default_args=default_args, schedule_interval="0 0 * * 1")
 
 
 def get_github_user(user_name):
-
     try:
         # Set up your GitHub API credentials
         github_token = Config.GITHUB_TOKEN
@@ -37,12 +36,10 @@ def get_github_user(user_name):
 
 
 def get_github_repo(user_name, repo_name):
-
     conn = None
     cursor = None
 
     try:
-
         # Set up your GitHub API credentials
         github_token = Config.GITHUB_TOKEN
         github_client = Github(github_token)

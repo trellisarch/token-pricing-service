@@ -21,7 +21,6 @@ class TelegramData(Base):
 
     @classmethod
     def fetch_and_save_data(cls, account, bot_response, combot_response):
-
         # Extract relevant user information
         members_total = bot_response
         combot_data = combot_response
@@ -43,7 +42,6 @@ class TelegramData(Base):
 
         try:
             with get_session() as session:
-
                 new_info = cls(
                     account=account,
                     members_total=members_total,

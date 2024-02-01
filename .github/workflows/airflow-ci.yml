@@ -1,4 +1,4 @@
-name: CI airflow
+name: Airflow Continuous Integration
 
 on:
   push:
@@ -9,6 +9,11 @@ on:
     branches:
       - develop
       - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - labeled
   release:
     types: [published]
 permissions:
@@ -20,15 +25,12 @@ permissions:
 jobs:
   lint:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: consumers/airflow-service
     steps:
       - uses: actions/checkout@v3
-      # - uses: psf/black@stable
-      #   with:
-      #     options: "--check --verbose"
-      #     src: "consumers/airflow-service/app"
+      - uses: psf/black@stable
+        with:
+          options: "--check --verbose"
+          src: "."
 
   tags:
     needs: lint
@@ -76,6 +78,30 @@ jobs:
       service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
       role_to_assume: ${{ secrets.DOCKERHUB_RELEASER_ROLE }}
 
+  build-token-service:
+    needs: 
+    - tags
+    uses: radixdlt/public-iac-resuable-artifacts/.github/workflows/docker-build.yml@main
+    with:
+      runs_on: ubuntu-latest
+      image_registry: "docker.io"
+      image_organization: "radixdlt"
+      image_name: "token-price-service"
+      tags: |
+          type=sha,event=pr
+          type=sha,event=branch
+          type=semver,pattern={{version}}
+      context: "consumers/token-price-service"
+      dockerfile: "consumers/token-price-service/Dockerfile"
+      platforms: "linux/amd64"
+      provenance: "false"
+      scan_image: false
+      snyk_target_ref: ${{ github.ref_name }}
+    secrets:
+      workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDP }}
+      service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+      role_to_assume: ${{ secrets.DOCKERHUB_RELEASER_ROLE }}
+
   build-airflow-migrations:
     needs: 
     - tags
@@ -102,11 +128,13 @@ jobs:
 
   deploy-airflow-dev:
     if:  github.ref == 'refs/heads/develop'
+    name: "Deploy Airflow Dev"
     uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@v0.15.0
     needs:
       - tags
       - build-airflow
       - build-airflow-migrations
+      - build-token-service
     with:
       app_name: 'airflow'
       step_name: 'deploy-airflow-dev'
@@ -118,55 +146,62 @@ jobs:
       aws_region: eu-west-2
       role_to_assume: arn:aws:iam::308190735829:role/gh-airflow-dev-deployer
       eks_cluster: rdx-works-main-dev
-      helm_folder: "airflow/deploy/helm"
+      helm_folder: "deploy/helm/airflow"
       helmfile_extra_vars: >-
         ci.tag=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.environment=dev,
         ci.HF_CREATE_NAMESPACES=false,
+        ci.INSTALL_DB=${{ false }},
+        ci.INSTALL_AIRFLOW=${{ true }},
+        ci.INSTALL_TOKEN_SERVICE=${{ true }},
         ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.onlyDB=false,
         ci.useLocalDb=false
 
-## Only deploys in case deploy-db label is tagged
-  deploy_pull_request_only_db:
-    if: ${{ github.event.label.name == 'deploy-db' }}
-    name: "Deploy PR only DB"
+  deploy-airflow-prod:
+    if:  github.ref == 'refs/heads/main'
+    name: "Deploy Airflow Prod"
     uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@v0.15.0
     needs:
       - tags
       - build-airflow
       - build-airflow-migrations
+      - build-token-service
     with:
-      env_name: pr
-      hierarchical_namespace: airflow-ci-pr
-      namespace: airflow-pr-${{ github.event.number }}
+      app_name: 'airflow'
+      step_name: 'deploy-airflow-prod'
+      env_name: prod
+      namespace: airflow-prod
       helm_command: "apply"
-      create_subns: true
+      create_subns: false
       restart_pods: false
       aws_region: eu-west-2
-      role_to_assume: 'arn:aws:iam::308190735829:role/gh-airflow-pr-deployer'
-      eks_cluster: rdx-works-main-dev
-      helm_folder: "airflow/deploy/helm"
+      role_to_assume: arn:aws:iam::308190735829:role/gh-airflow-prod-deployer
+      eks_cluster: rdx-works-main-prod
+      helm_folder: "deploy/helm/airflow"
       helmfile_extra_vars: >-
         ci.tag=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
+        ci.environment=dev,
+        ci.HF_CREATE_NAMESPACES=false,
+        ci.INSTALL_DB=${{ false }},
+        ci.INSTALL_AIRFLOW=${{ true }},
+        ci.INSTALL_TOKEN_SERVICE=${{ true }},
         ci.prNumber=${{ github.event.number }},
         ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.onlyDB=true,
         ci.useLocalDb=true
-      app_name: 'airflow'
-      step_name: 'deploy-pr'
 
-## Only deploys in case deploy-airflow label is tagged
   deploy_pull_request_airflow:
-    if: contains(github.event.pull_request.labels.*.name, 'deploy-airflow')
+    if: ${{ github.event.pull_request }}
     name: "Deploy PR airflow"
     uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@v0.15.0
     needs:
       - tags
       - build-airflow
       - build-airflow-migrations
+      - build-token-service
     with:
       env_name: pr
       hierarchical_namespace: airflow-ci-pr
@@ -177,10 +212,13 @@ jobs:
       aws_region: eu-west-2
       role_to_assume: 'arn:aws:iam::308190735829:role/gh-airflow-pr-deployer'
       eks_cluster: rdx-works-main-dev
-      helm_folder: "airflow/deploy/helm"
+      helm_folder: "deploy/helm/airflow/"
       helmfile_extra_vars: >-
         ci.tag=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.prNumber=${{ github.event.number }},
+        ci.INSTALL_DB=${{ contains(github.event.pull_request.labels.*.name, 'deploy-db') || contains(github.event.pull_request.labels.*.name, 'deploy-airflow') || contains(github.event.pull_request.labels.*.name, 'deploy-token-service') }},
+        ci.INSTALL_AIRFLOW=${{ contains(github.event.pull_request.labels.*.name, 'deploy-airflow') }},
+        ci.INSTALL_TOKEN_SERVICE=${{ contains(github.event.pull_request.labels.*.name, 'deploy-token-service') }},
         ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.onlyDB=false,

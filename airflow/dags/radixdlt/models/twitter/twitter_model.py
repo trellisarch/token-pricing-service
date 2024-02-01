@@ -19,7 +19,6 @@ class TwitterData(Base):
 
     @classmethod
     def fetch_and_save_data(cls, account, api_response):
-
         # Extract relevant user information
         followers_count = api_response.followers_count
         friends_count = api_response.friends_count

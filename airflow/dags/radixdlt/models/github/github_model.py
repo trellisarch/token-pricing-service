@@ -20,7 +20,6 @@ class GithubAccountsData(Base):
 
     @classmethod
     def fetch_and_save_data(cls, account, api_response):
-
         # Extract relevant user information
         public_repos_total = api_response.get_repos().totalCount
         followers_total = api_response.get_followers().totalCount
@@ -80,7 +79,6 @@ class GithubRepositoriesData(Base):
 
     @classmethod
     def fetch_and_save_data(cls, account, repository, api_response):
-
         logging.info(f"api_response: {api_response}")
 
         # Extract relevant repository information

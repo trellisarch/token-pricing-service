@@ -23,7 +23,6 @@ logging.basicConfig(level=logging.INFO)
 
 
 def get_telegram_info(user_name, bot_id, combot_id, combot_api_key):
-
     try:
         # Your Telegram API logic to fetch the user count
         headers = {"accept": "application/json"}

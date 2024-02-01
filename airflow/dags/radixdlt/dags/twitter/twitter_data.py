@@ -21,7 +21,6 @@ dag = DAG("twitter", default_args=default_args, schedule_interval="0 0 * * 1")
 def get_twitter_followers(
     user_name, consumer_key, consumer_secret, access_token, access_token_secret
 ):
-
     try:
         auth = tweepy.OAuth1UserHandler(
             consumer_key, consumer_secret, access_token, access_token_secret
