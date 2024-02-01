@@ -192,8 +192,6 @@ jobs:
         ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.onlyDB=true,
         ci.useLocalDb=true
-      app_name: 'airflow'
-      step_name: 'deploy-pr'
 
   deploy_pull_request_airflow:
     if: ${{ github.event.pull_request }}
