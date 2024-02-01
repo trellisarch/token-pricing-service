@@ -91,6 +91,7 @@ x-airflow-common:
     TELEGRAM_RADIX_DEVS_COMBOT_ID: $TELEGRAM_RADIX_DEVS_COMBOT_ID
     TELEGRAM_RADIX_DEVS_COMBOT_API_KEY: $TELEGRAM_RADIX_DEVS_COMBOT_API_KEY
     COIN_MARKET_CAP_TOKEN: $COIN_MARKET_CAP_TOKEN
+    DB_URI: postgresql+psycopg2://postgres:postgres@airflow-postgresql/dags
 
 
   volumes:

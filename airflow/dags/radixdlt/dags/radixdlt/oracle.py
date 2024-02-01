@@ -1,10 +1,11 @@
+import logging
 from datetime import datetime, timedelta
 import requests
-from airflow import DAG
-from airflow.operators.python import PythonOperator
+from airflow.decorators import task, dag
 from radixdlt.config.config import Config
 from radixdlt.lib.coingecko import calculate_xrd_quote
 from radixdlt.lib.ret import create_transaction
+
 from radixdlt.models.oracles.token_price import OracleTokenPrice
 
 default_args = {
@@ -15,77 +16,101 @@ default_args = {
     "retry_delay": timedelta(minutes=5),
 }
 
-dag = DAG(
-    "oracle_prices",
-    default_args=default_args,
-    description="DAG to fetch quotes from CMC and Coin Gecko",
-    schedule_interval=None,
-)
+COIN_DICT = {
+    "radix": "XRD",
+    "bitcoin": "BTC",
+    "ethereum": "ETH",
+    "tether": "USDT",
+    "usd-coin": "USDC",
+}
 
 
-def process_quotes():
-    headers = {"accept": "application/json"}
+@dag(schedule=None, default_args=default_args, catchup=False, dag_id="oracle_price")
+def oracle_prices_dag():
 
-    coin_gecko_prices = {}
-    coin_gecko_price = requests.get(
-        url=f"https://api.coingecko.com/api/v3/simple/price?ids="
-        f"radix,bitcoin,ethereum,tether,usd-coin&vs_currencies=USD",
-        headers=headers,
-    ).json()
+    @task
+    def process_coin_gecko_prices():
+        headers = {"accept": "application/json"}
+        coin_ids = Config.ORACLE_COIN_GECKO_IDS.split(",")
 
-    coin_gecko_btc_xrd_price = calculate_xrd_quote(
-        coin_gecko_price["bitcoin"]["usd"], coin_gecko_price["radix"]["usd"]
-    )
-    coin_gecko_prices["BTC/XRD"] = coin_gecko_btc_xrd_price
-    OracleTokenPrice.insert_price("BTC/XRD", coin_gecko_btc_xrd_price, "CoinGecko")
+        coin_gecko_price = requests.get(
+            url=f"{Config.COIN_GECKO_API}/simple/price?ids="
+            f"{','.join(coin_ids)},radix&vs_currencies=USD",
+            headers=headers,
+        ).json()
 
-    coin_gecko_eth_xrd_price = calculate_xrd_quote(
-        coin_gecko_price["ethereum"]["usd"], coin_gecko_price["radix"]["usd"]
-    )
-    coin_gecko_prices["ETH/XRD"] = coin_gecko_eth_xrd_price
-    OracleTokenPrice.insert_price("ETH/XRD", coin_gecko_eth_xrd_price, "CoinGecko")
+        coin_gecko_prices = {}
+        for coin_id in coin_ids:
+            coin_pair = f"{COIN_DICT[coin_id]}/XRD"
+            coin_gecko_xrd_price = calculate_xrd_quote(
+                coin_gecko_price[coin_id]["usd"], coin_gecko_price["radix"]["usd"]
+            )
+            coin_gecko_prices[coin_pair] = coin_gecko_xrd_price
+            OracleTokenPrice.insert_price(coin_pair, coin_gecko_xrd_price, "CoinGecko")
+        return coin_gecko_prices
 
-    coin_gecko_usdt_xrd_price = calculate_xrd_quote(
-        coin_gecko_price["tether"]["usd"], coin_gecko_price["radix"]["usd"]
-    )
-    coin_gecko_prices["USDT/XRD"] = coin_gecko_usdt_xrd_price
-    OracleTokenPrice.insert_price("USDT/XRD", coin_gecko_usdt_xrd_price, "CoinGecko")
+    @task
+    def process_cmc_pairs():
+        pairs = Config.ORACLE_CMC_PAIRS.split(",")
+        cmc_prices = {}
+        # TODO once we have a better plan at CMC we can avoid this for loop
+        for pair in pairs:
+            logging.info(f"Getting price for pair: {pair}")
+            base = pair.split("/")[0]
+            quote = pair.split("/")[1]
+            url = (
+                f"https://pro-api.coinmarketcap.com/v2/cryptocurrency/"
+                f"quotes/latest?symbol={base}&convert={quote}"
+            )
+            headers = {
+                "Accepts": "application/json",
+                "X-CMC_PRO_API_KEY": f"{Config.COINMARKETCAP_DEV_API_KEY}",
+            }
 
-    coin_gecko_usdc_xrd_price = calculate_xrd_quote(
-        coin_gecko_price["usd-coin"]["usd"], coin_gecko_price["radix"]["usd"]
-    )
-    coin_gecko_prices["USDC/XRD"] = coin_gecko_usdc_xrd_price
-    OracleTokenPrice.insert_price("USDC/XRD", coin_gecko_usdc_xrd_price, "CoinGecko")
+            logging.info(headers)
+            cmc_price_response = requests.get(url=url, headers=headers)
+            if cmc_price_response.status_code == 200:
+                cmc_price = cmc_price_response.json()["data"][base][0]["quote"][quote][
+                    "price"
+                ]
+                cmc_prices[pair] = cmc_price
+                OracleTokenPrice.insert_price(pair, cmc_price, "CMC")
+            else:
+                logging.info(cmc_price_response.text)
+        return cmc_prices
 
-    pairs = ["BTC/XRD", "ETH/XRD", "USDT/XRD", "USDC/XRD"]
-    cmc_prices = {}
-    for pair in pairs:
-        base = pair.split("/")[0]
-        quote = pair.split("/")[1]
-        url = (
-            f"https://pro-api.coinmarketcap.com/v2/cryptocurrency/"
-            f"quotes/latest?symbol={base}&convert={quote}"
-        )
-        headers = {
-            "Accepts": "application/json",
-            "X-CMC_PRO_API_KEY": f"{Config.COINMARKETCAP_DEV_API_KEY}",
-        }
+    @task
+    def update_oracle(coin_gecko_prices, cmc_prices):
+        transaction_metadata = []
+        for pair, gecko_price in coin_gecko_prices.items():
+            cmc_price = cmc_prices.get(pair, None)
+            if cmc_price is not None:
+                logging.info(f"Checking pair: {pair}")
+                logging.info(f"Gecko price: {gecko_price}")
+                logging.info(f"CMC price: {cmc_price}")
+                price_diff = abs(gecko_price - cmc_price) / max(gecko_price, cmc_price)
+                logging.info(f"Price difference: {price_diff}")
+                if price_diff < Config.ORACLE_PRICE_DIFF_TRIGGER:
+                    avg_price = (gecko_price + cmc_price) / 2
+                    transaction_metadata.append(
+                        {"base": pair.split("/")[0], "price": avg_price}
+                    )
+        if len(transaction_metadata) > 0:
+            logging.info(transaction_metadata)
+            notarized_transaction_hex, address = create_transaction(
+                transaction_metadata
+            )
+            submit_transaction_body = {
+                "notarized_transaction_hex": notarized_transaction_hex
+            }
+            requests.post(
+                url=f"{Config.NETWORK_GATEWAY}/transaction/submit",
+                json=submit_transaction_body,
+            )
+        else:
+            logging.info("Nothing to update")
 
-        cmc_price = requests.get(url=url, headers=headers).json()["data"][base][0][
-            "quote"
-        ][quote]["price"]
-        cmc_prices[pair] = cmc_price
-        OracleTokenPrice.insert_price(pair, cmc_price, "CMC")
-
-    # TODO this is hardcoded now but we need to create the list based on the price diff
-    base_symbols = ["BTC", "USDT"]
-    notarized_transaction_hex, address = create_transaction(base_symbols)
-    submit_transaction_body = {"notarized_transaction_hex": notarized_transaction_hex}
-    requests.post(url=Config.NETWORK_GATEWAY, json=submit_transaction_body)
+    update_oracle(process_coin_gecko_prices(), process_cmc_pairs())
 
 
-process_quotes_task = PythonOperator(
-    task_id="process_quotes",
-    python_callable=process_quotes,
-    dag=dag,
-)
+oracle_prices_dag()

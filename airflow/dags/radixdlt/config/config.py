@@ -9,10 +9,20 @@ class Config:
 
     DB_URI = getenv("DB_URI")
     NETWORK_ID = getenv("NETWORK_ID", 2)
-    NETWORK_GATEWAY = getenv(
-        "NETWORK_GATEWAY", "https://stokenet.radixdlt.com/transaction/submit"
-    )
+    NETWORK_GATEWAY = getenv("NETWORK_GATEWAY", "https://stokenet.radixdlt.com")
+
     COINMARKETCAP_DEV_API_KEY = getenv("COINMARKETCAP_DEV_API_KEY")
+    COIN_GECKO_API = getenv("COIN_GECKO_API", "https://api.coingecko.com/api/v3")
+
+    ORACLE_COIN_GECKO_IDS = "radix,bitcoin,ethereum,tether,usd-coin"
+    ORACLE_CMC_PAIRS = "BTC/XRD,ETH/XRD,USDT/XRD,USDC/XRD"
+    ORACLE_PRICE_DIFF_TRIGGER = 0.02
+    ORACLE_LOCK_FEE_ADDRESS = getenv(
+        "ORACLE_LOCK_FEE_ADDRESS",
+        "component_tdx_2_1cptxxxxxxxxxfaucetxxxxxxxxx000527798379xxxxxxxxxyulkzl",
+    )
+    ORACLE_LOCK_FEE = float(getenv("ORACLE_LOCK_FEE", 0.58434484845))
+
     TWITTER_RADIXDLT_API_KEY = getenv("TWITTER_RADIXDLT_API_KEY")
     TWITTER_RADIXDLT_API_KEY_SECRET = getenv("TWITTER_RADIXDLT_API_KEY_SECRET")
     TWITTER_RADIXDLT_ACCESS_TOKEN = getenv("TWITTER_RADIXDLT_ACCESS_TOKEN")
