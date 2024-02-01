@@ -78,7 +78,6 @@ jobs:
       service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
       role_to_assume: ${{ secrets.DOCKERHUB_RELEASER_ROLE }}
 
-<<<<<<< HEAD
   build-token-service:
     needs: 
     - tags
@@ -103,8 +102,6 @@ jobs:
       service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
       role_to_assume: ${{ secrets.DOCKERHUB_RELEASER_ROLE }}
 
-=======
->>>>>>> 88134aee7f7821f3caaec099298f3e353390edc7
   build-airflow-migrations:
     needs: 
     - tags
@@ -137,10 +134,7 @@ jobs:
       - tags
       - build-airflow
       - build-airflow-migrations
-<<<<<<< HEAD
       - build-token-service
-=======
->>>>>>> 88134aee7f7821f3caaec099298f3e353390edc7
     with:
       app_name: 'airflow'
       step_name: 'deploy-airflow-dev'
@@ -157,17 +151,13 @@ jobs:
         ci.tag=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.environment=dev,
         ci.HF_CREATE_NAMESPACES=false,
-<<<<<<< HEAD
-        ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.INSTALL_DB=${{ false }},
         ci.INSTALL_AIRFLOW=${{ true }},
         ci.INSTALL_TOKEN_SERVICE=${{ true }}
-=======
         ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.onlyDB=false,
         ci.useLocalDb=false
->>>>>>> 88134aee7f7821f3caaec099298f3e353390edc7
 
   deploy-airflow-prod:
     if:  github.ref == 'refs/heads/main'
@@ -177,10 +167,7 @@ jobs:
       - tags
       - build-airflow
       - build-airflow-migrations
-<<<<<<< HEAD
       - build-token-service
-=======
->>>>>>> 88134aee7f7821f3caaec099298f3e353390edc7
     with:
       app_name: 'airflow'
       step_name: 'deploy-airflow-prod'
@@ -195,14 +182,11 @@ jobs:
       helm_folder: "deploy/helm/airflow"
       helmfile_extra_vars: >-
         ci.tag=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
-<<<<<<< HEAD
         ci.environment=dev,
         ci.HF_CREATE_NAMESPACES=false,
-        ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.INSTALL_DB=${{ false }},
         ci.INSTALL_AIRFLOW=${{ true }},
         ci.INSTALL_TOKEN_SERVICE=${{ true }}
-=======
         ci.prNumber=${{ github.event.number }},
         ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
@@ -210,7 +194,6 @@ jobs:
         ci.useLocalDb=true
       app_name: 'airflow'
       step_name: 'deploy-pr'
->>>>>>> 88134aee7f7821f3caaec099298f3e353390edc7
 
   deploy_pull_request_airflow:
     if: ${{ github.event.pull_request }}
@@ -220,10 +203,7 @@ jobs:
       - tags
       - build-airflow
       - build-airflow-migrations
-<<<<<<< HEAD
       - build-token-service
-=======
->>>>>>> 88134aee7f7821f3caaec099298f3e353390edc7
     with:
       env_name: pr
       hierarchical_namespace: airflow-ci-pr
@@ -238,16 +218,12 @@ jobs:
       helmfile_extra_vars: >-
         ci.tag=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.prNumber=${{ github.event.number }},
-<<<<<<< HEAD
-        ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.INSTALL_DB=${{ contains(github.event.pull_request.labels.*.name, 'deploy-db') || contains(github.event.pull_request.labels.*.name, 'deploy-airflow') || contains(github.event.pull_request.labels.*.name, 'deploy-token-service') }},
         ci.INSTALL_AIRFLOW=${{ contains(github.event.pull_request.labels.*.name, 'deploy-airflow') }},
         ci.INSTALL_TOKEN_SERVICE=${{ contains(github.event.pull_request.labels.*.name, 'deploy-token-service') }}
-=======
         ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.onlyDB=false,
         ci.useLocalDb=true
->>>>>>> 88134aee7f7821f3caaec099298f3e353390edc7
       app_name: 'airflow'
       step_name: 'deploy-pr'
