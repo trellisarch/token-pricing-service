@@ -5,8 +5,8 @@ import requests
 
 
 def test_convertion():
-    df = pd.read_csv('resources/olympia_babylon_addresses.csv', skiprows=1)
-    api_url = 'https://mainnet.radixdlt.com/state/entity/details'
+    df = pd.read_csv("resources/olympia_babylon_addresses.csv", skiprows=1)
+    api_url = "https://mainnet.radixdlt.com/state/entity/details"
     max_threads = 10
 
     def send_request(addresses):
@@ -14,7 +14,7 @@ def test_convertion():
         response = requests.post(api_url, json=request_body)
         return response.status_code
 
-    batches = [[row['babylon_address']] for _, row in df.iterrows()]
+    batches = [[row["babylon_address"]] for _, row in df.iterrows()]
     with ThreadPoolExecutor(max_threads) as executor:
         futures = {executor.submit(send_request, batch): batch for batch in batches}
         for future in as_completed(futures):

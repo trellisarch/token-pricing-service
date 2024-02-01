@@ -7,8 +7,9 @@ from radixdlt.models.base import get_session
 
 Base = declarative_base()
 
+
 class TwitterData(Base):
-    __tablename__ = 'twitter'
+    __tablename__ = "twitter"
     id = Column(Integer, primary_key=True, autoincrement=True)
     account = Column(String, nullable=False)
     followers_count = Column(Integer)
@@ -23,13 +24,15 @@ class TwitterData(Base):
         followers_count = api_response.followers_count
         friends_count = api_response.friends_count
         statuses_count = api_response.statuses_count
-        
-        logging.info(f"""Followers Count: {followers_count}, 
+
+        logging.info(
+            f"""Followers Count: {followers_count}, 
                      Friends Count: {friends_count}, 
-                     Statuses Count: {statuses_count}""")
-        
+                     Statuses Count: {statuses_count}"""
+        )
+
         try:
-            session = get_session()    
+            session = get_session()
 
             new_info = cls(
                 account=account,
@@ -45,6 +48,3 @@ class TwitterData(Base):
         except SQLAlchemyError as e:
             session.rollback()
             logging.error(f"Error occurred: {e}")
-
-
-

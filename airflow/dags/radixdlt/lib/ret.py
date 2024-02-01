@@ -11,7 +11,7 @@ from radix_engine_toolkit import (
     TransactionHeader,
     Instructions,
     TransactionManifest,
-    TransactionBuilder
+    TransactionBuilder,
 )
 
 from radixdlt.config.config import Config
@@ -22,13 +22,13 @@ def create_transaction(base_symbols):
     private_key_bytes = token_bytes(32)
     private_key = PrivateKey.new_secp256k1(private_key_bytes)
     address = derive_virtual_account_address_from_public_key(
-        public_key=private_key.public_key(),
-        network_id=2
+        public_key=private_key.public_key(), network_id=2
     )
 
     network_id = Config.NETWORK_ID
     tx_construction_metadata = requests.post(
-        url="https://stokenet.radixdlt.com/transaction/construction")
+        url="https://stokenet.radixdlt.com/transaction/construction"
+    )
 
     start_epoch = tx_construction_metadata.json()["ledger_state"]["epoch"]
     transaction_header = TransactionHeader(
@@ -38,9 +38,11 @@ def create_transaction(base_symbols):
         notary_is_signatory=True,
         end_epoch_exclusive=start_epoch + 20,
         start_epoch_inclusive=start_epoch,
-        notary_public_key=private_key.public_key()
+        notary_public_key=private_key.public_key(),
     )
-    config_file_path = join(dirname(dirname(abspath(__file__))), "dags", "radixdlt", "config.json")
+    config_file_path = join(
+        dirname(dirname(abspath(__file__))), "dags", "radixdlt", "config.json"
+    )
     quote_config = json.loads(open(config_file_path).read())
 
     instructions_list = """CALL_METHOD
@@ -57,7 +59,8 @@ def create_transaction(base_symbols):
                   Address("{quote_config["quote_resource"]["resource_address"]}")
                   Decimal("1000");"""
     instructions = Instructions.from_string(
-        string=instructions_list, network_id=network_id)
+        string=instructions_list, network_id=network_id
+    )
     transaction_manifest = TransactionManifest(instructions, [])
 
     notarized_transaction = (
@@ -67,6 +70,10 @@ def create_transaction(base_symbols):
         .sign_with_private_key(private_key)
         .notarize_with_private_key(private_key)
     )
-    logging.info(f"Transaction to be sent: {notarized_transaction.intent_hash().as_str()}")
-    return ''.join(
-        hex(i)[2:].zfill(2) for i in notarized_transaction.compile()), address
+    logging.info(
+        f"Transaction to be sent: {notarized_transaction.intent_hash().as_str()}"
+    )
+    return (
+        "".join(hex(i)[2:].zfill(2) for i in notarized_transaction.compile()),
+        address,
+    )

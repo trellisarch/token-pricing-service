@@ -6,7 +6,7 @@ Base = declarative_base()
 
 
 class RadixToken(Base):
-    __tablename__ = 'radix_tokens'
+    __tablename__ = "radix_tokens"
     id = Column(Integer, primary_key=True, autoincrement=True)
     resource_address = Column(String, unique=True, nullable=False)
     symbol = Column(String)
@@ -16,7 +16,9 @@ class RadixToken(Base):
     def insert_tokens(cls, tokens):
         session = get_session()
         for resource_address, token_data in tokens.items():
-            existing_token = session.query(cls).filter_by(resource_address=resource_address).first()
+            existing_token = (
+                session.query(cls).filter_by(resource_address=resource_address).first()
+            )
             if not existing_token:
                 new_token = cls(
                     resource_address=resource_address,
@@ -27,7 +29,6 @@ class RadixToken(Base):
 
         session.commit()
         session.close()
-
 
     @classmethod
     def list_tokens(cls):

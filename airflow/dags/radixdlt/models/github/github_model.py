@@ -7,8 +7,9 @@ from radixdlt.models.base import get_session
 
 Base = declarative_base()
 
+
 class GithubAccountsData(Base):
-    __tablename__ = 'github_accounts'
+    __tablename__ = "github_accounts"
     id = Column(Integer, primary_key=True, autoincrement=True)
     account = Column(String, nullable=False)
     public_repos_total = Column(Integer)
@@ -19,27 +20,29 @@ class GithubAccountsData(Base):
 
     @classmethod
     def fetch_and_save_data(cls, account, api_response):
-         
+
         # Extract relevant user information
         public_repos_total = api_response.get_repos().totalCount
         followers_total = api_response.get_followers().totalCount
         gists_total = api_response.get_gists().totalCount
         following_total = api_response.get_following().totalCount
 
-        logging.info(f"""public_repos_total: {public_repos_total}, 
+        logging.info(
+            f"""public_repos_total: {public_repos_total}, 
                      followers_total: {followers_total}, 
                      gists_total: {gists_total}, 
-                     following_total: {following_total}""")
-        
+                     following_total: {following_total}"""
+        )
+
         try:
-            session = get_session()    
+            session = get_session()
 
             new_info = cls(
                 account=account,
-                public_repos_total = public_repos_total,
-                followers_total = followers_total,
-                gists_total = gists_total,
-                following_total = following_total,
+                public_repos_total=public_repos_total,
+                followers_total=followers_total,
+                gists_total=gists_total,
+                following_total=following_total,
             )
             session.add(new_info)
             logging.info("Data inserted successfully.")
@@ -52,7 +55,7 @@ class GithubAccountsData(Base):
 
 
 class GithubRepositoriesData(Base):
-    __tablename__ = 'github_repositories'
+    __tablename__ = "github_repositories"
     id = Column(Integer, primary_key=True, autoincrement=True)
     account = Column(String, nullable=False)
     repository = Column(String, nullable=False)
@@ -79,7 +82,7 @@ class GithubRepositoriesData(Base):
     def fetch_and_save_data(cls, account, repository, api_response):
 
         logging.info(f"api_response: {api_response}")
-        
+
         # Extract relevant repository information
         commits = api_response.get_commits().totalCount
         branches = api_response.get_branches().totalCount
@@ -108,9 +111,9 @@ class GithubRepositoriesData(Base):
             clones_traffic_unique = 0
             views_traffic = 0
             views_traffic_unique = 0
-        
+
         try:
-            session = get_session()    
+            session = get_session()
 
             new_info = cls(
                 account=account,
@@ -141,7 +144,3 @@ class GithubRepositoriesData(Base):
         except SQLAlchemyError as e:
             session.rollback()
             logging.error(f"Error occurred: {e}")
-
-
-
-
