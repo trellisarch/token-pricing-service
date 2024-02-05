@@ -12,8 +12,8 @@ metrics:
   enabled: false
 
 env:
-  DB_HOST: "rds-airflow-dags-prod-ro.rdx-works-main-prod.extratools.works"
-  DB_NAME: "token-price"
+  DB_HOST: "airflow-prod-rds-ro.rdx-works-main-prod.internal"
+  DB_NAME: "dags"
 
 ingress:
   enabled: true
@@ -28,11 +28,11 @@ ingress:
 secrets:
   - name: rds-username
     variable: "DB_USER"
-    path: "rdx-works-main-prod/airflow/airflow-dags/postgres-prod"
+    path: "rdx-works-main-prod/airflow/postgres-prod"
     secretProperty: "postgresqlUsername"
     secretName: "database-username"
   - name: rds-password
     variable: "DB_PASSWORD"
-    path: "rdx-works-main-prod/airflow/airflow-dags/postgres-prod"
+    path: "rdx-works-main-prod/airflow/postgres-prod"
     secretProperty: "postgresql-password"
     secretName: "database-password"
