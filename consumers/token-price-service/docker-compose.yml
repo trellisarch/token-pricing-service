@@ -2,11 +2,15 @@ version: "3.7"
 
 services:
   app:
-    image: pepe
+    build:
+      context: .
+    entrypoint: uvicorn app.main:app --host 0.0.0.0 --port 8000 --log-level info --reload 
     environment:
       DB_PASSWORD: postgres
     ports:
       - 8000:8000
+    volumes:
+      - ./app/:/app
   postgres:
     image: postgres:13
     environment:
@@ -20,6 +24,6 @@ services:
       start_period: 5s
     restart: always
     volumes:
-      - ./sample_data/:/postgres
+      - ./sample_data/data_dump.sql:/docker-entrypoint-initdb.d/data_dump.sql
     ports:
       - 5432:5432
