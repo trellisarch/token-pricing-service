@@ -93,6 +93,9 @@ x-airflow-common:
     COIN_MARKET_CAP_TOKEN: $COIN_MARKET_CAP_TOKEN
     DB_URI: postgresql+psycopg2://postgres:postgres@airflow-postgresql/dags
 
+    REDDIT_CLIENT_ID: $REDDIT_CLIENT_ID
+    REDDIT_CLIENT_SECRET: $REDDIT_CLIENT_SECRET
+    REDDIT_USER_AGENT: $REDDIT_USER_AGENT
 
   volumes:
     - ./dags:/opt/airflow/dags
