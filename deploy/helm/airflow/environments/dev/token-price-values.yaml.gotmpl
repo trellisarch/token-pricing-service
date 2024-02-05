@@ -22,13 +22,13 @@ ingress:
           pathType: Prefix
 
 envs:
-  DB_HOST: "rds-airflow-dags-dev-ro.rdx-works-main.extratools.works"
+  DB_HOST: "airflow-dev-rds-ro.rdx-works-main.internal"
   DB_NAME: "dags"
   DB_USER: "postgres"
 
 secrets:
   - name: rds-password
     variable: "DB_PASSWORD"
-    path: "rdx-works-main-dev/airflow/token-price/postgres-dev"
+    path: "rdx-works-main-dev/airflow/postgres-dev"
     secretProperty: "postgresql-password"
     secretName: "database-password"
