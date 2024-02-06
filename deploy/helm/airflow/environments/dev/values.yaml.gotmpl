@@ -1,17 +1,10 @@
 ingress:
   enabled: true
-  annotations:
-    kubernetes.io/ingress.class: nginx
   hosts:
     - host: airflow-dev.rdx-works-main.extratools.works
       paths:
         - path: /
           pathType: Prefix
-          backend:
-            service:
-              name: airflow-webserver
-              port:
-                number: 8080
 
 docker:
   secrets:
