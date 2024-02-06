@@ -1,11 +1,12 @@
 ingress:
   enabled: true
   hosts:
-    - host: airflow-dev.rdx-works-main.extratools.works
+    - host: airflow-service.rdxworks.com
       paths:
         - path: /
           pathType: Prefix
-
+  tls: []
+  
 docker:
   secrets:
     region: eu-west-1
