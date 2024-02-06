@@ -3,7 +3,7 @@ ingress:
   annotations:
     kubernetes.io/ingress.class: nginx
   hosts:
-    - host: airflow-dev.rdx-works-main.extratools.works
+    - host: airflow-service.rdxworks.com
       paths:
         - path: /
           pathType: Prefix
@@ -12,7 +12,7 @@ ingress:
               name: airflow-webserver
               port:
                 number: 8080
-
+  tls: []
 docker:
   secrets:
     region: eu-west-1
