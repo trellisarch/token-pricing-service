@@ -22,8 +22,8 @@ spec:
         runbook_url: https://runbooks.extratools.works
 
     - alert: AirflowDAGFailure
-      expr: airflow_dag_failure_count > 0
-      for: 10m
+      expr: airflow_dagrun_failed > 0
+      for: 1m
       labels:
         severity: warning
         tier: application
@@ -55,8 +55,8 @@ spec:
         description: "DAG '{{ "{{$labels.dag_id}}" }}' processing time is over 10secs."
 
     - alert: AirflowHighOperatorFailures
-      expr: rate(airflow_operator_failures[1m]) > 5
-      for: 5m
+      expr: airflow_operator_failures > 1
+      for: 2m
       labels:
         severity: warning
         tier: application
@@ -66,8 +66,8 @@ spec:
         description: "Airflow operator reports more than 5 failures/sec"
 
     - alert: AirflowSlowTasks
-      expr: airflow_task_duration{quantile="0.9"} > 120
-      for: 5m
+      expr: airflow_task_duration{quantile="0.9"} > 20
+      for: 2m
       labels:
         severity: warning
         tier: application
