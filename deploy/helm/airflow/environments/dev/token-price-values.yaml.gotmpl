@@ -16,11 +16,11 @@ ingress:
   annotations:
     kubernetes.io/ingress.class: nginx
   hosts:
-    - host: token-price-dev.rdx-works-main.extratools.works
+    - host: token-price.rdxworks.com
       paths:
         - path: /
           pathType: Prefix
-
+  tls: []
 envs:
   DB_HOST: "airflow-dev-rds-ro.rdx-works-main.internal"
   DB_NAME: "dags"
