@@ -39,6 +39,7 @@ releases:
           airflow:
             repository: radixdlt/airflow
             tag: {{ .StateValues.ci.tag }}
+      - environments/{{ .Environment.Name }}/statsd-extramappings.yaml.gotmpl     
       - environments/{{ .Environment.Name }}/values.yaml.gotmpl
       - environments/{{ .Environment.Name }}/secrets.yaml.gotmpl
     needs:

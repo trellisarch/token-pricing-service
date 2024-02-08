@@ -1,3 +1,6 @@
+env:
+  - name: "AIRFLOW__METRICS__METRICS_ALLOW_LIST"
+    value: “scheduler,executor,dagrun,dag,pool,task,ti,sla"
 ingress:
   enabled: true
   annotations:
@@ -21,7 +24,6 @@ pgbouncer:
   enabled: true
 postgresql:
   enabled: false
-
 data:
   metadataSecretName: postgres-secrets-formatted
 
