@@ -11,5 +11,4 @@ app.include_router(tokens_router, prefix="/tokens")
 
 @app.get("/healthz")
 def healthz():
-    sys.exit(1)
     return {"Everything": "Ok"}
