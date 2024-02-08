@@ -1,3 +1,5 @@
+import sys
+
 from fastapi import FastAPI
 from app.api.price import price_router
 from app.api.token import tokens_router
@@ -9,4 +11,5 @@ app.include_router(tokens_router, prefix="/tokens")
 
 @app.get("/healthz")
 def healthz():
+    sys.exit(1)
     return {"Everything": "Ok"}
