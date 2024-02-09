@@ -1,3 +1,5 @@
+import datetime
+
 from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 
@@ -15,6 +17,21 @@ class TokenPrice(Base):
     last_updated_at = Column(DateTime)
 
     token = relationship("Token", back_populates="prices")
+
+    @classmethod
+    def insert_new(cls, resource_address: str, usd_price: float):
+        session = get_session()
+        new_price = cls(
+            resource_address=resource_address,
+            usd_price=usd_price,
+            usd_market_cap=0,
+            usd_vol_24h=0,
+            last_updated_at=datetime.datetime.now(),
+        )
+
+        session.add(new_price)
+        session.commit()
+        return new_price
 
 
 class LsuPrice:
