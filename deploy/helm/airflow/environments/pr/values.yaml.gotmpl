@@ -10,7 +10,7 @@ ingress:
     - host: {{ .Namespace }}-airflow.rdx-works-main.extratools.works
       paths:
         - path: /
-          pathType: Prefix
+          pathType: ImplementationSpecific
           backend:
               service:
                 name: airflow-webserver
