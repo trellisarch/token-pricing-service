@@ -24,7 +24,7 @@ async def get_tokens_prices(data: TokenPricesRequest = Body(...)):
         raise HTTPException(
             status_code=400,
             detail=f"Currency: {currency} not supported. Supported currencies: "
-                   f"{Config.SUPPORTED_CURRENCIES}",
+            f"{Config.SUPPORTED_CURRENCIES}",
         )
 
     token_prices = []
