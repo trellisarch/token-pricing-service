@@ -24,19 +24,16 @@ async def get_tokens_prices(data: TokenPricesRequest = Body(...)):
         raise HTTPException(
             status_code=400,
             detail=f"Currency: {currency} not supported. Supported currencies: "
-            f"{Config.SUPPORTED_CURRENCIES}",
+                   f"{Config.SUPPORTED_CURRENCIES}",
         )
 
     token_prices = []
     for resource_address in tokens:
         latest_price = get_latest_price(resource_address)
+        # Append to response if only price is available for the resource
         if latest_price:
             token_prices.append(latest_price)
-        else:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Resource: {resource_address} does not have a price",
-            )
+
     lsus_prices = get_lsu_redemption_values(addresses=lsus)
     logger.info(lsus_prices)
     token_price_response = TokenPricesResponse(
