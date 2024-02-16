@@ -14,7 +14,7 @@ ingress:
     - host: token-price-pr-{{ .StateValues.ci.prNumber }}.rdx-works-main.extratools.works
       paths:
         - path: /
-          pathType: Prefix
+          pathType: ImplementationSpecific
   tls: []
 
 envs:
