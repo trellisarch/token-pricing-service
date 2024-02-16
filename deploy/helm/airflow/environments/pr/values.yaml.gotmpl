@@ -27,11 +27,5 @@ workers:
     - name: db-migrations
       image: radixdlt/airflow-migration:{{ .StateValues.ci.AIRFLOW_MIGRATION_IMAGE_TAG }}
       env:
-        - name: DB_HOST
-          value: "airflow-postgresql"
-        - name: DB_USER
-          value: "postgres"
-        - name: DB_PASSWORD
-          value: "postgres"
-        - name: DB_NAME
-          value: "dags"
+        - name: DB_URI
+          value: "postgresql://postgres:postgres@airflow-postgresql:5432/dags"

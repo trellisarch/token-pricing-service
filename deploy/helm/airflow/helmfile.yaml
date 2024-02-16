@@ -1,6 +1,6 @@
 helmDefaults:
   verify: false
-  wait: true
+  wait: false
   timeout: 600
   recreatePods: false
   force: false
