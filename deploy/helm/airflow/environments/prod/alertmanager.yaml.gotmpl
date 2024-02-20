@@ -1,9 +1,9 @@
 alertmanager:
   env: "prod"
-  nameOverride: "token-price-amcfg"
+  nameOverride: "airflow-amcfg"
   slackConfig:
-    channel: "feed--alerts-token-price-prod"
+    channel: "feed--alerts-airflow-prod"
   secrets:
-    region: eu-west-1
-    name: "rdx-works-main-prod/eks/token-price/prod/alertmanager-integration-keys"
+    region: eu-west-2
+    name: "rdx-works-main-prod/eks/airflow/prod/alertmanager-integration-keys"
   enable_pagerduty_notifications: true

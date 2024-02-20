@@ -10,12 +10,11 @@ metrics:
 ingress:
   enabled: true
   annotations:
-    kubernetes.io/ingress.class: nginx
   hosts:
     - host: token-price-pr-{{ .StateValues.ci.prNumber }}.rdx-works-main.extratools.works
       paths:
         - path: /
-          pathType: Prefix
+          pathType: ImplementationSpecific
   tls: []
 
 envs:

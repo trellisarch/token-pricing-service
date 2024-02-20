@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, func, and_
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import relationship
 from app.models.base import Base, get_session
 from app.models.token_price import TokenPrice
@@ -13,6 +14,21 @@ class Token(Base):
     name = Column(String)
 
     prices = relationship("TokenPrice", back_populates="token")
+
+    @classmethod
+    def insert_new(cls, resource_address: str, symbol: str, name: str):
+        session = get_session()
+        new_token = cls(name=name, symbol=symbol, resource_address=resource_address)
+        try:
+            session.add(new_token)
+            session.commit()
+            return new_token
+        except IntegrityError:
+            session.rollback()
+            existing_token = (
+                session.query(cls).filter_by(resource_address=resource_address).first()
+            )
+            return existing_token
 
 
 def get_price_for_resource_address(resource_address) -> TokenPrice:

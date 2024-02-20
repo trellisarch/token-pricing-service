@@ -1,6 +1,6 @@
 helmDefaults:
   verify: false
-  wait: true
+  wait: false
   timeout: 600
   recreatePods: false
   force: false
@@ -39,6 +39,7 @@ releases:
           airflow:
             repository: radixdlt/airflow
             tag: {{ .StateValues.ci.tag }}
+      - environments/{{ .Environment.Name }}/statsd-override-mappings.yaml.gotmpl
       - environments/{{ .Environment.Name }}/values.yaml.gotmpl
       - environments/{{ .Environment.Name }}/secrets.yaml.gotmpl
     needs:

@@ -39,7 +39,6 @@ service:
 
 ingress:
   enabled: true
-  className: nginx
   annotations:
   hosts: []
 
