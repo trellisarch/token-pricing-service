@@ -14,12 +14,6 @@ on:
       - labeled
   release:
     types: [published]
-permissions:
-  id-token: write
-  pull-requests: write
-  contents: read
-  deployments: write
-  packages: write
 jobs:
   lint:
     runs-on: ubuntu-latest
