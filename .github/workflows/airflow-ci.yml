@@ -126,7 +126,8 @@ jobs:
       service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
       role_to_assume: ${{ secrets.DOCKERHUB_RELEASER_ROLE }}
 
-  fetch-airflow-dev-secrets:
+  deploy-airflow-dev:
+    name: "Deploy airflow dev"
     if:  github.ref == 'refs/heads/develop'
     runs-on: ubuntu-latest
     permissions:
@@ -134,6 +135,11 @@ jobs:
       pull-requests: read
       contents: read
       deployments: write
+    needs:
+      - tags
+      - build-airflow
+      - build-airflow-migrations
+      - build-token-service
     steps:
       - uses: RDXWorks-actions/checkout@main
       - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
@@ -144,8 +150,33 @@ jobs:
           secret_prefix: 'AIRFLOW'
           secret_name: ${{ secrets.AWS_AIRFLOW_DEV_SECRET_ARN }}
           parse_json: true
+      - uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@v0.15.0
+        with:
+          app_name: 'airflow'
+          step_name: 'deploy-airflow-dev'
+          env_name: dev
+          namespace: airflow-dev
+          helm_command: "apply"
+          create_subns: false
+          restart_pods: false
+          aws_region: eu-west-2
+          role_to_assume: arn:aws:iam::308190735829:role/gh-airflow-dev-deployer
+          eks_cluster: rdx-works-main-dev
+          helm_folder: "deploy/helm/airflow"
+          helmfile_extra_vars: >-
+            ci.tag=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
+            ci.environment=dev,
+            ci.HF_CREATE_NAMESPACES=false,
+            ci.INSTALL_DB=${{ false }},
+            ci.INSTALL_AIRFLOW=${{ true }},
+            ci.INSTALL_TOKEN_SERVICE=${{ true }},
+            ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
+            ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
+            ci.AIRFLOW_WEBSERVER_USERNAME=${{ env.AIRFLOW_WEBSERVER_USERNAME }},         
+            ci.AIRFLOW_WEBSERVER_PASSWORD=${{ env.AIRFLOW_WEBSERVER_PASSWORD }}
 
-  fetch-airflow-prod-secrets:
+  deploy-airflow-prod:
+    name: "Deploy airflow prod"
     if:  github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
@@ -153,6 +184,11 @@ jobs:
       pull-requests: read
       contents: read
       deployments: write
+    needs:
+      - tags
+      - build-airflow
+      - build-airflow-migrations
+      - build-token-service
     steps:
       - uses: RDXWorks-actions/checkout@main
       - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
@@ -163,80 +199,30 @@ jobs:
           secret_prefix: 'AIRFLOW'
           secret_name: ${{ secrets.AWS_AIRFLOW_PROD_SECRET_ARN }}
           parse_json: true
-
-  deploy-airflow-dev:
-    if:  github.ref == 'refs/heads/develop'
-    name: "Deploy Airflow Dev"
-    uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@v0.15.0
-    needs:
-      - tags
-      - build-airflow
-      - build-airflow-migrations
-      - build-token-service
-      - fetch-airflow-dev-secrets
-    secrets:
-      WEBSERVER_USERNAME: ${{ env.AIRFLOW_WEBSERVER_USERNAME }}
-      WEBSERVER_PASSWORD: ${{ env.AIRFLOW_WEBSERVER_PASSWORD }}
-    with:
-      app_name: 'airflow'
-      step_name: 'deploy-airflow-dev'
-      env_name: dev
-      namespace: airflow-dev
-      helm_command: "apply"
-      create_subns: false
-      restart_pods: false
-      aws_region: eu-west-2
-      role_to_assume: arn:aws:iam::308190735829:role/gh-airflow-dev-deployer
-      eks_cluster: rdx-works-main-dev
-      helm_folder: "deploy/helm/airflow"
-      helmfile_extra_vars: >-
-        ci.tag=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
-        ci.environment=dev,
-        ci.HF_CREATE_NAMESPACES=false,
-        ci.INSTALL_DB=${{ false }},
-        ci.INSTALL_AIRFLOW=${{ true }},
-        ci.INSTALL_TOKEN_SERVICE=${{ true }},
-        ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
-        ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
-        ci.AIRFLOW_WEBSERVER_USERNAME=${{ secrets.WEBSERVER_USERNAME }},         
-        ci.AIRFLOW_WEBSERVER_PASSWORD=${{ secrets.WEBSERVER_PASSWORD }}
-
-  deploy-airflow-prod:
-    if:  github.ref == 'refs/heads/main'
-    name: "Deploy Airflow Prod"
-    uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@v0.15.0
-    needs:
-      - tags
-      - build-airflow
-      - build-airflow-migrations
-      - build-token-service
-      - fetch-airflow-prod-secrets
-    secrets:
-      WEBSERVER_USERNAME: ${{ env.AIRFLOW_WEBSERVER_USERNAME }}
-      WEBSERVER_PASSWORD: ${{ env.AIRFLOW_WEBSERVER_PASSWORD }}
-    with:
-      app_name: 'airflow'
-      step_name: 'deploy-airflow-prod'
-      env_name: prod
-      namespace: airflow-prod
-      helm_command: "apply"
-      create_subns: false
-      restart_pods: false
-      aws_region: eu-west-2
-      role_to_assume: arn:aws:iam::308190735829:role/gh-airflow-prod-deployer
-      eks_cluster: rdx-works-main-prod
-      helm_folder: "deploy/helm/airflow"
-      helmfile_extra_vars: >-
-        ci.tag=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
-        ci.environment=prod,
-        ci.HF_CREATE_NAMESPACES=false,
-        ci.INSTALL_DB=${{ false }},
-        ci.INSTALL_AIRFLOW=${{ true }},
-        ci.INSTALL_TOKEN_SERVICE=${{ true }},
-        ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
-        ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
-        ci.AIRFLOW_WEBSERVER_USERNAME=${{ secrets.WEBSERVER_USERNAME }},         
-        ci.AIRFLOW_WEBSERVER_PASSWORD=${{ secrets.WEBSERVER_PASSWORD }}
+      - uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@v0.15.0
+        with:
+          app_name: 'airflow'
+          step_name: 'deploy-airflow-prod'
+          env_name: prod
+          namespace: airflow-prod
+          helm_command: "apply"
+          create_subns: false
+          restart_pods: false
+          aws_region: eu-west-2
+          role_to_assume: arn:aws:iam::308190735829:role/gh-airflow-prod-deployer
+          eks_cluster: rdx-works-main-prod
+          helm_folder: "deploy/helm/airflow"
+          helmfile_extra_vars: >-
+            ci.tag=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
+            ci.environment=prod,
+            ci.HF_CREATE_NAMESPACES=false,
+            ci.INSTALL_DB=${{ false }},
+            ci.INSTALL_AIRFLOW=${{ true }},
+            ci.INSTALL_TOKEN_SERVICE=${{ true }},
+            ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
+            ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
+            ci.AIRFLOW_WEBSERVER_USERNAME=${{ env.WEBSERVER_USERNAME }},         
+            ci.AIRFLOW_WEBSERVER_PASSWORD=${{ env.WEBSERVER_PASSWORD }}
 
   deploy_pull_request_airflow:
     if: ${{ github.event.pull_request }}
