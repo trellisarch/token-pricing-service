@@ -196,8 +196,8 @@ jobs:
         ci.INSTALL_TOKEN_SERVICE=${{ true }},
         ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
-        ci.AIRFLOW_WEBSERVER_USERNAME = ${{ env.GH_WEBSERVER_USERNAME }},         
-        ci.AIRFLOW_WEBSERVER_PASSWORD = ${{ env.GH_WEBSERVER_PASSWORD }} 
+        ci.AIRFLOW_WEBSERVER_USERNAME=${{ env.GH_WEBSERVER_USERNAME }},         
+        ci.AIRFLOW_WEBSERVER_PASSWORD=${{ env.GH_WEBSERVER_PASSWORD }} 
 
   deploy-airflow-prod:
     if:  github.ref == 'refs/heads/main'
@@ -230,8 +230,8 @@ jobs:
         ci.INSTALL_TOKEN_SERVICE=${{ true }},
         ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
-        ci.AIRFLOW_WEBSERVER_USERNAME = ${{ env.GH_WEBSERVER_USERNAME }},         
-        ci.AIRFLOW_WEBSERVER_PASSWORD = ${{ env.GH_WEBSERVER_PASSWORD }} 
+        ci.AIRFLOW_WEBSERVER_USERNAME=${{ env.GH_WEBSERVER_USERNAME }},         
+        ci.AIRFLOW_WEBSERVER_PASSWORD=${{ env.GH_WEBSERVER_PASSWORD }} 
 
   deploy_pull_request_airflow:
     if: ${{ github.event.pull_request }}
