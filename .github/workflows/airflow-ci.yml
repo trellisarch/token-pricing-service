@@ -125,7 +125,7 @@ jobs:
       workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDP }}
       service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
       role_to_assume: ${{ secrets.DOCKERHUB_RELEASER_ROLE }}
-
+  
   deploy-airflow-dev:
     if:  github.ref == 'refs/heads/develop'
     name: "Deploy Airflow Dev"
@@ -156,7 +156,7 @@ jobs:
         ci.INSTALL_TOKEN_SERVICE=${{ true }},
         ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }}
-
+  
   deploy-airflow-prod:
     if:  github.ref == 'refs/heads/main'
     name: "Deploy Airflow Prod"

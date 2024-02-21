@@ -31,6 +31,17 @@ spec:
       annotations:
         summary: "Airflow DAG failed: {{ "{{$labels.dag_id}}" }}"
         description: "DAG '{{ "{{$labels.dag_id}}" }}' failed."
+    
+    - alert: OraclePriceDAGFailure
+      expr: af_agg_dagrun_duration_failed_count{dag_id="oracle_price"} > 0
+      for: 1m
+      labels:
+        severity: critical
+        tier: application
+        application: airflow
+      annotations:
+        summary: "Oracle Price DAG failed: {{ "{{$labels.dag_id}}" }}"
+        description: "DAG '{{ "{{$labels.dag_id}}" }}' failed."
 
     - alert: AirflowDAGImportErrors
       expr: airflow_dag_processing_import_errors > 0
