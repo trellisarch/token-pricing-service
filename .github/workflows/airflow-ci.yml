@@ -152,8 +152,8 @@ jobs:
       - name: Set outputs
         id: setup_outputs
         run: |
-          echo "::set-output name=webserver-dev-username::${{ env.GH_WEBSERVER_USERNAME }}"
-          echo "::set-output name=webserver-dev-password::${{ env.GH_WEBSERVER_PASSWORD }}"
+          echo "webserver-dev-username=${{ env.GH_WEBSERVER_USERNAME }}" >> $GITHUB_OUTPUT
+          echo "webserver-dev-password=${{ env.GH_WEBSERVER_PASSWORD }}" >> $GITHUB_OUTPUT
           echo "WEBSERVER USERNAME: ${{ env.GH_WEBSERVER_USERNAME }}"
 
   deploy-airflow-dev:
@@ -187,8 +187,8 @@ jobs:
         ci.INSTALL_TOKEN_SERVICE=${{ true }},
         ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
-        ci.AIRFLOW_WEBSERVER_USERNAME=${{ env.GH_WEBSERVER_USERNAME }},         
-        ci.AIRFLOW_WEBSERVER_PASSWORD=${{ env.GH_WEBSERVER_PASSWORD }} 
+        ci.AIRFLOW_WEBSERVER_USERNAME=${{ needs.fetch-airflow-dev-secrets.outputs.webserver-dev-username }},         
+        ci.AIRFLOW_WEBSERVER_PASSWORD=${{ needs.fetch-airflow-dev-secrets.outputs.webserver-dev-password }} 
   
   fetch-airflow-prod-secrets:
     if:  github.ref == 'refs/heads/main'
