@@ -126,31 +126,6 @@ jobs:
       service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
       role_to_assume: ${{ secrets.DOCKERHUB_RELEASER_ROLE }}
   
-  fetch-airflow-dev-secrets:
-    if:  github.ref == 'refs/heads/develop'
-    name: "Fetch Airflow Dev secrets"
-    runs-on: ubuntu-latest
-    permissions: write-all
-    outputs:
-      webserver-dev-username: ${{ steps.setup_outputs.outputs.webserver-dev-username }}
-      webserver-dev-password: ${{ steps.setup_outputs.outputs.webserver-dev-password }}
-    steps:
-      - uses: RDXWorks-actions/checkout@main
-      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
-        with:
-          role_name: ${{ secrets.AWS_ROLE_NAME_AIRFLOW_SECRETS }}
-          app_name: 'airflow'
-          step_name: 'airflow-webserver-secrets'
-          secret_prefix: 'GH'
-          secret_name: ${{ secrets.AWS_AIRFLOW_DEV_SECRET_ARN }}
-          parse_json: true
-      - name: Set outputs
-        id: setup_outputs
-        run: |
-          echo "webserver-dev-username=${{ env.GH_WEBSERVER_USERNAME }}" >> $GITHUB_OUTPUT
-          echo "webserver-dev-password=${{ env.GH_WEBSERVER_PASSWORD }}" >> $GITHUB_OUTPUT
-          echo "WEBSERVER USERNAME: ${{ env.GH_WEBSERVER_USERNAME }}"
-
   deploy-airflow-dev:
     if:  github.ref == 'refs/heads/develop'
     name: "Deploy Airflow Dev"
@@ -160,7 +135,6 @@ jobs:
       - build-airflow
       - build-airflow-migrations
       - build-token-service
-      - fetch-airflow-dev-secrets
     with:
       app_name: 'airflow'
       step_name: 'deploy-airflow-dev'
@@ -181,29 +155,8 @@ jobs:
         ci.INSTALL_AIRFLOW=${{ true }},
         ci.INSTALL_TOKEN_SERVICE=${{ true }},
         ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
-        ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
-        ci.AIRFLOW_WEBSERVER_USERNAME=${{ needs.fetch-airflow-dev-secrets.outputs.webserver-dev-username }},         
-        ci.AIRFLOW_WEBSERVER_PASSWORD=${{ needs.fetch-airflow-dev-secrets.outputs.webserver-dev-password }}
+        ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }}
   
-  fetch-airflow-prod-secrets:
-    if:  github.ref == 'refs/heads/main'
-    name: "Fetch Airflow Prod secrets"
-    runs-on: ubuntu-latest
-    outputs:
-      webserver-prod-username: ${{ env.GH_WEBSERVER_USERNAME }}
-      webserver-prod-password: ${{ env.GH_WEBSERVER_PASSWORD }}
-    permissions: write-all
-    steps:
-      - uses: RDXWorks-actions/checkout@main
-      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
-        with:
-          role_name: ${{ secrets.AWS_ROLE_NAME_AIRFLOW_SECRETS }}
-          app_name: 'airflow'
-          step_name: 'airflow-webserver-secrets'
-          secret_prefix: 'GH'
-          secret_name: ${{ secrets.AWS_AIRFLOW_PROD_SECRET_ARN }}
-          parse_json: true  
-
   deploy-airflow-prod:
     if:  github.ref == 'refs/heads/main'
     name: "Deploy Airflow Prod"
@@ -213,7 +166,6 @@ jobs:
       - build-airflow
       - build-airflow-migrations
       - build-token-service
-      - fetch-airflow-prod-secrets
     with:
       app_name: 'airflow'
       step_name: 'deploy-airflow-prod'
@@ -234,9 +186,7 @@ jobs:
         ci.INSTALL_AIRFLOW=${{ true }},
         ci.INSTALL_TOKEN_SERVICE=${{ true }},
         ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
-        ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
-        ci.AIRFLOW_WEBSERVER_USERNAME=${{ needs.fetch-airflow-prod-secrets.outputs.webserver-prod-username }},         
-        ci.AIRFLOW_WEBSERVER_PASSWORD=${{ needs.fetch-airflow-prod-secrets.outputs.webserver-prod-password }} 
+        ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }}
 
   deploy_pull_request_airflow:
     if: ${{ github.event.pull_request }}
