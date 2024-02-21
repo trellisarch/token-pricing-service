@@ -54,7 +54,6 @@ spec:
         summary: "Slow DAG processing on {{ "{{$labels.dag_id}}" }}"
         description: "DAG '{{ "{{$labels.dag_id}}" }}' processing time is over 10secs."
 
-##
     - alert: AirflowHighOperatorFailures
       expr: airflow_operator_failures > 1
       for: 2m
