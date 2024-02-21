@@ -10,7 +10,7 @@ spec:
   - name: Airflow
     rules:
     - alert: AirflowTaskFailure
-      expr: airflow_task_failure_count > 0
+      expr: af_agg_ti_finish{state="failed"} > 0
       for: 5m
       labels:
         severity: warning
@@ -18,11 +18,11 @@ spec:
         application: airflow
       annotations:
         summary: "Airflow task failed: {{ "{{$labels.task_name}}" }}"
-        description: "Task '{{ "{{$labels.task_name}}" }}' in DAG '{{ "{{$labels.dag_id}}" }}' failed."
+        description: "Task '{{ "{{$labels.task_id}}" }}' in DAG '{{ "{{$labels.dag_id}}" }}' failed."
         runbook_url: https://runbooks.extratools.works
 
     - alert: AirflowDAGFailure
-      expr: airflow_dagrun_failed > 0
+      expr: af_agg_dagrun_duration_failed_count > 0
       for: 1m
       labels:
         severity: warning
@@ -32,6 +32,7 @@ spec:
         summary: "Airflow DAG failed: {{ "{{$labels.dag_id}}" }}"
         description: "DAG '{{ "{{$labels.dag_id}}" }}' failed."
 
+## Missing dag_id --> look other metric
     - alert: AirflowDAGImportErrors
       expr: airflow_dag_processing_import_errors > 0
       for: 10m
@@ -44,7 +45,7 @@ spec:
         description: "DAG '{{ "{{$labels.dag_id}}" }}' import errored."
 
     - alert: AirflowSlowDAGProcessing
-      expr: airflow_dag_processing_last_duration{quantile="0.9"} > 10
+      expr: af_agg_dag_processing_duration{quantile="0.9"} > 10
       for: 5m
       labels:
         severity: warning
@@ -54,6 +55,7 @@ spec:
         summary: "Slow DAG processing on {{ "{{$labels.dag_id}}" }}"
         description: "DAG '{{ "{{$labels.dag_id}}" }}' processing time is over 10secs."
 
+##
     - alert: AirflowHighOperatorFailures
       expr: airflow_operator_failures > 1
       for: 2m
@@ -66,7 +68,7 @@ spec:
         description: "Airflow operator reports more than 5 failures/sec"
 
     - alert: AirflowSlowTasks
-      expr: airflow_task_duration{quantile="0.9"} > 20
+      expr: (increase(af_agg_dag_task_duration_sum) / clamp_min(increase(af_agg_dag_task_duration_count),1) != 0) > 20
       for: 2m
       labels:
         severity: warning
