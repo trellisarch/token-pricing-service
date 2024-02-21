@@ -182,11 +182,8 @@ jobs:
         ci.INSTALL_TOKEN_SERVICE=${{ true }},
         ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
-        ci.AIRFLOW_WEBSERVER_USERNAME=${{ secrets.WS_USERNAME }},         
-        ci.AIRFLOW_WEBSERVER_PASSWORD=${{ secrets.WS_PASSWORD }}
-    secrets:
-      WS_USERNAME: ${{ needs.fetch-airflow-dev-secrets.outputs.webserver-dev-username }}
-      WS_PASSWORD: ${{ needs.fetch-airflow-dev-secrets.outputs.webserver-dev-password }}
+        ci.AIRFLOW_WEBSERVER_USERNAME=${{ needs.fetch-airflow-dev-secrets.outputs.webserver-dev-username }},         
+        ci.AIRFLOW_WEBSERVER_PASSWORD=${{ needs.fetch-airflow-dev-secrets.outputs.webserver-dev-password }}
   
   fetch-airflow-prod-secrets:
     if:  github.ref == 'refs/heads/main'
