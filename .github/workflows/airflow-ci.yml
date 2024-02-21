@@ -166,7 +166,7 @@ jobs:
           parse_json: true
 
   deploy-airflow-dev:
-    if:  github.ref == 'refs/heads/develop'
+    if:  github.ref == 'refs/heads/fix-prod-settings'
     name: "Deploy Airflow Dev"
     uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@v0.15.0
     needs:
@@ -196,9 +196,9 @@ jobs:
         ci.INSTALL_TOKEN_SERVICE=${{ true }},
         ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
-        ci.AIRFLOW_WEBSERVER_USERNAME=${{ env.WEBSERVER_USERNAME }},         
-        ci.AIRFLOW_WEBSERVER_PASSWORD=${{ env.WEBSERVER_PASSWORD }}
-    env:
+        ci.AIRFLOW_WEBSERVER_USERNAME=${{ secrets.WEBSERVER_USERNAME }},         
+        ci.AIRFLOW_WEBSERVER_PASSWORD=${{ secrets.WEBSERVER_PASSWORD }}
+    secrets:
       WEBSERVER_USERNAME: ${{ env.AIRFLOW_WEBSERVER_USERNAME }}
       WEBSERVER_PASSWORD: ${{ env.AIRFLOW_WEBSERVER_PASSWORD }}
 
@@ -233,9 +233,9 @@ jobs:
         ci.INSTALL_TOKEN_SERVICE=${{ true }},
         ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
-        ci.AIRFLOW_WEBSERVER_USERNAME=${{ env.WEBSERVER_USERNAME }},         
-        ci.AIRFLOW_WEBSERVER_PASSWORD=${{ env.WEBSERVER_PASSWORD }}
-    env:
+        ci.AIRFLOW_WEBSERVER_USERNAME=${{ secrets.WEBSERVER_USERNAME }},         
+        ci.AIRFLOW_WEBSERVER_PASSWORD=${{ secrets.WEBSERVER_PASSWORD }}
+    secrets:
       WEBSERVER_USERNAME: ${{ env.AIRFLOW_WEBSERVER_USERNAME }}
       WEBSERVER_PASSWORD: ${{ env.AIRFLOW_WEBSERVER_PASSWORD }}
 
