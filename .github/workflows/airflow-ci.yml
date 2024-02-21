@@ -129,11 +129,6 @@ jobs:
   fetch-airflow-dev-secrets:
     if:  github.ref == 'refs/heads/develop'
     name: "Fetch Airflow Dev secrets"
-    needs:
-      - tags
-      - build-airflow
-      - build-airflow-migrations
-      - build-token-service
     runs-on: ubuntu-latest
     permissions: write-all
     outputs:
