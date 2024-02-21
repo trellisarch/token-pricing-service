@@ -134,7 +134,6 @@ jobs:
       - build-airflow
       - build-airflow-migrations
       - build-token-service
-      - fetch-airflow-dev-secrets
     runs-on: ubuntu-latest
     permissions: write-all
     outputs:
