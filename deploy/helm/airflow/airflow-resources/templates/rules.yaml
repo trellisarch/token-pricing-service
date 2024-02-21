@@ -32,7 +32,6 @@ spec:
         summary: "Airflow DAG failed: {{ "{{$labels.dag_id}}" }}"
         description: "DAG '{{ "{{$labels.dag_id}}" }}' failed."
 
-## Missing dag_id --> look other metric
     - alert: AirflowDAGImportErrors
       expr: airflow_dag_processing_import_errors > 0
       for: 10m
