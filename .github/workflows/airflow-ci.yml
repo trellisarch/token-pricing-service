@@ -126,7 +126,6 @@ jobs:
       service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
       role_to_assume: ${{ secrets.DOCKERHUB_RELEASER_ROLE }}
 
-
   fetch-airflow-dev-secrets:
     if:  github.ref == 'refs/heads/develop'
     name: "Fetch Airflow Dev secrets"
@@ -225,7 +224,9 @@ jobs:
         ci.INSTALL_AIRFLOW=${{ true }},
         ci.INSTALL_TOKEN_SERVICE=${{ true }},
         ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
-        ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }}
+        ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
+        ci.AIRFLOW_WEBSERVER_USERNAME = ${{ env.GH_WEBSERVER_USERNAME }},         
+        ci.AIRFLOW_WEBSERVER_PASSWORD = ${{ env.GH_WEBSERVER_PASSWORD }} 
 
   deploy_pull_request_airflow:
     if: ${{ github.event.pull_request }}
