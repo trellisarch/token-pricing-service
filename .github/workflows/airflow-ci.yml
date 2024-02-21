@@ -130,9 +130,6 @@ jobs:
     if:  github.ref == 'refs/heads/develop'
     name: "Fetch Airflow Dev secrets"
     runs-on: ubuntu-latest
-    outputs:
-      webserver-dev-username: ${{ env.GH_WEBSERVER_USERNAME }}
-      webserver-dev-password: ${{ env.GH_WEBSERVER_PASSWORD }}
     permissions: write-all
     steps:
       - uses: RDXWorks-actions/checkout@main
@@ -143,26 +140,12 @@ jobs:
           step_name: 'airflow-webserver-secrets'
           secret_prefix: 'GH'
           secret_name: ${{ secrets.AWS_AIRFLOW_DEV_SECRET_ARN }}
-          parse_json: true  
-
-  fetch-airflow-prod-secrets:
-    if:  github.ref == 'refs/heads/main'
-    name: "Fetch Airflow Prod secrets"
-    runs-on: ubuntu-latest
-    outputs:
-      webserver-prod-username: ${{ env.GH_WEBSERVER_USERNAME }}
-      webserver-prod-password: ${{ env.GH_WEBSERVER_PASSWORD }}
-    permissions: write-all
-    steps:
-      - uses: RDXWorks-actions/checkout@main
-      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
-        with:
-          role_name: ${{ secrets.AWS_ROLE_NAME_AIRFLOW_SECRETS }}
-          app_name: 'airflow'
-          step_name: 'airflow-webserver-secrets'
-          secret_prefix: 'GH'
-          secret_name: ${{ secrets.AWS_AIRFLOW_PROD_SECRET_ARN }}
-          parse_json: true  
+          parse_json: true
+      - name: Set outputs
+        run: |
+          echo "::set-output name=webserver-dev-username::${{ env.GH_WEBSERVER_USERNAME }}"
+          echo "::set-output name=webserver-dev-password::${{ env.GH_WEBSERVER_PASSWORD }}"
+          echo "WEBSERVER USERNAME: ${{ env.GH_WEBSERVER_USERNAME }}"
 
   deploy-airflow-dev:
     if:  github.ref == 'refs/heads/develop'
@@ -197,6 +180,25 @@ jobs:
         ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.AIRFLOW_WEBSERVER_USERNAME=${{ needs.fetch-airflow-dev-secrets.outputs.webserver-dev-username }},         
         ci.AIRFLOW_WEBSERVER_PASSWORD=${{ needs.fetch-airflow-dev-secrets.outputs.webserver-dev-password }} 
+  
+  fetch-airflow-prod-secrets:
+    if:  github.ref == 'refs/heads/main'
+    name: "Fetch Airflow Prod secrets"
+    runs-on: ubuntu-latest
+    outputs:
+      webserver-prod-username: ${{ env.GH_WEBSERVER_USERNAME }}
+      webserver-prod-password: ${{ env.GH_WEBSERVER_PASSWORD }}
+    permissions: write-all
+    steps:
+      - uses: RDXWorks-actions/checkout@main
+      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
+        with:
+          role_name: ${{ secrets.AWS_ROLE_NAME_AIRFLOW_SECRETS }}
+          app_name: 'airflow'
+          step_name: 'airflow-webserver-secrets'
+          secret_prefix: 'GH'
+          secret_name: ${{ secrets.AWS_AIRFLOW_PROD_SECRET_ARN }}
+          parse_json: true  
 
   deploy-airflow-prod:
     if:  github.ref == 'refs/heads/main'
