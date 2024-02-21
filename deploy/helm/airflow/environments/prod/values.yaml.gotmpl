@@ -43,3 +43,15 @@ workers:
             secretKeyRef:
               name: db-migration-postgres-secrets-formatted
               key: connection
+
+webserver:
+  defaultUser:
+    enabled: true
+    role: Admin
+    username: {{ .StateValues.ci.AIRFLOW_WEBSERVER_USERNAME }}
+    email: team-devops@rdx.works
+    firstName: team-devops
+    lastName: team-devops
+    password: {{ .StateValues.ci.AIRFLOW_WEBSERVER_PASSWORD }}
+    
+webserverSecretKeySecretName: webserver-key
