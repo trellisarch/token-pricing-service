@@ -125,6 +125,16 @@ jobs:
       workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDP }}
       service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
       role_to_assume: ${{ secrets.DOCKERHUB_RELEASER_ROLE }}
+  
+  checkout-reusable-artifacts:
+    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
+    name: Checkout reusable artifacts
+    uses: RDXWorks-actions/checkout@main
+    needs:
+      - tags
+      - build-airflow
+      - build-airflow-migrations
+      - build-token-service    
 
   fetch-airflow-dev-secrets:
     if:  github.ref == 'refs/heads/develop'
@@ -135,6 +145,7 @@ jobs:
       - build-airflow
       - build-airflow-migrations
       - build-token-service
+      - checkout-reusable-artifacts
     with:
       role_name: ${{ secrets.AWS_ROLE_NAME_AIRFLOW_SECRETS }}
       app_name: 'airflow'
@@ -152,6 +163,7 @@ jobs:
       - build-airflow
       - build-airflow-migrations
       - build-token-service
+      - checkout-reusable-artifacts
     with:
       role_name: ${{ secrets.AWS_ROLE_NAME_AIRFLOW_SECRETS }}
       app_name: 'airflow'
