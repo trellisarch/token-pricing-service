@@ -155,9 +155,6 @@ jobs:
     if:  github.ref == 'refs/heads/develop'
     name: "Deploy Airflow Dev"
     uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@v0.15.0
-    env:
-      WS_USERNAME: ${{ needs.fetch-airflow-prod-secrets.outputs.webserver-prod-username }}
-      WS_PASSWORD: ${{ needs.fetch-airflow-prod-secrets.outputs.webserver-prod-password }}
     needs:
       - tags
       - build-airflow
@@ -185,8 +182,11 @@ jobs:
         ci.INSTALL_TOKEN_SERVICE=${{ true }},
         ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
-        ci.AIRFLOW_WEBSERVER_USERNAME=${{ env.WS_USERNAME }},         
-        ci.AIRFLOW_WEBSERVER_PASSWORD=${{ env.WS_PASSWORD }} 
+        ci.AIRFLOW_WEBSERVER_USERNAME=${{ secrets.WS_USERNAME }},         
+        ci.AIRFLOW_WEBSERVER_PASSWORD=${{ secrets.WS_PASSWORD }}
+    secrets:
+      WS_USERNAME: ${{ needs.fetch-airflow-dev-secrets.outputs.webserver-dev-username }}
+      WS_PASSWORD: ${{ needs.fetch-airflow-dev-secrets.outputs.webserver-dev-password }}
   
   fetch-airflow-prod-secrets:
     if:  github.ref == 'refs/heads/main'
