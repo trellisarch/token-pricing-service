@@ -131,6 +131,10 @@ jobs:
     name: "Fetch Airflow Dev secrets"
     runs-on: ubuntu-latest
     permissions: write-all
+    outputs:
+      webserver-dev-username: ${{ steps.setup_outputs.outputs.webserver-dev-username }}
+      webserver-dev-password: ${{ steps.setup_outputs.outputs.webserver-dev-password }}
+      airflow-json: ${{ steps.docker-tags-airflow-service.outputs.json }}
     steps:
       - uses: RDXWorks-actions/checkout@main
       - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
@@ -179,8 +183,8 @@ jobs:
         ci.INSTALL_TOKEN_SERVICE=${{ true }},
         ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
-        ci.AIRFLOW_WEBSERVER_USERNAME=${{ needs.fetch-airflow-dev-secrets.steps.setup_outputs.outputs.webserver-dev-username }},         
-        ci.AIRFLOW_WEBSERVER_PASSWORD=${{ needs.fetch-airflow-dev-secrets.steps.setup_outputs.outputs.webserver-dev-password }} 
+        ci.AIRFLOW_WEBSERVER_USERNAME=${{ needs.fetch-airflow-dev-secrets.outputs.webserver-dev-username }},         
+        ci.AIRFLOW_WEBSERVER_PASSWORD=${{ needs.fetch-airflow-dev-secrets.outputs.webserver-dev-password }} 
   
   fetch-airflow-prod-secrets:
     if:  github.ref == 'refs/heads/main'
