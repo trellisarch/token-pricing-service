@@ -66,7 +66,7 @@ spec:
         description: "Airflow operator reports more than 5 failures/sec"
 
     - alert: AirflowSlowTasks
-      expr: af_agg_dag_task_duration_sum > 20
+      expr: af_agg_dag_task_duration{quantile="0.9"} > 20
       for: 2m
       labels:
         severity: warning
@@ -74,4 +74,4 @@ spec:
         application: airflow
       annotations:
         summary: "Slow Airflow task execution for {{ "{{$labels.dag_id}}" }} {{ "{{$labels.task_id}}" }}"
-        description: "Task execution time is over 120 seconds on the 90th percentile"
+        description: "Task execution time is over 20 seconds on the 90th percentile"
