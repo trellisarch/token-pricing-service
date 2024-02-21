@@ -134,12 +134,6 @@ jobs:
     steps:
       - uses: RDXWorks-actions/checkout@main
       - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
-        needs:
-          - tags
-          - build-airflow
-          - build-airflow-migrations
-          - build-token-service
-          - checkout-reusable-artifacts
         with:
           role_name: ${{ secrets.AWS_ROLE_NAME_AIRFLOW_SECRETS }}
           app_name: 'airflow'
@@ -156,12 +150,6 @@ jobs:
     steps:
       - uses: RDXWorks-actions/checkout@main
       - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
-        needs:
-          - tags
-          - build-airflow
-          - build-airflow-migrations
-          - build-token-service
-          - checkout-reusable-artifacts
         with:
           role_name: ${{ secrets.AWS_ROLE_NAME_AIRFLOW_SECRETS }}
           app_name: 'airflow'
