@@ -126,7 +126,6 @@ jobs:
       service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
       role_to_assume: ${{ secrets.DOCKERHUB_RELEASER_ROLE }}
 
-
   fetch-airflow-dev-secrets:
     if:  github.ref == 'refs/heads/develop'
     runs-on: ubuntu-latest
@@ -166,7 +165,7 @@ jobs:
           parse_json: true
 
   deploy-airflow-dev:
-    if:  github.ref == 'refs/heads/fix-prod-settings'
+    if:  github.ref == 'refs/heads/develop'
     name: "Deploy Airflow Dev"
     uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@v0.15.0
     needs:
