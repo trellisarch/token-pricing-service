@@ -56,10 +56,10 @@ jobs:
 
   build-airflow:
     needs: 
-    - tags
+      - tags
+    runs-on: ubuntu-latest
     uses: radixdlt/public-iac-resuable-artifacts/.github/workflows/docker-build.yml@main
     with:
-      runs_on: ubuntu-latest
       image_registry: "docker.io"
       image_organization: "radixdlt"
       image_name: "airflow"
@@ -80,10 +80,10 @@ jobs:
 
   build-token-service:
     needs: 
-    - tags
+      - tags
+    runs-on: ubuntu-latest
     uses: radixdlt/public-iac-resuable-artifacts/.github/workflows/docker-build.yml@main
     with:
-      runs_on: ubuntu-latest
       image_registry: "docker.io"
       image_organization: "radixdlt"
       image_name: "token-price-service"
@@ -104,10 +104,10 @@ jobs:
 
   build-airflow-migrations:
     needs: 
-    - tags
+      - tags
+    runs-on: ubuntu-latest
     uses: radixdlt/public-iac-resuable-artifacts/.github/workflows/docker-build.yml@main
     with:
-      runs_on: ubuntu-latest
       image_registry: "docker.io"
       image_organization: "radixdlt"
       image_name: "airflow-migration"
