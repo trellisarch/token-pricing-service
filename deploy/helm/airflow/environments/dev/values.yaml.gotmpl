@@ -9,7 +9,6 @@ ingress:
         - path: /
           pathType: ImplementationSpecific
   tls: []
-  
 docker:
   secrets:
     region: eu-west-1
@@ -47,3 +46,5 @@ webserver:
     firstName: team-devops
     lastName: team-devops
     password: $(WEBSERVER_PASSWORD)
+
+webserverSecretKeySecretName: webserver-secret-key
