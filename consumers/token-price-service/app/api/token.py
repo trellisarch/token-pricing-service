@@ -10,7 +10,7 @@ logger = get_logger()
 tokens_router = APIRouter()
 
 
-@tokens_router.post("/", response_model=list[Token])
+@tokens_router.post("", response_model=list[Token])
 async def get_tokens():
     tokens = fetch_tokens_with_latest_price()
 
