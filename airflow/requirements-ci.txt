@@ -5,3 +5,4 @@ praw
 pythclient
 sqlalchemy
 pytest
+pytest-asyncio
