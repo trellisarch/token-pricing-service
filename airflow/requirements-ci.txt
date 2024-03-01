@@ -1,0 +1,7 @@
+tweepy
+PyGithub
+radix-engine-toolkit
+praw
+pythclient
+sqlalchemy
+pytest

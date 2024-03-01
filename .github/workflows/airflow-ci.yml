@@ -31,9 +31,20 @@ jobs:
         with:
           options: "--check --verbose"
           src: "."
-
-  tags:
+  unit-tests:
     needs: lint
+    runs-on: ubuntu-latest
+    container:
+      image: python:3.10
+    steps:
+      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
+      - name: unit tests
+        run: |
+          cd airflow 
+          pip install -r requirements-ci.txt
+          pytest
+  tags:
+    needs: unit-tests
     runs-on: ubuntu-latest
     outputs:
       airflow-tags: ${{ steps.docker-tags-airflow-service.outputs.tags }}
