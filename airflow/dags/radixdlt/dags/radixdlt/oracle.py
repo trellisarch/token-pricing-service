@@ -1,13 +1,9 @@
-import asyncio
 from datetime import datetime, timedelta
 from airflow.decorators import task, dag
 from radixdlt.lib.cmc import process_cmc_prices
-from radixdlt.lib.coingecko import calculate_xrd_quote, process_coin_gecko_prices
+from radixdlt.lib.coingecko import process_coin_gecko_prices
 from radixdlt.lib.oracle import update_oracle
-from radixdlt.lib.pyth import get_pyth_prices
-
-
-from radixdlt.models.oracles.token_price import OracleTokenPrice
+from radixdlt.lib.pyth import process_pyth_prices
 
 default_args = {
     "owner": "airflow",
@@ -31,21 +27,13 @@ def oracle_prices_dag():
 
     @task
     def process_pyth_prices_task():
-        pyth_xrd_prices = {}
-        pyth_prices = asyncio.run(get_pyth_prices())
-        for pair in pyth_prices.keys():
-            pyth_xrd_price = calculate_xrd_quote(
-                pyth_prices[pair], pyth_prices["XRD/USD"]
-            )
-            pyth_xrd_prices[f'{pair.split("/")[0]}/XRD'] = pyth_xrd_price
-            OracleTokenPrice.insert_price(pair, pyth_xrd_price, "PYTH")
-        return pyth_xrd_prices
+        return process_pyth_prices()
 
     @task
     def update_oracle_task(coin_gecko_prices, cmc_prices, pyth_prices):
         update_oracle(coin_gecko_prices, cmc_prices, pyth_prices)
 
-    update_oracle(
+    update_oracle_task(
         process_coin_gecko_prices_task(),
         process_cmc_prices_task(),
         process_pyth_prices_task(),
