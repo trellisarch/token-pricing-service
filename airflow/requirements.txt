@@ -2,3 +2,4 @@ tweepy
 PyGithub
 radix-engine-toolkit
 praw
+pythclient

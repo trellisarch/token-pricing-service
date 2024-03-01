@@ -1,9 +1,14 @@
+import asyncio
 import logging
 from datetime import datetime, timedelta
 import requests
 from airflow.decorators import task, dag
+from pythclient.pythclient import PythClient
+from pythclient.solana import PYTHNET_HTTP_ENDPOINT
+from pythclient.utils import get_key
+
 from radixdlt.config.config import Config
-from radixdlt.lib.coingecko import calculate_xrd_quote
+from radixdlt.lib.coingecko import calculate_xrd_quote, process_coin_gecko_prices
 from radixdlt.lib.ret import create_transaction
 
 from radixdlt.models.oracles.token_price import OracleTokenPrice
@@ -16,38 +21,39 @@ default_args = {
     "retry_delay": timedelta(minutes=5),
 }
 
-COIN_DICT = {
-    "radix": "XRD",
-    "bitcoin": "BTC",
-    "ethereum": "ETH",
-    "tether": "USDT",
-    "usd-coin": "USDC",
-}
+
+async def get_pyth_prices():
+    v2_first_mapping_account_key = get_key("pythnet", "mapping")
+    v2_program_key = get_key("pythnet", "program")
+    async with PythClient(
+        first_mapping_account_key=v2_first_mapping_account_key,
+        program_key=v2_program_key,
+        solana_endpoint=PYTHNET_HTTP_ENDPOINT,
+    ) as c:
+        pyth_prices = {}
+        products = await c.get_products()
+        for p in products:
+            if p.symbol in [
+                "Crypto.BTC/USD",
+                "Crypto.XRD/USD",
+                "Crypto.ETH/USD",
+                "Crypto.USDT/USD",
+                "Crypto.USDC/USD",
+            ]:
+
+                prices = await p.get_prices()
+                for _, pr in prices.items():
+                    pyth_prices[p.symbol.split("Crypto.")[1]] = pr.aggregate_price
+        await c.close()
+        return pyth_prices
 
 
 @dag(schedule=None, default_args=default_args, catchup=False, dag_id="oracle_price")
 def oracle_prices_dag():
 
     @task
-    def process_coin_gecko_prices():
-        headers = {"accept": "application/json"}
-        coin_ids = Config.ORACLE_COIN_GECKO_IDS.split(",")
-
-        coin_gecko_price = requests.get(
-            url=f"{Config.COIN_GECKO_API}/simple/price?ids="
-            f"{','.join(coin_ids)},radix&vs_currencies=USD",
-            headers=headers,
-        ).json()
-
-        coin_gecko_prices = {}
-        for coin_id in coin_ids:
-            coin_pair = f"{COIN_DICT[coin_id]}/XRD"
-            coin_gecko_xrd_price = calculate_xrd_quote(
-                coin_gecko_price[coin_id]["usd"], coin_gecko_price["radix"]["usd"]
-            )
-            coin_gecko_prices[coin_pair] = coin_gecko_xrd_price
-            OracleTokenPrice.insert_price(coin_pair, coin_gecko_xrd_price, "CoinGecko")
-        return coin_gecko_prices
+    def process_coin_gecko_prices_task():
+        return process_coin_gecko_prices()
 
     @task
     def process_cmc_pairs():
@@ -66,8 +72,6 @@ def oracle_prices_dag():
                 "Accepts": "application/json",
                 "X-CMC_PRO_API_KEY": f"{Config.COINMARKETCAP_DEV_API_KEY}",
             }
-
-            logging.info(headers)
             cmc_price_response = requests.get(url=url, headers=headers)
             if cmc_price_response.status_code == 200:
                 cmc_price = cmc_price_response.json()["data"][base][0]["quote"][quote][
@@ -80,20 +84,42 @@ def oracle_prices_dag():
         return cmc_prices
 
     @task
-    def update_oracle(coin_gecko_prices, cmc_prices):
+    def process_pyth_prices():
+        pyth_xrd_prices = {}
+        pyth_prices = asyncio.run(get_pyth_prices())
+        for pair in pyth_prices.keys():
+            pyth_xrd_price = calculate_xrd_quote(
+                pyth_prices[pair], pyth_prices["XRD/USD"]
+            )
+            pyth_xrd_prices[f'{pair.split("/")[0]}/XRD'] = pyth_xrd_price
+            OracleTokenPrice.insert_price(pair, pyth_xrd_price, "PYTH")
+        return pyth_xrd_prices
+
+    @task
+    def update_oracle(coin_gecko_prices, cmc_prices, pyth_prices):
         transaction_metadata = []
+        logging.info(f"Gecko prices: {coin_gecko_prices}")
+        logging.info(f"CMC prices: {cmc_prices}")
+        logging.info(f"Pyth prices: {pyth_prices}")
         for pair, gecko_price in coin_gecko_prices.items():
             cmc_price = cmc_prices.get(pair, None)
             if cmc_price is not None:
                 logging.info(f"Checking pair: {pair}")
                 logging.info(f"Gecko price: {gecko_price}")
                 logging.info(f"CMC price: {cmc_price}")
-                price_diff = abs(gecko_price - cmc_price) / max(gecko_price, cmc_price)
-                logging.info(f"Price difference: {price_diff}")
-                if price_diff < Config.ORACLE_PRICE_DIFF_TRIGGER:
-                    avg_price = (gecko_price + cmc_price) / 2
+                logging.info(f"PYTH price: {pyth_prices[pair]}")
+
+                gecko_lowest_price = gecko_price - gecko_price * 5 / 100
+                gecko_highest_price = gecko_price + gecko_price * 5 / 100
+
+                cmc_lowest_price = cmc_price - cmc_price * 5 / 100
+                cmc_highest_price = cmc_price + cmc_price * 5 / 100
+
+                if (gecko_lowest_price < pyth_prices[pair] < gecko_highest_price) or (
+                    cmc_lowest_price < pyth_prices[pair] < cmc_highest_price
+                ):
                     transaction_metadata.append(
-                        {"base": pair.split("/")[0], "price": avg_price}
+                        {"base": pair.split("/")[0], "price": pyth_prices[pair]}
                     )
         if len(transaction_metadata) > 0:
             logging.info(transaction_metadata)
@@ -110,7 +136,9 @@ def oracle_prices_dag():
         else:
             logging.info("Nothing to update")
 
-    update_oracle(process_coin_gecko_prices(), process_cmc_pairs())
+    update_oracle(
+        process_coin_gecko_prices(), process_cmc_pairs(), process_pyth_prices()
+    )
 
 
 oracle_prices_dag()

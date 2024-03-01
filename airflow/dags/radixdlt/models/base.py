@@ -3,7 +3,7 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 
 from radixdlt.config.config import Config
 
-engine = create_engine(Config.DB_URI)
+engine = create_engine(Config.DB_URI or "sqlite:///app.db")
 Session = sessionmaker(bind=engine)
 Base = declarative_base()
 
