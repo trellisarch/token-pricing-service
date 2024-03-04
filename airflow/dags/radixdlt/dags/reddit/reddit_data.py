@@ -22,6 +22,7 @@ dag = DAG("reddit", default_args=default_args, schedule_interval="0 0 * * 1")
 client_id = Config.REDDIT_CLIENT_ID
 client_secret = Config.REDDIT_CLIENT_SECRET
 user_agent = Config.REDDIT_USER_AGENT
+refresh_token = Config.REDDIT_REFRESH_TOKEN
 
 
 def get_reddit_redditor_data(user_name):
@@ -50,6 +51,7 @@ def get_reddit_subreddit_data(user_name):
             client_id=client_id,
             client_secret=client_secret,
             user_agent=user_agent,
+            refresh_token=refresh_token,
         )
 
         subreddit = reddit.subreddit(user_name)

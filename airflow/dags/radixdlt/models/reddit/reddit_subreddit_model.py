@@ -14,6 +14,9 @@ class RedditSubredditData(Base):
     account = Column(String, nullable=False)
     subscribers_count = Column(Integer)
     active_user_count = Column(Integer)
+    unique_pageviews = Column(Integer)
+    total_pageviews = Column(Integer)
+    subscribers = Column(Integer)
     timestamp = Column(DateTime, default=datetime.now)
 
     @classmethod
@@ -23,14 +26,32 @@ class RedditSubredditData(Base):
         subscribers_count = api_response.subscribers
         active_user_count = api_response.active_user_count
 
-        # To get traffic, PRAW should authenticate with username and password
-        # https://praw.readthedocs.io/en/stable/getting_started/faq.html
-        # traffic = api_response.traffic
+        try:
+            traffic = api_response.traffic()
+
+            week = traffic["day"][1:8]
+
+            unique_pageviews = total_pageviews = subscribers = 0
+
+            for entry in week:
+                unique_pageviews += entry[1]
+                total_pageviews += entry[2]
+                subscribers += entry[3]
+
+        except Exception as traffic_error:
+            logging.error(f"Could not retrieve traffic information: {traffic_error}")
+            unique_pageviews = 0
+            total_pageviews = 0
+            subscribers = 0
 
         logging.info(
             f"""user: {account},
-                     subscribers_count: {subscribers_count}, 
-                     active_user_count: {active_user_count}"""
+                subscribers_count: {subscribers_count}, 
+                active_user_count: {active_user_count},
+                unique_pageviews: {unique_pageviews},
+                total_pageviews: {total_pageviews},
+                subscribers: {subscribers}
+            """
         )
 
         try:
@@ -40,6 +61,9 @@ class RedditSubredditData(Base):
                 account=account,
                 subscribers_count=subscribers_count,
                 active_user_count=active_user_count,
+                unique_pageviews=unique_pageviews,
+                total_pageviews=total_pageviews,
+                subscribers=subscribers,
             )
             session.add(new_info)
             logging.info("Data inserted successfully.")

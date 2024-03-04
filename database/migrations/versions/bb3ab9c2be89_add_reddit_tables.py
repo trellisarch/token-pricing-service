@@ -26,6 +26,9 @@ def upgrade() -> None:
         sa.Column("account", sa.String(), nullable=True),
         sa.Column("subscribers_count", sa.Integer(), nullable=True),
         sa.Column("active_user_count", sa.Integer(), nullable=True),
+        sa.Column("unique_pageviews", sa.Integer(), nullable=True),
+        sa.Column("total_pageviews", sa.Integer(), nullable=True),
+        sa.Column("subscribers", sa.Integer(), nullable=True),
         sa.Column("timestamp", sa.DateTime(), nullable=False),
         sa.PrimaryKeyConstraint("id"),
     )
