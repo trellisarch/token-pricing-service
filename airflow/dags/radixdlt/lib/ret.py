@@ -1,6 +1,7 @@
 import json
 import logging
 import random
+from os import getenv
 from os.path import abspath, dirname, join
 from secrets import token_bytes
 
@@ -18,8 +19,7 @@ from radixdlt.config.config import Config
 
 
 def create_transaction(transaction_metadata):
-    # TODO: this will be replaced by a key in belonging to the service
-    private_key_bytes = token_bytes(32)
+    private_key_bytes = getenv("PRIVATE_KEY_BYTES", None).encode()
     private_key = PrivateKey.new_secp256k1(private_key_bytes)
     address = derive_virtual_account_address_from_public_key(
         public_key=private_key.public_key(), network_id=2
