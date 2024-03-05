@@ -1,25 +1,26 @@
 {
-  "network_id": 2,
-  "oracle_address": "component_tdx_2_1cqz4fg2nnhctxl4fh2m64n0j6jegw4fra9hyc9fhxsta9g9zf5x40x",
+  "network_id": 1,
+  "oracle_address": "component_rdx1crty68w9d6ud4ecreewvpsvgyq0u9ta8syqrmuzelem593putyu79e",
+  "badge_resource_address": "resource_rdx1tky4yalqsh5wjenesrfsql0v9j68zrn4wm6yu5s48h8cf0qkfe7qgj",
   "quote_resource": {
-    "resource_address": "resource_tdx_2_1thwmtk9qet08y3wpujd8nddmvjuqyptg5nt0mw0zcdgcrahu5k36qx",
+    "resource_address": "resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd",
     "symbol": "XRD"
   },
   "base_resources": [
     {
-      "resource_address": "resource_tdx_2_1t4p3ytx933n576pdps4ua7jkjh36zrh36a543u0tfcsu2vthavlqg8",
+      "resource_address": "resource_rdx1thrvr3xfs2tarm2dl9emvs26vjqxu6mqvfgvqjne940jv0lnrrg7rw",
       "symbol": "USDT"
     },
     {
-      "resource_address": "resource_tdx_2_1t59gx963vzd6u6fz63h5de2zh9nmgwxc8y832edmr6pxvz98wg6zu3",
+      "resource_address": "resource_rdx1th88qcj5syl9ghka2g9l7tw497vy5x6zaatyvgfkwcfe8n9jt2npww",
       "symbol": "ETH"
     },
     {
-      "resource_address": "resource_tdx_2_1thfv477eqwlh8x4wt6xsc62myt4z0zxmdpr4ea74fa8jnxh243y60r",
+      "resource_address": "resource_rdx1t4upr78guuapv5ept7d7ptekk9mqhy605zgms33mcszen8l9fac8vf",
       "symbol": "USDC"
     },
     {
-      "resource_address": "resource_tdx_2_1thltk578jr4v7axqpu5ceznhlha6ca2qtzcflqdmytgtf37xncu7l9",
+      "resource_address": "resource_rdx1t580qxc7upat7lww4l2c4jckacafjeudxj5wpjrrct0p3e82sq4y75",
       "symbol": "BTC"
     }
   ]

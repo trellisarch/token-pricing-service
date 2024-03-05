@@ -60,6 +60,11 @@ Tuple(
 
     instructions_list = f"""
 CALL_METHOD
+    Address("${address}")
+    "create_proof_of_amount"
+    Address("${quote_config["badge_resource_address"]}")
+    Decimal("1");
+CALL_METHOD
     Address("{Config.ORACLE_LOCK_FEE_ADDRESS}")
     "lock_fee"
     Decimal("{Config.ORACLE_LOCK_FEE}");
