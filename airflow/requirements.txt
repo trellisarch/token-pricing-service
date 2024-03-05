@@ -3,3 +3,4 @@ PyGithub
 radix-engine-toolkit
 praw
 pythclient
+requests

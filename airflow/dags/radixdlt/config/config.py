@@ -48,3 +48,12 @@ class Config:
     REDDIT_CLIENT_SECRET = getenv("REDDIT_CLIENT_SECRET")
     REDDIT_USER_AGENT = getenv("REDDIT_USER_AGENT")
     REDDIT_REFRESH_TOKEN = getenv("REDDIT_REFRESH_TOKEN")
+
+    BURNTRACKER_FIVE_BURN = (
+        "https://burntracker.io/api/token/getFiveBurnData?symbol=XRD"
+    )
+    BURNTRACKER_BURNDATA = "https://burntracker.io/api/token/fetch_burndata_for_graph?decimal=18&symbol=XRD&type=Token&format=burn&range=24h"
+    DEFILAMA_TVL = "https://api.llama.fi/v2/historicalChainTvl/Radix"
+    RADIX_API_STATS = "https://api.radixapi.net/v1/network/statistics"
+    COINGECKO_XRD = "https://api.coingecko.com/api/v3/coins/radix/history?date="
+    COINGECKO_EXRD = "https://api.coingecko.com/api/v3/coins/e-radix/history?date="

@@ -6,3 +6,4 @@ pythclient
 sqlalchemy
 pytest
 pytest-asyncio
+requests
