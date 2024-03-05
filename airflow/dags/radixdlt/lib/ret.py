@@ -21,7 +21,7 @@ def create_transaction(transaction_metadata):
     private_key_bytes = bytes.fromhex(private_key_bytes_hex)
     private_key = PrivateKey.new_secp256k1(private_key_bytes)
     address = derive_virtual_account_address_from_public_key(
-        public_key=private_key.public_key(), network_id=2
+        public_key=private_key.public_key(), network_id=1
     )
 
     network_id = Config.NETWORK_ID
@@ -60,14 +60,14 @@ Tuple(
 
     instructions_list = f"""
 CALL_METHOD
-    Address("${address.as_str()}")
-    "create_proof_of_amount"
-    Address("${quote_config["badge_resource_address"]}")
-    Decimal("1");
-CALL_METHOD
-    Address("{Config.ORACLE_LOCK_FEE_ADDRESS}")
+    Address("{address.as_str()}")
     "lock_fee"
     Decimal("{Config.ORACLE_LOCK_FEE}");
+CALL_METHOD
+    Address("{address.as_str()}")
+    "create_proof_of_amount"
+    Address("{quote_config["badge_resource_address"]}")
+    Decimal("1");
 CALL_METHOD
     Address("{quote_config["oracle_address"]}")
     "set_price_batch"
@@ -76,6 +76,7 @@ CALL_METHOD
     );
 """
 
+    logging.info(instructions_list)
     instructions = Instructions.from_string(
         string=instructions_list, network_id=network_id
     )

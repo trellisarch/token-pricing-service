@@ -1,5 +1,4 @@
 from os import getenv
-from urllib.parse import quote_plus
 
 
 class Config:
@@ -8,8 +7,8 @@ class Config:
     RADIX_CHARTS_AUTHORIZATION_TOKEN = getenv("RADIX_CHARTS_AUTHORIZATION_TOKEN")
 
     DB_URI = getenv("DB_URI")
-    NETWORK_ID = getenv("NETWORK_ID", 2)
-    NETWORK_GATEWAY = getenv("NETWORK_GATEWAY", "https://stokenet.radixdlt.com")
+    NETWORK_ID = getenv("NETWORK_ID", 1)
+    NETWORK_GATEWAY = getenv("NETWORK_GATEWAY", "https://mainnet.radixdlt.com")
 
     COINMARKETCAP_DEV_API_KEY = getenv("COINMARKETCAP_DEV_API_KEY")
     COIN_GECKO_API = getenv("COIN_GECKO_API", "https://api.coingecko.com/api/v3")

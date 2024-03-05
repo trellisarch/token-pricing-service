@@ -14,7 +14,12 @@ default_args = {
 }
 
 
-@dag(schedule=None, default_args=default_args, catchup=False, dag_id="oracle_price")
+@dag(
+    schedule_interval="*/1 * * * *",
+    default_args=default_args,
+    catchup=False,
+    dag_id="oracle_price",
+)
 def oracle_prices_dag():
 
     @task

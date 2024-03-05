@@ -35,9 +35,11 @@ def update_oracle(coin_gecko_prices, cmc_prices, pyth_prices):
         submit_transaction_body = {
             "notarized_transaction_hex": notarized_transaction_hex
         }
-        requests.post(
+        response = requests.post(
             url=f"{Config.NETWORK_GATEWAY}/transaction/submit",
             json=submit_transaction_body,
         )
+        logging.info("Oracle price update transaction submitted successfully")
+        logging.info(response.text)
     else:
         logging.info("Nothing to update")
