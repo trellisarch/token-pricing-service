@@ -60,7 +60,7 @@ Tuple(
 
     instructions_list = f"""
 CALL_METHOD
-    Address("${address}")
+    Address("${address.as_str()}")
     "create_proof_of_amount"
     Address("${quote_config["badge_resource_address"]}")
     Decimal("1");
