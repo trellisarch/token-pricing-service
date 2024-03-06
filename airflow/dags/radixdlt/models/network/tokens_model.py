@@ -44,7 +44,6 @@ class TokensData(Base):
         token_id,
         response_api,
     ):
-
         token_response = response_api.json()
 
         symbol = token_response["symbol"]

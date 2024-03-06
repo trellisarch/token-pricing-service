@@ -25,6 +25,7 @@ def process_coin_gecko_prices():
     coin_ids = Config.ORACLE_COIN_GECKO_IDS.split(",")
 
     try:
+        logging.info(f"Getting gecko prices from {Config.COIN_GECKO_API}")
         coin_gecko_price_response = requests.get(
             url=f"{Config.COIN_GECKO_API}/simple/price?ids="
             f"{','.join(coin_ids)},radix&vs_currencies=USD",

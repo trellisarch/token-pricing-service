@@ -20,7 +20,6 @@ class RedditRedditorData(Base):
 
     @classmethod
     def fetch_and_save_data(cls, account, api_response):
-
         # Extract relevant user information
         comment_karma = api_response.comment_karma
         link_karma = api_response.link_karma

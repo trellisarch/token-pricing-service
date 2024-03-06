@@ -31,7 +31,9 @@ def update_oracle(coin_gecko_prices, cmc_prices, pyth_prices):
                 )
     if len(transaction_metadata) > 0:
         logging.info(transaction_metadata)
-        notarized_transaction_hex, address = create_transaction(transaction_metadata)
+        notarized_transaction_hex, address, txn_intent_hash = create_transaction(
+            transaction_metadata
+        )
         submit_transaction_body = {
             "notarized_transaction_hex": notarized_transaction_hex
         }
@@ -41,5 +43,7 @@ def update_oracle(coin_gecko_prices, cmc_prices, pyth_prices):
         )
         logging.info("Oracle price update transaction submitted successfully")
         logging.info(response.text)
+        return txn_intent_hash
     else:
         logging.info("Nothing to update")
+        raise

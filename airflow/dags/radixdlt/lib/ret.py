@@ -17,7 +17,7 @@ from radixdlt.config.config import Config
 
 
 def create_transaction(transaction_metadata):
-    private_key_bytes_hex = getenv("PRIVATE_KEY_BYTES", None)
+    private_key_bytes_hex = getenv("PRIVATE_KEY_BYTES")
     private_key_bytes = bytes.fromhex(private_key_bytes_hex)
     private_key = PrivateKey.new_secp256k1(private_key_bytes)
     address = derive_virtual_account_address_from_public_key(
@@ -103,4 +103,5 @@ CALL_METHOD
     return (
         "".join(hex(i)[2:].zfill(2) for i in notarized_transaction.compile()),
         address,
+        notarized_transaction.intent_hash().as_str(),
     )

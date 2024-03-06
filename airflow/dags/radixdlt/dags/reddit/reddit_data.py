@@ -26,7 +26,6 @@ refresh_token = Config.REDDIT_REFRESH_TOKEN
 
 
 def get_reddit_redditor_data(user_name):
-
     try:
         # Initialize Reddit instance
         reddit = praw.Reddit(
@@ -44,7 +43,6 @@ def get_reddit_redditor_data(user_name):
 
 
 def get_reddit_subreddit_data(user_name):
-
     try:
         # Initialize Reddit instance
         reddit = praw.Reddit(

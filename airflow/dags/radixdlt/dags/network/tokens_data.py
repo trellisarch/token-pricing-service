@@ -28,7 +28,6 @@ def get_tokens(token_id):
     }
 
     try:
-
         coin_gecko_price_response = requests.get(
             url=f"{Config.COIN_GECKO_API}/coins/{token_id}",
             headers=headers,

@@ -21,7 +21,6 @@ class RedditSubredditData(Base):
 
     @classmethod
     def fetch_and_save_data(cls, account, api_response):
-
         # Extract relevant user information
         subscribers_count = api_response.subscribers
         active_user_count = api_response.active_user_count

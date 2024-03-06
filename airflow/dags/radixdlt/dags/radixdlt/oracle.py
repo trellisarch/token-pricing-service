@@ -1,8 +1,10 @@
+import logging
 from datetime import datetime, timedelta
 from airflow.decorators import task, dag
 from radixdlt.config.config import Config
 from radixdlt.lib.cmc import process_cmc_prices
 from radixdlt.lib.coingecko import process_coin_gecko_prices
+from radixdlt.lib.gateway import is_transaction_committed
 from radixdlt.lib.oracle import update_oracle
 from radixdlt.lib.pyth import process_pyth_prices
 
@@ -22,7 +24,6 @@ default_args = {
     dag_id="oracle_price",
 )
 def oracle_prices_dag():
-
     @task
     def process_coin_gecko_prices_task():
         return process_coin_gecko_prices()
@@ -37,12 +38,20 @@ def oracle_prices_dag():
 
     @task
     def update_oracle_task(coin_gecko_prices, cmc_prices, pyth_prices):
-        update_oracle(coin_gecko_prices, cmc_prices, pyth_prices)
+        return update_oracle(coin_gecko_prices, cmc_prices, pyth_prices)
 
-    update_oracle_task(
-        process_coin_gecko_prices_task(),
-        process_cmc_prices_task(),
-        process_pyth_prices_task(),
+    @task
+    def get_transaction_status_task(txn_intent_hash):
+        logging.info(f"Getting the status of transaction: {txn_intent_hash}")
+        transaction_committed = is_transaction_committed(txn_intent_hash)
+        assert transaction_committed
+
+    get_transaction_status_task(
+        update_oracle_task(
+            process_coin_gecko_prices_task(),
+            process_cmc_prices_task(),
+            process_pyth_prices_task(),
+        )
     )
 
 

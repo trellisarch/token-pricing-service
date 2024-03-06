@@ -26,7 +26,6 @@ async def get_pyth_prices():
                 "Crypto.USDT/USD",
                 "Crypto.USDC/USD",
             ]:
-
                 prices = await p.get_prices()
                 for _, pr in prices.items():
                     pyth_prices[p.symbol.split("Crypto.")[1]] = pr.aggregate_price

@@ -51,6 +51,7 @@ x-airflow-common:
   # Comment the image line, place your Dockerfile in the directory where you placed the docker-compose.yaml
   # and uncomment the "build" line below, Then run `docker-compose build` to build the images.
   image: local-airflow
+  platform: linux/amd64
   # build: .
   environment:
     &airflow-common-env
@@ -91,7 +92,7 @@ x-airflow-common:
     TELEGRAM_RADIX_DEVS_COMBOT_ID: $TELEGRAM_RADIX_DEVS_COMBOT_ID
     TELEGRAM_RADIX_DEVS_COMBOT_API_KEY: $TELEGRAM_RADIX_DEVS_COMBOT_API_KEY
     COIN_MARKET_CAP_TOKEN: $COIN_MARKET_CAP_TOKEN
-    DB_URI: postgresql+psycopg2://postgres:postgres@airflow-postgresql/postgres
+    DB_URI: postgresql+psycopg2://postgres:postgres@airflow-postgresql/dags
     REDDIT_CLIENT_ID: $REDDIT_CLIENT_ID
     REDDIT_CLIENT_SECRET: $REDDIT_CLIENT_SECRET
     REDDIT_USER_AGENT: $REDDIT_USER_AGENT

@@ -1,3 +1,5 @@
+import logging
+
 from sqlalchemy import Column, String, Float, DateTime, Integer
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
@@ -17,6 +19,7 @@ class OracleTokenPrice(Base):
     @classmethod
     def insert_price(cls, pair, quote, quote_source):
         session = get_session()
+        logging.info(session)
         new_price = cls(
             pair=pair,
             quote=quote,

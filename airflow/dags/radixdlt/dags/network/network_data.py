@@ -24,7 +24,6 @@ def get_network():
     cursor = None
 
     try:
-
         # Make a GET request to the API
         response_five = requests.get(Config.BURNTRACKER_FIVE_BURN)
         response_burn = requests.get(Config.BURNTRACKER_BURNDATA)
