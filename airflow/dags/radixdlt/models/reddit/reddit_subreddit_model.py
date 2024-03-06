@@ -28,14 +28,13 @@ class RedditSubredditData(Base):
         try:
             traffic = api_response.traffic()
 
-            week = traffic["day"][1:8]
+            data_day = traffic["day"][1]
 
             unique_pageviews = total_pageviews = subscribers = 0
 
-            for entry in week:
-                unique_pageviews += entry[1]
-                total_pageviews += entry[2]
-                subscribers += entry[3]
+            unique_pageviews = data_day[1]
+            total_pageviews = data_day[2]
+            subscribers = data_day[3]
 
         except Exception as traffic_error:
             logging.error(f"Could not retrieve traffic information: {traffic_error}")

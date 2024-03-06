@@ -12,12 +12,12 @@ from radixdlt.models.reddit.reddit_subreddit_model import RedditSubredditData
 default_args = {
     "owner": "airflow",
     "depends_on_past": False,
-    "start_date": datetime(2024, 1, 16),
+    "start_date": datetime(2024, 3, 5),
     "retries": 0,
     "retry_delay": timedelta(minutes=5),
 }
 
-dag = DAG("reddit", default_args=default_args, schedule_interval="0 0 * * 1")
+dag = DAG("reddit", default_args=default_args, schedule_interval="0 0 * * *")
 
 client_id = Config.REDDIT_CLIENT_ID
 client_secret = Config.REDDIT_CLIENT_SECRET

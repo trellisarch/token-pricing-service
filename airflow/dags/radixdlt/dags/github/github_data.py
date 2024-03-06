@@ -4,8 +4,10 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 from github import Github
 from radixdlt.config.config import Config
-from radixdlt.models.github.github_model import (
+from radixdlt.models.github.github_accounts_model import (
     GithubAccountsData,
+)
+from radixdlt.models.github.github_repositories_model import (
     GithubRepositoriesData,
 )
 
@@ -13,12 +15,12 @@ from radixdlt.models.github.github_model import (
 default_args = {
     "owner": "airflow",
     "depends_on_past": False,
-    "start_date": datetime(2024, 1, 16),
+    "start_date": datetime(2024, 3, 5),
     "retries": 1,
     "retry_delay": timedelta(minutes=5),
 }
 
-dag = DAG("github", default_args=default_args, schedule_interval="0 0 * * 1")
+dag = DAG("github", default_args=default_args, schedule_interval="0 0 * * *")
 
 
 def get_github_user(user_name):

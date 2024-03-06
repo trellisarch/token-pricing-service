@@ -10,12 +10,12 @@ from radixdlt.models.twitter.twitter_model import TwitterData
 default_args = {
     "owner": "airflow",
     "depends_on_past": False,
-    "start_date": datetime(2024, 1, 16),
+    "start_date": datetime(2024, 3, 5),
     "retries": 0,
     "retry_delay": timedelta(minutes=5),
 }
 
-dag = DAG("twitter", default_args=default_args, schedule_interval="0 0 * * 1")
+dag = DAG("twitter", default_args=default_args, schedule_interval="0 0 * * *")
 
 
 def get_twitter_followers(

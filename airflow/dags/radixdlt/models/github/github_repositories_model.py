@@ -8,51 +8,6 @@ from radixdlt.models.base import get_session
 Base = declarative_base()
 
 
-class GithubAccountsData(Base):
-    __tablename__ = "github_accounts"
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    account = Column(String, nullable=False)
-    public_repos_total = Column(Integer)
-    followers_total = Column(Integer)
-    gists_total = Column(Integer)
-    following_total = Column(Integer)
-    timestamp = Column(DateTime, default=datetime.now)
-
-    @classmethod
-    def fetch_and_save_data(cls, account, api_response):
-        # Extract relevant user information
-        public_repos_total = api_response.get_repos().totalCount
-        followers_total = api_response.get_followers().totalCount
-        gists_total = api_response.get_gists().totalCount
-        following_total = api_response.get_following().totalCount
-
-        logging.info(
-            f"""public_repos_total: {public_repos_total}, 
-                     followers_total: {followers_total}, 
-                     gists_total: {gists_total}, 
-                     following_total: {following_total}"""
-        )
-
-        try:
-            session = get_session()
-
-            new_info = cls(
-                account=account,
-                public_repos_total=public_repos_total,
-                followers_total=followers_total,
-                gists_total=gists_total,
-                following_total=following_total,
-            )
-            session.add(new_info)
-            logging.info("Data inserted successfully.")
-            session.commit()
-            session.close()
-
-        except SQLAlchemyError as e:
-            session.rollback()
-            logging.error(f"Error occurred: {e}")
-
-
 class GithubRepositoriesData(Base):
     __tablename__ = "github_repositories"
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -109,6 +64,27 @@ class GithubRepositoriesData(Base):
             clones_traffic_unique = 0
             views_traffic = 0
             views_traffic_unique = 0
+
+        logging.info(
+            f"""commits:{commits},
+                branches:{branches},
+                pr_all:{pr_all},
+                pr_open:{pr_open},
+                pr_closed:{pr_closed},
+                issues_all:{issues_all},
+                issues_open:{issues_open},
+                issues_closed:{issues_closed},
+                contributors:{contributors},
+                releases:{releases},
+                subscribers:{subscribers},
+                tags:{tags},
+                watchers:{watchers},
+                clones_traffic:{clones_traffic},
+                clones_traffic_unique:{clones_traffic_unique},
+                views_traffic:{views_traffic},
+                views_traffic_unique:{views_traffic_unique},
+                """
+        )
 
         try:
             session = get_session()

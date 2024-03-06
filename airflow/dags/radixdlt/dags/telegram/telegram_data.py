@@ -11,12 +11,12 @@ from radixdlt.models.telegram.telegram_model import TelegramData
 default_args = {
     "owner": "airflow",
     "depends_on_past": False,
-    "start_date": datetime(2024, 1, 16),
+    "start_date": datetime(2024, 3, 5),
     "retries": 1,
     "retry_delay": timedelta(minutes=5),
 }
 
-dag = DAG("telegram", default_args=default_args, schedule_interval="0 0 * * 1")
+dag = DAG("telegram", default_args=default_args, schedule_interval="0 0 * * *")
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -37,16 +37,17 @@ def get_telegram_info(user_name, bot_id, combot_id, combot_api_key):
         current_time = datetime.now()  # Use UTC time instead of local time
 
         # Calculate timestamps
+        from_timestamp = int(
+            (current_time - timedelta(days=1))
+            .replace(hour=0, minute=0, second=0)
+            .timestamp()
+        )
+
         to_timestamp = int(
             (
                 current_time.replace(hour=23, minute=59, second=59)
                 + timedelta(seconds=1)
             ).timestamp()
-        )
-        from_timestamp = int(
-            (current_time - timedelta(days=6))
-            .replace(hour=0, minute=0, second=0)
-            .timestamp()
         )
 
         # Your combot API URL
