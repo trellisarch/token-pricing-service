@@ -16,7 +16,10 @@ def calculate_xrd_quote(base_usd_price, xrd_usd_price):
 
 
 def process_coin_gecko_prices():
-    headers = {"accept": "application/json"}
+    headers = {
+        "accept": "application/json",
+        "x-cg-pro-api-key": Config.COIN_GECKO_API_KEY,
+    }
     coin_ids = Config.ORACLE_COIN_GECKO_IDS.split(",")
 
     try:

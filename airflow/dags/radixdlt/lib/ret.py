@@ -21,7 +21,7 @@ def create_transaction(transaction_metadata):
     private_key_bytes = bytes.fromhex(private_key_bytes_hex)
     private_key = PrivateKey.new_secp256k1(private_key_bytes)
     address = derive_virtual_account_address_from_public_key(
-        public_key=private_key.public_key(), network_id=1
+        public_key=private_key.public_key(), network_id=Config.NETWORK_ID
     )
 
     network_id = Config.NETWORK_ID

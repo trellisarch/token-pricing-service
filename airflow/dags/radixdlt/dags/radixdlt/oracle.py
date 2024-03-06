@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from airflow.decorators import task, dag
+from radixdlt.config.config import Config
 from radixdlt.lib.cmc import process_cmc_prices
 from radixdlt.lib.coingecko import process_coin_gecko_prices
 from radixdlt.lib.oracle import update_oracle
@@ -15,7 +16,7 @@ default_args = {
 
 
 @dag(
-    schedule_interval="*/1 * * * *",
+    schedule_interval=Config.ORACLE_SCHEDULE_INTERVAL,
     default_args=default_args,
     catchup=False,
     dag_id="oracle_price",

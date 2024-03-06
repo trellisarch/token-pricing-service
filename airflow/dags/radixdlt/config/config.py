@@ -7,12 +7,15 @@ class Config:
     RADIX_CHARTS_AUTHORIZATION_TOKEN = getenv("RADIX_CHARTS_AUTHORIZATION_TOKEN")
 
     DB_URI = getenv("DB_URI")
-    NETWORK_ID = getenv("NETWORK_ID", 1)
-    NETWORK_GATEWAY = getenv("NETWORK_GATEWAY", "https://mainnet.radixdlt.com")
+
+    NETWORK_ID = getenv("NETWORK_ID", 2)
+    NETWORK_GATEWAY = getenv("NETWORK_GATEWAY", "https://stokenet.radixdlt.com")
 
     COINMARKETCAP_DEV_API_KEY = getenv("COINMARKETCAP_DEV_API_KEY")
     COIN_GECKO_API = getenv("COIN_GECKO_API", "https://api.coingecko.com/api/v3")
+    COIN_GECKO_API_KEY = getenv("COIN_GECKO_API_KEY", "")
 
+    ORACLE_SCHEDULE_INTERVAL = getenv("ORACLE_SCHEDULE_INTERVAL", None)
     ORACLE_COIN_GECKO_IDS = "radix,bitcoin,ethereum,tether,usd-coin"
     ORACLE_CMC_PAIRS = "BTC/XRD,ETH/XRD,USDT/XRD,USDC/XRD"
     ORACLE_PRICE_DIFF_TRIGGER = 0.02
