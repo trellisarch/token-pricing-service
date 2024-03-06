@@ -1,3 +1,5 @@
+import logging
+
 import requests
 from radixdlt.config.config import Config
 from radixdlt.models.oracles.token_price import OracleTokenPrice
@@ -31,8 +33,10 @@ def process_coin_gecko_prices():
         if coin_gecko_price_response.status_code == 200:
             coin_gecko_price = coin_gecko_price_response.json()
         else:
+            logging.info(coin_gecko_price_response.text)
             raise
-    except Exception:
+    except Exception as e:
+        logging.info(str(e))
         raise Exception("Failed to get the Coin Gecko prices")
 
     coin_gecko_prices = {}
