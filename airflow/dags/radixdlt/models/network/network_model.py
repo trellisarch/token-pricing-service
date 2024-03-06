@@ -32,10 +32,6 @@ class NetworkData(Base):
     max_supply = Column(Float)
     current_block = Column(Float)
     price = Column(Float)
-    xrd_market_cap_usd = Column(Float)
-    xrd_total_volume_usd = Column(Float)
-    exrd_market_cap_usd = Column(Float)
-    exrd_total_volume_usd = Column(Float)
     timestamp = Column(DateTime, default=datetime.now)
 
     @classmethod
@@ -45,8 +41,6 @@ class NetworkData(Base):
         response_burn,
         response_defillama,
         response_radixapi,
-        response_coingecko_xrd,
-        response_coingecko_exrd,
     ):
         # Extract relevant user information
         # Parse the JSON response
@@ -81,16 +75,6 @@ class NetworkData(Base):
         created_accounts_total = radixapi_stats["data"]["total"]["created_accounts"]
         staked_xrd = radixapi_stats["data"]["total"]["staked_xrd"]
 
-        xrd = response_coingecko_xrd.json()
-
-        xrd_market_cap_usd = xrd["market_data"]["market_cap"]["usd"]
-        xrd_total_volume_usd = xrd["market_data"]["total_volume"]["usd"]
-
-        exrd = response_coingecko_exrd.json()
-
-        exrd_market_cap_usd = exrd["market_data"]["market_cap"]["usd"]
-        exrd_total_volume_usd = exrd["market_data"]["total_volume"]["usd"]
-
         logging.info(
             f"""tx_count_24h: {tx_count_24h},
                 created_accounts_24h: {created_accounts_24h},
@@ -112,10 +96,6 @@ class NetworkData(Base):
                 max_supply: {max_supply},
                 current_block: {current_block},
                 price: {price},
-                xrd_market_cap_usd: {xrd_market_cap_usd},
-                xrd_total_volume_usd: {xrd_total_volume_usd},
-                exrd_market_cap_usd: {exrd_market_cap_usd},
-                exrd_total_volume_usd: {exrd_total_volume_usd}
             """
         )
 
@@ -143,10 +123,6 @@ class NetworkData(Base):
                 max_supply=max_supply,
                 current_block=current_block,
                 price=price,
-                xrd_market_cap_usd=xrd_market_cap_usd,
-                xrd_total_volume_usd=xrd_total_volume_usd,
-                exrd_market_cap_usd=exrd_market_cap_usd,
-                exrd_total_volume_usd=exrd_total_volume_usd,
             )
             session.add(new_info)
             logging.info("Data inserted successfully.")

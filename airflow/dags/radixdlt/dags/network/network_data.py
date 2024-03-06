@@ -25,8 +25,6 @@ def get_network():
 
     try:
 
-        today_date = datetime.now().strftime("%d-%m-%Y")
-
         # Make a GET request to the API
         response_five = requests.get(Config.BURNTRACKER_FIVE_BURN)
         response_burn = requests.get(Config.BURNTRACKER_BURNDATA)
@@ -35,16 +33,11 @@ def get_network():
             Config.RADIX_API_STATS, headers=get_radix_charts_headers()
         )
 
-        response_coingecko_xrd = requests.get(Config.COINGECKO_XRD + today_date)
-        response_coingecko_exrd = requests.get(Config.COINGECKO_EXRD + today_date)
-
         NetworkData.fetch_and_save_data(
             response_five,
             response_burn,
             response_defillama,
             response_radixapi,
-            response_coingecko_xrd,
-            response_coingecko_exrd,
         )
 
     except Exception as e:
