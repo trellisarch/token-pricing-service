@@ -6,11 +6,13 @@ extraEnv: |
   - name: COIN_GECKO_API
     value: 'https://pro-api.coingecko.com'
   - name: NETWORK_ID
-    value: 1
+    value: "1"
   - name: NETWORK_GATEWAY
     value: 'https://mainnet.radixdlt.com'
   - name: ORACLE_SCHEDULE_INTERVAL
     value: '*/1 * * * *'
+  - name: ORACLE_CONFIG_FILE
+    value: 'config.json'
 
 ingress:
   enabled: true

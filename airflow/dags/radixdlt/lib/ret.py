@@ -40,7 +40,10 @@ def create_transaction(transaction_metadata):
         notary_public_key=private_key.public_key(),
     )
     config_file_path = join(
-        dirname(dirname(abspath(__file__))), "dags", "radixdlt", "config.json"
+        dirname(dirname(abspath(__file__))),
+        "dags",
+        "radixdlt",
+        Config.ORACLE_CONFIG_FILE,
     )
     quotes = ""
     quote_config = json.loads(open(config_file_path).read())
@@ -60,14 +63,19 @@ Tuple(
 
     instructions_list = f"""
 CALL_METHOD
-    Address("{address.as_str()}")
+    Address("{address.as_str() if Config.NETWORK_ID == 1 else Config.ORACLE_LOCK_FEE_ADDRESS}")
     "lock_fee"
     Decimal("{Config.ORACLE_LOCK_FEE}");
+"""
+    if Config.NETWORK_ID == 1:
+        instructions_list += f"""
 CALL_METHOD
     Address("{address.as_str()}")
     "create_proof_of_amount"
     Address("{quote_config["badge_resource_address"]}")
     Decimal("1");
+    """
+    instructions_list += f"""
 CALL_METHOD
     Address("{quote_config["oracle_address"]}")
     "set_price_batch"

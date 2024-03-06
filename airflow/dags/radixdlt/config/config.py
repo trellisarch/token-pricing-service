@@ -8,7 +8,7 @@ class Config:
 
     DB_URI = getenv("DB_URI")
 
-    NETWORK_ID = getenv("NETWORK_ID", 2)
+    NETWORK_ID = int(getenv("NETWORK_ID", 2))
     NETWORK_GATEWAY = getenv("NETWORK_GATEWAY", "https://stokenet.radixdlt.com")
 
     COINMARKETCAP_DEV_API_KEY = getenv("COINMARKETCAP_DEV_API_KEY")
@@ -24,6 +24,7 @@ class Config:
         "component_tdx_2_1cptxxxxxxxxxfaucetxxxxxxxxx000527798379xxxxxxxxxyulkzl",
     )
     ORACLE_LOCK_FEE = float(getenv("ORACLE_LOCK_FEE", 0.58434484845))
+    ORACLE_CONFIG_FILE = getenv("ORACLE_CONFIG_FILE", "config-develop.json")
 
     TWITTER_RADIXDLT_API_KEY = getenv("TWITTER_RADIXDLT_API_KEY")
     TWITTER_RADIXDLT_API_KEY_SECRET = getenv("TWITTER_RADIXDLT_API_KEY_SECRET")
