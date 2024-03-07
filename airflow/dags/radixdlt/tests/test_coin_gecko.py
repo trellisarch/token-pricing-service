@@ -49,20 +49,20 @@ def test_process_coin_gecko_prices_success(mock_requests, mock_insert_price):
 
 def test_process_coin_gecko_prices_api_failure(mock_requests):
     mock_requests.get.side_effect = Exception("API Error")
-    with pytest.raises(Exception, match="Failed to get the Coin Gecko prices"):
-        process_coin_gecko_prices()
+    prices = process_coin_gecko_prices()
+    assert prices == {}
 
 
 def test_process_coin_gecko_response_not_200(mock_requests):
     mock_response = mock_requests.get.return_value
     mock_response.status_code.return_value = 400
-    with pytest.raises(Exception, match="Failed to get the Coin Gecko prices"):
-        process_coin_gecko_prices()
+    prices = process_coin_gecko_prices()
+    assert prices == {}
 
 
 def test_process_coin_gecko_response_not_json(mock_requests):
     mock_response = mock_requests.get.return_value
     mock_response.status_code = 200
     mock_response.json.side_effect = JSONDecodeError("JSON decode error", "", 0)
-    with pytest.raises(Exception, match="Failed to get the Coin Gecko prices"):
-        process_coin_gecko_prices()
+    prices = process_coin_gecko_prices()
+    assert prices == {}

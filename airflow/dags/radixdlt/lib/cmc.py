@@ -22,15 +22,18 @@ def process_cmc_prices():
             "Accepts": "application/json",
             "X-CMC_PRO_API_KEY": f"{Config.COINMARKETCAP_DEV_API_KEY}",
         }
-        cmc_price_response = requests.get(url=url, headers=headers)
-        if cmc_price_response.status_code == 200:
-            cmc_price = cmc_price_response.json()["data"][base][0]["quote"][quote][
-                "price"
-            ]
-            cmc_prices[pair] = cmc_price
-            OracleTokenPrice.insert_price(pair, cmc_price, "CMC")
-        else:
-            logging.info(cmc_price_response.text)
-            raise Exception("Failed to get CMC prices")
-
+        try:
+            cmc_price_response = requests.get(url=url, headers=headers)
+            if cmc_price_response.status_code == 200:
+                cmc_price = cmc_price_response.json()["data"][base][0]["quote"][quote][
+                    "price"
+                ]
+                cmc_prices[pair] = cmc_price
+                OracleTokenPrice.insert_price(pair, cmc_price, "CMC")
+            else:
+                logging.info(cmc_price_response.text)
+                raise Exception("Failed to get CMC prices")
+        except Exception as e:
+            logging.info(str(e))
+    logging.info(f"CMC prices: {cmc_prices}")
     return cmc_prices

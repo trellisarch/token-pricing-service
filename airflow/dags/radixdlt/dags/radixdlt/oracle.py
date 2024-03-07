@@ -1,5 +1,6 @@
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime
+from airflow import AirflowException
 from airflow.decorators import task, dag
 from radixdlt.config.config import Config
 from radixdlt.lib.cmc import process_cmc_prices
@@ -12,8 +13,6 @@ default_args = {
     "owner": "airflow",
     "depends_on_past": False,
     "start_date": datetime(2024, 1, 22),
-    "retries": 1,
-    "retry_delay": timedelta(minutes=5),
 }
 
 
@@ -38,6 +37,8 @@ def oracle_prices_dag():
 
     @task
     def update_oracle_task(coin_gecko_prices, cmc_prices, pyth_prices):
+        if coin_gecko_prices == {} and cmc_prices == {}:
+            raise AirflowException("Both Gecko and CMC prices are empty")
         return update_oracle(coin_gecko_prices, cmc_prices, pyth_prices)
 
     @task

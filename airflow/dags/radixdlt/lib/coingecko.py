@@ -18,6 +18,7 @@ def calculate_xrd_quote(base_usd_price, xrd_usd_price):
 
 
 def process_coin_gecko_prices():
+    coin_gecko_prices = {}
     headers = {
         "accept": "application/json",
         "x-cg-pro-api-key": Config.COIN_GECKO_API_KEY,
@@ -36,17 +37,15 @@ def process_coin_gecko_prices():
         else:
             logging.info(coin_gecko_price_response.text)
             raise
+
+        for coin_id in coin_ids:
+            coin_pair = f"{COIN_DICT[coin_id]}/XRD"
+            coin_gecko_xrd_price = calculate_xrd_quote(
+                coin_gecko_price[coin_id]["usd"], coin_gecko_price["radix"]["usd"]
+            )
+            coin_gecko_prices[coin_pair] = coin_gecko_xrd_price
+            OracleTokenPrice.insert_price(coin_pair, coin_gecko_xrd_price, "CoinGecko")
     except Exception as e:
         logging.info(str(e))
-        raise Exception("Failed to get the Coin Gecko prices")
-
-    coin_gecko_prices = {}
-    for coin_id in coin_ids:
-        coin_pair = f"{COIN_DICT[coin_id]}/XRD"
-        coin_gecko_xrd_price = calculate_xrd_quote(
-            coin_gecko_price[coin_id]["usd"], coin_gecko_price["radix"]["usd"]
-        )
-
-        coin_gecko_prices[coin_pair] = coin_gecko_xrd_price
-        OracleTokenPrice.insert_price(coin_pair, coin_gecko_xrd_price, "CoinGecko")
+    logging.info(f"Gecko prices: {coin_gecko_prices}")
     return coin_gecko_prices

@@ -26,4 +26,3 @@ def test_process_pyth_prices_success(mock_insert_price):
     assert prices["ETH/XRD"] is not None
     assert prices["USDC/XRD"] is not None
     assert prices["USDT/XRD"] is not None
-    assert prices["XRD/XRD"] is not None

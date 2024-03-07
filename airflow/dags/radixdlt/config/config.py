@@ -18,7 +18,7 @@ class Config:
     ORACLE_SCHEDULE_INTERVAL = getenv("ORACLE_SCHEDULE_INTERVAL", None)
     ORACLE_COIN_GECKO_IDS = "radix,bitcoin,ethereum,tether,usd-coin"
     ORACLE_CMC_PAIRS = "BTC/XRD,ETH/XRD,USDT/XRD,USDC/XRD"
-    ORACLE_PRICE_DIFF_TRIGGER = 0.02
+    ORACLE_PRICE_DIFF_TRIGGER = 0.05
     ORACLE_LOCK_FEE_ADDRESS = getenv(
         "ORACLE_LOCK_FEE_ADDRESS",
         "component_tdx_2_1cptxxxxxxxxxfaucetxxxxxxxxx000527798379xxxxxxxxxyulkzl",

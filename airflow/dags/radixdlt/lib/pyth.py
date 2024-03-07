@@ -1,4 +1,5 @@
 import asyncio
+import logging
 
 from pythclient.pythclient import PythClient
 from pythclient.solana import PYTHNET_HTTP_ENDPOINT
@@ -35,9 +36,16 @@ async def get_pyth_prices():
 
 def process_pyth_prices():
     pyth_xrd_prices = {}
-    pyth_prices = asyncio.run(get_pyth_prices())
-    for pair in pyth_prices.keys():
-        pyth_xrd_price = calculate_xrd_quote(pyth_prices[pair], pyth_prices["XRD/USD"])
-        pyth_xrd_prices[f'{pair.split("/")[0]}/XRD'] = pyth_xrd_price
-        OracleTokenPrice.insert_price(pair, pyth_xrd_price, "PYTH")
+    try:
+        pyth_prices = asyncio.run(get_pyth_prices())
+        for pair in pyth_prices.keys():
+            logging.info(f"Pyth pair: {pair}")
+            if pair != "XRD/USD":
+                pyth_xrd_price = calculate_xrd_quote(
+                    pyth_prices[pair], pyth_prices["XRD/USD"]
+                )
+                pyth_xrd_prices[f'{pair.split("/")[0]}/XRD'] = pyth_xrd_price
+                OracleTokenPrice.insert_price(pair, pyth_xrd_price, "PYTH")
+    except Exception:
+        raise
     return pyth_xrd_prices
