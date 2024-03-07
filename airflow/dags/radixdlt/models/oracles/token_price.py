@@ -19,7 +19,6 @@ class OracleTokenPrice(Base):
     @classmethod
     def insert_price(cls, pair, quote, quote_source):
         session = get_session()
-        logging.info(session)
         new_price = cls(
             pair=pair,
             quote=quote,

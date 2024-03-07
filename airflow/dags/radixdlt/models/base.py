@@ -11,5 +11,4 @@ Base = declarative_base()
 
 
 def get_session() -> Session:
-    logging.info(Config.DB_URI)
     return Session()
