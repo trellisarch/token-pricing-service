@@ -61,3 +61,12 @@ class Config:
     BURNTRACKER_BURNDATA = "https://burntracker.io/api/token/fetch_burndata_for_graph?decimal=18&symbol=XRD&type=Token&format=burn&range=24h"
     DEFILAMA_TVL = "https://api.llama.fi/v2/historicalChainTvl/Radix"
     RADIX_API_STATS = "https://api.radixapi.net/v1/network/statistics"
+    COINGECKO_XRD = "https://api.coingecko.com/api/v3/coins/radix/history?date="
+    COINGECKO_EXRD = "https://api.coingecko.com/api/v3/coins/e-radix/history?date="
+
+    YOUTUBE_RADIXDLT_CHANNEL_ID = getenv("YOUTUBE_RADIXDLT_CHANNEL_ID")
+    YOUTUBE_RADIXDLT_REFRESH_TOKEN = getenv("YOUTUBE_RADIXDLT_REFRESH_TOKEN")
+    YOUTUBE_SCRYPTO_CHANNEL_ID = getenv("YOUTUBE_SCRYPTO_CHANNEL_ID")
+    YOUTUBE_SCRYPTO_REFRESH_TOKEN = getenv("YOUTUBE_SCRYPTO_REFRESH_TOKEN")
+    YOUTUBE_CLIENT_ID = getenv("YOUTUBE_CLIENT_ID")
+    YOUTUBE_CLIENT_SECRET = getenv("YOUTUBE_CLIENT_SECRET")
