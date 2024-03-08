@@ -29,6 +29,6 @@ class TestProcessCmcPrices:
             }
         }
         with patch.object(requests, "get", return_value=mock_response):
-            cmc_prices = process_cmc_prices()
+            process_cmc_prices()
             mock_insert_price.assert_any_call("BTC/XRD", 40000, "CMC")
             mock_insert_price.assert_any_call("ETH/XRD", 1000, "CMC")

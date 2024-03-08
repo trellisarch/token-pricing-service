@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import pytest
 from unittest.mock import patch
 from requests import JSONDecodeError
@@ -17,14 +19,15 @@ def mock_insert_price():
 
 
 def test_process_coin_gecko_prices_success(mock_requests, mock_insert_price):
+    utc_now_seconds = int(datetime.utcnow().timestamp())
     mock_response = mock_requests.get.return_value
     mock_response.status_code = 200
     mock_response.json.return_value = {
-        "bitcoin": {"usd": 25000},
-        "ethereum": {"usd": 1700},
-        "radix": {"usd": 0.2},
-        "tether": {"usd": 1},
-        "usd-coin": {"usd": 1},
+        "bitcoin": {"usd": 25000, "last_updated_at": utc_now_seconds},
+        "ethereum": {"usd": 1700, "last_updated_at": utc_now_seconds},
+        "radix": {"usd": 0.2, "last_updated_at": utc_now_seconds},
+        "tether": {"usd": 1, "last_updated_at": utc_now_seconds},
+        "usd-coin": {"usd": 1, "last_updated_at": utc_now_seconds},
     }
 
     result = process_coin_gecko_prices()

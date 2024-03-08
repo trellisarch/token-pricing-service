@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 
 import requests
 from radixdlt.config.config import Config
@@ -18,6 +19,8 @@ def calculate_xrd_quote(base_usd_price, xrd_usd_price):
 
 
 def process_coin_gecko_prices():
+    utc_now_seconds = int(datetime.utcnow().timestamp())
+    utc_three_minutes_ago = utc_now_seconds - 180
     coin_gecko_prices = {}
     headers = {
         "accept": "application/json",
@@ -29,7 +32,7 @@ def process_coin_gecko_prices():
         logging.info(f"Getting gecko prices from {Config.COIN_GECKO_API}")
         coin_gecko_price_response = requests.get(
             url=f"{Config.COIN_GECKO_API}/simple/price?ids="
-            f"{','.join(coin_ids)},radix&vs_currencies=USD",
+            f"{','.join(coin_ids)},radix&vs_currencies=USD&include_last_updated_at=true",
             headers=headers,
         )
         if coin_gecko_price_response.status_code == 200:
@@ -40,11 +43,15 @@ def process_coin_gecko_prices():
 
         for coin_id in coin_ids:
             coin_pair = f"{COIN_DICT[coin_id]}/XRD"
-            coin_gecko_xrd_price = calculate_xrd_quote(
-                coin_gecko_price[coin_id]["usd"], coin_gecko_price["radix"]["usd"]
-            )
-            coin_gecko_prices[coin_pair] = coin_gecko_xrd_price
-            OracleTokenPrice.insert_price(coin_pair, coin_gecko_xrd_price, "CoinGecko")
+
+            if coin_gecko_price[coin_id]["last_updated_at"] > utc_three_minutes_ago:
+                coin_gecko_xrd_price = calculate_xrd_quote(
+                    coin_gecko_price[coin_id]["usd"], coin_gecko_price["radix"]["usd"]
+                )
+                coin_gecko_prices[coin_pair] = coin_gecko_xrd_price
+                OracleTokenPrice.insert_price(
+                    coin_pair, coin_gecko_xrd_price, "CoinGecko"
+                )
     except Exception as e:
         logging.info(str(e))
     logging.info(f"Gecko prices: {coin_gecko_prices}")
