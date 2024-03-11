@@ -16,7 +16,7 @@ default_args = {
     "retry_delay": timedelta(minutes=5),
 }
 
-dag = DAG("youtube", default_args=default_args, schedule_interval="0 0 * * 1")
+dag = DAG("youtube", default_args=default_args, schedule_interval="0 0 * * *")
 
 logging.basicConfig(level=logging.INFO)
 
