@@ -8,5 +8,5 @@ def get_headers():
 def get_radix_charts_headers():
     return {
         "accept": "application/json",
-        "authorization": f"bearer {Config.RADIX_CHARTS_AUTHORIZATION_TOKEN}",
+        "authorization": f"bearer {Config.RADIX_CHARTS_AUTHORIZATION_TOKEN}"
     }
