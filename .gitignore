@@ -3,5 +3,5 @@ logs/
 .idea/
 *.log
 .env
-
+airflow/dags/radixdlt/scripts/*.csv
 consumers/olympia/output
