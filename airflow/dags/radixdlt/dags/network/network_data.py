@@ -20,6 +20,7 @@ dag = DAG(
     "network",
     default_args=default_args,
     schedule_interval=Config.ORACLE_SCHEDULE_INTERVAL,
+    catchup=False,
 )
 
 

@@ -18,6 +18,7 @@ dag = DAG(
     default_args=default_args,
     description="DAG to fetch tokens price and save to PostgreSQL",
     schedule_interval=None,
+    catchup=False,
 )
 
 
