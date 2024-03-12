@@ -42,37 +42,10 @@ def upgrade():
         sa.Column("max_supply", sa.Float(), nullable=False),
         sa.Column("current_block", sa.Float(), nullable=False),
         sa.Column("price", sa.Float(), nullable=False),
-        sa.Column("timestamp", sa.DateTime(), nullable=False),
-        sa.PrimaryKeyConstraint("id"),
-    )
-
-    op.create_table(
-        "tokens",
-        sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("token_id", sa.String(), nullable=False),
-        sa.Column("symbol", sa.String(), nullable=False),
-        sa.Column("market_cap_usd", sa.Float(), nullable=False),
-        sa.Column("total_volume_usd", sa.Float(), nullable=False),
-        sa.Column("sentiment_votes_up_percentage", sa.Float(), nullable=False),
-        sa.Column("sentiment_votes_down_percentage", sa.Float(), nullable=False),
-        sa.Column("watchlist_portfolio_users", sa.Float(), nullable=False),
-        sa.Column("market_cap_rank", sa.Float(), nullable=False),
-        sa.Column("current_price", sa.Float(), nullable=False),
-        sa.Column("total_value_locked_usd", sa.Float(), nullable=False),
-        sa.Column("total_value_locked_btc", sa.Float(), nullable=False),
-        sa.Column("mcap_to_tvl_ratio", sa.Float(), nullable=False),
-        sa.Column("fdv_to_tvl_ratio", sa.Float(), nullable=False),
-        sa.Column("ath", sa.Float(), nullable=False),
-        sa.Column("ath_change_percentage", sa.Float(), nullable=False),
-        sa.Column("ath_date", sa.DateTime(), nullable=False),
-        sa.Column("atl", sa.Float(), nullable=False),
-        sa.Column("atl_change_percentage", sa.Float(), nullable=False),
-        sa.Column("atl_date", sa.DateTime(), nullable=False),
-        sa.Column("fully_diluted_valuation", sa.Float(), nullable=False),
-        sa.Column("market_cap_fdv_ratio", sa.Float(), nullable=False),
-        sa.Column("high_24h", sa.Float(), nullable=False),
-        sa.Column("low_24h", sa.Float(), nullable=False),
-        sa.Column("circulating_supply", sa.Float(), nullable=False),
+        sa.Column("xrd_market_cap_usd", sa.Float(), nullable=False),
+        sa.Column("xrd_total_volume_usd", sa.Float(), nullable=False),
+        sa.Column("exrd_market_cap_usd", sa.Float(), nullable=False),
+        sa.Column("exrd_total_volume_usd", sa.Float(), nullable=False),
         sa.Column("timestamp", sa.DateTime(), nullable=False),
         sa.PrimaryKeyConstraint("id"),
     )
@@ -80,4 +53,3 @@ def upgrade():
 
 def downgrade():
     op.drop_table("network")
-    op.drop_table("tokens")
