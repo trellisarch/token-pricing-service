@@ -39,6 +39,7 @@ def get_github_user(user_name):
 
     except Exception as e:
         logging.error("Error occurred while fetching Github information: %s", e)
+        raise
 
 
 def get_github_repo(user_name, repo_name):
@@ -56,6 +57,7 @@ def get_github_repo(user_name, repo_name):
 
     except Exception as e:
         logging.error("Error occurred while fetching repository info: %s", e)
+        raise
 
 
 # Define the PythonOperator with a function that takes the repository name as a parameter

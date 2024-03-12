@@ -66,6 +66,7 @@ def get_telegram_info(user_name, bot_id, combot_id, combot_api_key):
 
     except Exception as e:
         logging.error("Error occurred while fetching Telegram information: %s", e)
+        raise
 
 
 # Define the PythonOperator with a function that takes the repository name as a parameter

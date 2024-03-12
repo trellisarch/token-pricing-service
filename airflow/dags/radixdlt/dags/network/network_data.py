@@ -45,6 +45,7 @@ def get_network():
 
     except Exception as e:
         logging.error("Error occurred while fetching repository info: %s", e)
+        raise
 
 
 # Define the PythonOperator with a function that takes the repository name as a parameter

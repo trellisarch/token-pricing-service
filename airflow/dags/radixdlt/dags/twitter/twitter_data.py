@@ -39,6 +39,7 @@ def get_twitter_followers(
 
     except Exception as e:
         logging.error("Error occurred while fetching Twitter followers: %s", e)
+        raise
 
 
 # Define the PythonOperator with a function that takes the repository name as a parameter

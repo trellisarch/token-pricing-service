@@ -37,13 +37,11 @@ def get_tokens(token_id):
             headers=headers,
         )
 
-        if coin_gecko_price_response.status_code == 200:
-            TokensData.fetch_and_save_data(token_id, coin_gecko_price_response)
-        else:
-            raise
+        TokensData.fetch_and_save_data(token_id, coin_gecko_price_response)
 
     except Exception as e:
         logging.error("Error occurred while fetching info: %s", e)
+        raise
 
 
 def repo_task(coin_name):

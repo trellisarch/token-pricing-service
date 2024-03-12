@@ -44,6 +44,7 @@ def get_reddit_redditor_data(user_name):
 
     except Exception as e:
         logging.error("Error occurred while fetching Redditor data: %s", e)
+        raise
 
 
 def get_reddit_subreddit_data(user_name):
@@ -62,6 +63,7 @@ def get_reddit_subreddit_data(user_name):
 
     except Exception as e:
         logging.error("Error occurred while fetching Subredditor data: %s", e)
+        raise
 
 
 # Define the PythonOperator with a function that takes the repository name as a parameter

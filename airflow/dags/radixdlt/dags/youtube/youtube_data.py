@@ -40,10 +40,11 @@ def get_youtube_info(user_name, channel, refresh_token):
         )
         credentials.refresh(Request())
 
+        YoutubeData.fetch_and_save_data(user_name, channel, credentials)
+
     except Exception as e:
         logging.error("Error occurred while fetching youtube information: %s", e)
-
-    YoutubeData.fetch_and_save_data(user_name, channel, credentials)
+        raise
 
 
 # Define the PythonOperator with a function that takes the repository name as a parameter
