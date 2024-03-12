@@ -17,7 +17,11 @@ default_args = {
     "retry_delay": timedelta(minutes=5),
 }
 
-dag = DAG("reddit", default_args=default_args, schedule_interval="0 0 * * *")
+dag = DAG(
+    "reddit",
+    default_args=default_args,
+    schedule_interval=Config.ORACLE_SCHEDULE_INTERVAL,
+)
 
 client_id = Config.REDDIT_CLIENT_ID
 client_secret = Config.REDDIT_CLIENT_SECRET

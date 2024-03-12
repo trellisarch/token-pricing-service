@@ -20,7 +20,11 @@ default_args = {
     "retry_delay": timedelta(minutes=5),
 }
 
-dag = DAG("github", default_args=default_args, schedule_interval="0 0 * * *")
+dag = DAG(
+    "github",
+    default_args=default_args,
+    schedule_interval=Config.ORACLE_SCHEDULE_INTERVAL,
+)
 
 
 def get_github_user(user_name):

@@ -16,7 +16,11 @@ default_args = {
     "retry_delay": timedelta(minutes=5),
 }
 
-dag = DAG("telegram", default_args=default_args, schedule_interval="0 0 * * *")
+dag = DAG(
+    "telegram",
+    default_args=default_args,
+    schedule_interval=Config.ORACLE_SCHEDULE_INTERVAL,
+)
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
