@@ -22,8 +22,9 @@ dag = DAG(
 
 
 def fetch_tokens():
-    response = requests.get(url=Config.RADIX_CHARTS_TOKENS_PRICE_LIST,
-                            headers=get_radix_charts_headers())
+    response = requests.get(
+        url=Config.RADIX_CHARTS_TOKENS_PRICE_LIST, headers=get_radix_charts_headers()
+    )
     logging.info(response.text)
     tokens = response.json()["data"]
     logging.info(tokens)
