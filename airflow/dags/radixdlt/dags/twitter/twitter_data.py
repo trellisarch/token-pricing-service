@@ -18,7 +18,7 @@ default_args = {
 dag = DAG(
     "twitter",
     default_args=default_args,
-    schedule_interval=Config.ORACLE_SCHEDULE_INTERVAL,
+    schedule_interval=Config.DAGS_SCHEDULE_INTERVAL,
     catchup=False,
 )
 
