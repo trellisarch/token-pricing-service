@@ -29,3 +29,7 @@ workers:
       env:
         - name: DB_URI
           value: "postgresql://postgres:postgres@airflow-postgresql:5432/dags"
+
+extraEnv: |
+  - name: ORACLE_SCHEDULE_INTERVAL
+    value: '*/1 * * * *'
