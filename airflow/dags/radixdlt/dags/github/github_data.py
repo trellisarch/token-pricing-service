@@ -45,6 +45,8 @@ def get_github_user(user_name):
 
 
 def get_github_repo(user_name, repo_name):
+    conn = None
+    cursor = None
     try:
         # Set up your GitHub API credentials
         github_token = Config.GITHUB_TOKEN
