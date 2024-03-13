@@ -52,9 +52,7 @@ def get_github_repo(user_name, repo_name):
 
         repo_response = github_client.get_repo(user_name + "/" + repo_name)
 
-        GithubRepositoriesData.fetch_and_save_data(
-            user_name, repo_name, repo_response
-        )
+        GithubRepositoriesData.fetch_and_save_data(user_name, repo_name, repo_response)
 
     except Exception as e:
         logging.error("Error occurred while fetching repository info: %s", e)
@@ -127,8 +125,6 @@ def export_statsd_metric():
     statsd_client.gauge("last_run_status", last_run_status)
 
 
-export_metric_task = PythonOperator(
-    task_id="export_metric_task", python_callable=export_statsd_metric, dag=dag
-)
+export_metric_task = PythonOperator(task_id="export_metric_task", python_callable=export_statsd_metric, dag=dag)
 
 github_user_task >> export_metric_task
