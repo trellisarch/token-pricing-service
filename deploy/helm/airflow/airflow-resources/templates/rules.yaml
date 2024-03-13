@@ -10,8 +10,8 @@ spec:
   - name: Airflow
     rules:
     - alert: AirflowTaskFailure
-      expr: af_agg_ti_finish{state="failed"} > 0
-      for: 5m
+      expr: (changes(af_agg_ti_finish{state="failed"}[1d]) > 0) unless (changes(af_agg_ti_finish{state="success"}[1d]) > 0)
+      for: 1m
       labels:
         severity: warning
         tier: application
@@ -22,7 +22,7 @@ spec:
         runbook_url: https://runbooks.extratools.works
         dashboard: https://radixdlt.grafana.net/d/lFXqBGxWk/poc3a-airflow-cluster-dashboard?orgId=1&refresh=5s&var-prometheus=FQomEQz4k&var-namespace=airflow-prod&var-dag_id=All&var-task_id=All&var-loki=6OqgV0p4z
     - alert: AirflowDAGFailure
-      expr: (changes(af_agg_dagrun_duration_failed_count[1d]) > 0) unless (changes(af_agg_dagrun_duration_success_count[1m]) > 0)
+      expr: (changes(af_agg_dagrun_duration_failed_count[1d]) > 0) unless (changes(af_agg_dagrun_duration_success_count[1d]) > 0)
       for: 1m
       labels:
         severity: warning
