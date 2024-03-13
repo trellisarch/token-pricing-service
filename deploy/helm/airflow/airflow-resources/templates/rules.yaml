@@ -34,7 +34,7 @@ spec:
     
     - alert: OraclePriceDAGFailure
       expr: (changes(af_agg_dagrun_duration_failed_count{dag_id="oracle_price"}[2m]) > 0) unless (changes(af_agg_dagrun_duration_success_count{dag_id="oracle_price"}[1m]) > 0)
-      for: 5m
+      for: 2m
       labels:
         severity: critical
         tier: application
