@@ -117,7 +117,11 @@ def get_current_dag_run_status():
     last_dag_run = next(iter(dag_runs), None)
 
     if last_dag_run:
-        return last_dag_run.state if last_dag_run.state in ["success", "failed"] else "running"
+        return (
+            last_dag_run.state
+            if last_dag_run.state in ["success", "failed"]
+            else "running"
+        )
     return "unknown"
 
 
@@ -127,6 +131,8 @@ def export_statsd_metric():
     statsd_client.gauge("last_run_status", last_run_status)
 
 
-export_metric_task = PythonOperator(task_id="export_metric_task", python_callable=export_statsd_metric, dag=dag)
+export_metric_task = PythonOperator(
+    task_id="export_metric_task", python_callable=export_statsd_metric, dag=dag
+)
 
 github_user_task >> export_metric_task
