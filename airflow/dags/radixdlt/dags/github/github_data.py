@@ -10,6 +10,11 @@ from radixdlt.models.github.github_accounts_model import (
 from radixdlt.models.github.github_repositories_model import (
     GithubRepositoriesData,
 )
+from statsd import StatsClient  # Import StatsClient
+
+# StatsD Configuration
+STATSD_HOST = 'localhost'
+STATSD_PORT = 8125
 
 # DAG configuration
 default_args = {
@@ -111,3 +116,29 @@ github_user_task >> github_repo_task14
 github_user_task >> github_repo_task15
 github_user_task >> github_repo_task16
 github_user_task >> github_repo_task17
+
+# Function to get the status of the current DAG run
+def get_current_dag_run_status():
+    dag_runs = dag.get_dagruns(start_date=datetime.now(), end_date=datetime.now())
+    last_dag_run = next(iter(dag_runs), None)  # Get the latest dag run
+
+    if last_dag_run:
+        return last_dag_run.state if last_dag_run.state in ['success', 'failed'] else 'running'
+    return 'unknown'
+
+# Export metric using StatsD
+def export_statsd_metric():
+    last_run_status = get_current_dag_run_status()
+    statsd_client = StatsClient(STATSD_HOST, STATSD_PORT)
+    statsd_client.gauge('last_run_status', last_run_status)
+
+
+# Define the task to export the metric
+export_metric_task = PythonOperator(
+    task_id='export_metric_task',
+    python_callable=export_statsd_metric,  # Use export_statsd_metric here
+    dag=dag,
+)
+
+# Set dependencies
+github_user_task >> export_metric_task
