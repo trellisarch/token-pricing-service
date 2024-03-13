@@ -42,16 +42,30 @@ def oracle_prices_dag():
         return update_oracle(coin_gecko_prices, cmc_prices, pyth_prices)
 
     @task
-    def get_transaction_status_task(txn_intent_hash):
-        logging.info(f"Getting the status of transaction: {txn_intent_hash}")
-        transaction_committed = is_transaction_committed(txn_intent_hash)
+    def get_transaction_status_task(transaction_metadata):
+        logging.info(
+            f"Getting the status of transaction: {transaction_metadata['txn_intent_hash']}"
+        )
+        transaction_committed = is_transaction_committed(
+            transaction_metadata["txn_intent_hash"]
+        )
         assert transaction_committed
+        return transaction_metadata
 
-    get_transaction_status_task(
-        update_oracle_task(
-            process_coin_gecko_prices_task(),
-            process_cmc_prices_task(),
-            process_pyth_prices_task(),
+    @task
+    def assert_all_pairs_updated_task(transaction_metadata):
+        logging.info(transaction_metadata)
+        assert len(transaction_metadata["transactions"]) == len(
+            Config.ORACLE_CMC_PAIRS.split(",")
+        )
+
+    assert_all_pairs_updated_task(
+        get_transaction_status_task(
+            update_oracle_task(
+                process_coin_gecko_prices_task(),
+                process_cmc_prices_task(),
+                process_pyth_prices_task(),
+            )
         )
     )
 

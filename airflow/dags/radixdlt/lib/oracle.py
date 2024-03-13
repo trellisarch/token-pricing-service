@@ -6,7 +6,7 @@ from radixdlt.lib.ret import create_transaction
 
 
 def update_oracle(coin_gecko_prices, cmc_prices, pyth_prices):
-    transaction_metadata = []
+    transaction_metadata = {"transactions": [], "txn_intent_hash": ""}
     logging.info(f"Gecko prices: {coin_gecko_prices}")
     logging.info(f"CMC prices: {cmc_prices}")
     logging.info(f"Pyth prices: {pyth_prices}")
@@ -34,7 +34,7 @@ def update_oracle(coin_gecko_prices, cmc_prices, pyth_prices):
                     logging.info(f"CMC lower limit: {cmc_lowest_price}")
                     logging.info(f"CMC higher limit: {cmc_highest_price}")
                     logging.info(f"Pyth price: {pyth_price}")
-                    transaction_metadata.append(
+                    transaction_metadata["transactions"].append(
                         {"base": pair.split("/")[0], "price": pyth_prices[pair]}
                     )
             else:
@@ -50,13 +50,13 @@ def update_oracle(coin_gecko_prices, cmc_prices, pyth_prices):
                         logging.info(f"Gecko lower limit: {gecko_lowest_price}")
                         logging.info(f"Gecko higher limit: {gecko_highest_price}")
                         logging.info(f"Pyth price: {pyth_price}")
-                        transaction_metadata.append(
+                        transaction_metadata["transactions"].append(
                             {"base": pair.split("/")[0], "price": pyth_prices[pair]}
                         )
-    if len(transaction_metadata) > 0:
+    if len(transaction_metadata["transactions"]) > 0:
         logging.info(transaction_metadata)
         notarized_transaction_hex, address, txn_intent_hash = create_transaction(
-            transaction_metadata
+            transaction_metadata["transactions"]
         )
         submit_transaction_body = {
             "notarized_transaction_hex": notarized_transaction_hex
@@ -67,7 +67,8 @@ def update_oracle(coin_gecko_prices, cmc_prices, pyth_prices):
         )
         logging.info("Oracle price update transaction submitted successfully")
         logging.info(response.text)
-        return txn_intent_hash
+        transaction_metadata["txn_intent_hash"] = txn_intent_hash
+        return transaction_metadata
     else:
         logging.info("Nothing to update")
         raise

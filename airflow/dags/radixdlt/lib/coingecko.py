@@ -20,7 +20,7 @@ def calculate_xrd_quote(base_usd_price, xrd_usd_price):
 
 def process_coin_gecko_prices():
     utc_now_seconds = int(datetime.utcnow().timestamp())
-    utc_three_minutes_ago = utc_now_seconds - 180
+    utc_three_minutes_ago = utc_now_seconds - Config.STALE_PERIOD_SECS
     coin_gecko_prices = {}
     headers = {
         "accept": "application/json",

@@ -9,7 +9,7 @@ from radixdlt.models.oracles.token_price import OracleTokenPrice
 
 def process_cmc_prices():
     utc_now_seconds = int(datetime.utcnow().timestamp())
-    utc_three_minutes_ago = utc_now_seconds - 180
+    utc_three_minutes_ago = utc_now_seconds - Config.STALE_PERIOD_SECS
 
     pairs = Config.ORACLE_CMC_PAIRS.split(",")
     quote_pairs = ",".join([pair.split("/")[0] for pair in pairs])
