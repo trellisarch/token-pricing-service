@@ -1,7 +1,7 @@
 {
   "network_id": 1,
-  "oracle_address": "component_rdx1crty68w9d6ud4ecreewvpsvgyq0u9ta8syqrmuzelem593putyu79e",
-  "badge_resource_address": "resource_rdx1tkycfhvss20xkgxl54grlfpj8fpdr976xe6p4udarmtv22a04p9500",
+  "oracle_address": "component_rdx1cr3psyfptwkktqusfg8ngtupr4wwfg32kz2xvh9tqh4c7pwkvlk2kn",
+  "badge_resource_address": "resource_rdx1th3yr5dlydnhw0lfp6r22x5l2fj9lv3t8f0enkp7j5ttnx3e09rhna",
   "quote_resource": {
     "resource_address": "resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd",
     "symbol": "XRD"
