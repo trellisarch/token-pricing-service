@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from time import sleep
 import pandas as pd
 import requests
@@ -39,7 +39,7 @@ if __name__ == "__main__":
     for i in range(60):
         print(f"Getting prices from Pyth: {i}")
         pyth_prices = asyncio.run(get_pyth_prices())
-        utc_now_seconds = int(datetime.utcnow().timestamp())
+        utc_timestamp_now = int(datetime.now(timezone.utc).timestamp())
         for price in pyth_prices:
             prices.append(
                 [
@@ -47,7 +47,7 @@ if __name__ == "__main__":
                     "PYTH",
                     price.product.symbol,
                     price.aggregate_price,
-                    utc_now_seconds - price.timestamp,
+                    utc_timestamp_now - price.timestamp,
                 ]
             )
         sleep(60)

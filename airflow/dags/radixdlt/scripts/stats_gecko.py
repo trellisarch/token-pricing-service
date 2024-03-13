@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from time import sleep
 import pandas as pd
 import requests
@@ -13,18 +13,18 @@ COIN_DICT = {
 }
 
 if __name__ == "__main__":
-    utc_now_seconds = int(datetime.utcnow().timestamp())
+
     coin_gecko_prices = {}
     headers = {
         "accept": "application/json",
-        "x-cg-pro-api-key": "CG-QMVV2gKH13c7Bhdf1wwn8jLS",
+        "x-cg-pro-api-key": "",
     }
     coin_ids = "radix,bitcoin,ethereum,tether,usd-coin".split(",")
 
     prices = []
     for i in range(60):
         print(f"Getting prices from Gecko: {i}")
-        utc_now_seconds = int(datetime.utcnow().timestamp())
+        utc_timestamp_now = int(datetime.now(timezone.utc).timestamp())
         coin_gecko_price_response = requests.get(
             url=f"https://pro-api.coingecko.com/api/v3/simple/price?ids="
             f"{','.join(coin_ids)},radix&vs_currencies=USD&include_last_updated_at=true",
@@ -40,7 +40,7 @@ if __name__ == "__main__":
                     "Gecko",
                     coin_pair,
                     0,
-                    utc_now_seconds - coin_gecko_price[coin_id]["last_updated_at"],
+                    utc_timestamp_now - coin_gecko_price[coin_id]["last_updated_at"],
                 ]
             )
         sleep(60)

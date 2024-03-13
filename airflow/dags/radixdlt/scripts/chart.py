@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 if __name__ == "__main__":
     timestamps = {}
     age_in_seconds = {}
-    with open("output_pyth.csv") as csvfile:
+    with open("output_cmc.csv") as csvfile:
         reader = csv.reader(csvfile)
 
         for row in reader:
