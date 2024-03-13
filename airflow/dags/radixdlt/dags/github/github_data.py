@@ -140,5 +140,5 @@ export_metric_task = PythonOperator(
     dag=dag,
 )
 
-# Set dependencies
+# Set dependencies to be run after dag succeed or fail
 github_user_task >> export_metric_task
