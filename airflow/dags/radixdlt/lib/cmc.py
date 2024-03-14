@@ -9,7 +9,7 @@ from radixdlt.models.oracles.token_price import OracleTokenPrice
 
 def process_cmc_prices():
     utc_now_seconds = int(datetime.utcnow().timestamp())
-    utc_three_minutes_ago = utc_now_seconds - Config.STALE_PERIOD_SECS
+    stale_price_time = utc_now_seconds - Config.STALE_PERIOD_SECS
 
     pairs = Config.ORACLE_CMC_PAIRS.split(",")
     quote_pairs = ",".join([pair.split("/")[0] for pair in pairs])
@@ -36,7 +36,7 @@ def process_cmc_prices():
                     pairs_prices[key][0]["last_updated"], "%Y-%m-%dT%H:%M:%S.%fZ"
                 )
                 last_updated_seconds = int(last_updated_date.timestamp())
-                if last_updated_seconds > utc_three_minutes_ago:
+                if last_updated_seconds > stale_price_time:
                     cmc_prices[pair] = cmc_price
                     OracleTokenPrice.insert_price(pair, cmc_price, "CMC")
         else:

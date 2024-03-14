@@ -20,7 +20,7 @@ def calculate_xrd_quote(base_usd_price, xrd_usd_price):
 
 def process_coin_gecko_prices():
     utc_now_seconds = int(datetime.utcnow().timestamp())
-    utc_three_minutes_ago = utc_now_seconds - Config.STALE_PERIOD_SECS
+    stale_price_time = utc_now_seconds - Config.STALE_PERIOD_SECS
     coin_gecko_prices = {}
     headers = {
         "accept": "application/json",
@@ -37,6 +37,7 @@ def process_coin_gecko_prices():
         )
         if coin_gecko_price_response.status_code == 200:
             coin_gecko_price = coin_gecko_price_response.json()
+            logging.info(coin_gecko_price)
         else:
             logging.info(coin_gecko_price_response.text)
             raise
@@ -44,7 +45,7 @@ def process_coin_gecko_prices():
         for coin_id in coin_ids:
             coin_pair = f"{COIN_DICT[coin_id]}/XRD"
 
-            if coin_gecko_price[coin_id]["last_updated_at"] > utc_three_minutes_ago:
+            if coin_gecko_price[coin_id]["last_updated_at"] > stale_price_time:
                 coin_gecko_xrd_price = calculate_xrd_quote(
                     coin_gecko_price[coin_id]["usd"], coin_gecko_price["radix"]["usd"]
                 )
