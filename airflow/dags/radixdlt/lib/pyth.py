@@ -56,7 +56,7 @@ def process_pyth_prices():
                 )
                 pyth_xrd_prices[f'{pair.split("/")[0]}/XRD'] = pyth_xrd_price
                 OracleSourcePrice.insert_source_price(
-                    pair=pair,
+                    pair=f'{pair.split("/")[0]}/XRD',
                     quote=pyth_xrd_price,
                     quote_source="PYTH",
                     last_updated=utc_now_seconds - pyth_prices[pair]["last_updated_at"],
