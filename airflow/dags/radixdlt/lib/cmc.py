@@ -1,16 +1,12 @@
 import logging
 from datetime import datetime
-
 import requests
-
 from radixdlt.config.config import Config
-from radixdlt.models.oracles.token_price import OracleTokenPrice
+from radixdlt.models.oracles.source_price import OracleSourcePrice
 
 
 def process_cmc_prices():
     utc_now_seconds = int(datetime.utcnow().timestamp())
-    stale_price_time = utc_now_seconds - Config.STALE_PERIOD_SECS
-
     pairs = Config.ORACLE_CMC_PAIRS.split(",")
     quote_pairs = ",".join([pair.split("/")[0] for pair in pairs])
     cmc_prices = {}
@@ -36,9 +32,21 @@ def process_cmc_prices():
                     pairs_prices[key][0]["last_updated"], "%Y-%m-%dT%H:%M:%S.%fZ"
                 )
                 last_updated_seconds = int(last_updated_date.timestamp())
-                if last_updated_seconds > stale_price_time:
+                last_updated = utc_now_seconds - last_updated_seconds
+                logging.info(f"Current time: {utc_now_seconds}")
+                logging.info(f"Last updated time: {last_updated_seconds}")
+                logging.info(f"Pair {pair} updated {last_updated} seconds ago")
+                if last_updated < Config.STALE_PERIOD_SECS:
                     cmc_prices[pair] = cmc_price
-                    OracleTokenPrice.insert_price(pair, cmc_price, "CMC")
+                else:
+                    # If price stale then we set it to 0
+                    cmc_price = 0
+                OracleSourcePrice.insert_source_price(
+                    pair=pair,
+                    quote=cmc_price,
+                    quote_source="CMC",
+                    last_updated=last_updated,
+                )
         else:
             logging.info(cmc_price_response.text)
             raise Exception("Failed to get CMC prices")

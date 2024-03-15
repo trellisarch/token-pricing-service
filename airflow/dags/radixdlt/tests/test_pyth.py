@@ -6,7 +6,7 @@ from radixdlt.lib.pyth import get_pyth_prices, process_pyth_prices
 
 @pytest.fixture
 def mock_insert_price():
-    with patch("radixdlt.lib.pyth.OracleTokenPrice.insert_price") as mock:
+    with patch("radixdlt.lib.pyth.OracleSourcePrice.insert_source_price") as mock:
         yield mock
 
 

@@ -3,6 +3,7 @@ from datetime import datetime
 
 import requests
 from radixdlt.config.config import Config
+from radixdlt.models.oracles.source_price import OracleSourcePrice
 from radixdlt.models.oracles.token_price import OracleTokenPrice
 
 COIN_DICT = {
@@ -20,7 +21,6 @@ def calculate_xrd_quote(base_usd_price, xrd_usd_price):
 
 def process_coin_gecko_prices():
     utc_now_seconds = int(datetime.utcnow().timestamp())
-    stale_price_time = utc_now_seconds - Config.STALE_PERIOD_SECS
     coin_gecko_prices = {}
     headers = {
         "accept": "application/json",
@@ -43,15 +43,28 @@ def process_coin_gecko_prices():
             raise
 
         for coin_id in coin_ids:
-            coin_pair = f"{COIN_DICT[coin_id]}/XRD"
+            if coin_id != "radix":
+                coin_pair = f"{COIN_DICT[coin_id]}/XRD"
+                last_updated_seconds = coin_gecko_price[coin_id]["last_updated_at"]
+                last_updated = utc_now_seconds - last_updated_seconds
+                logging.info(f"Current time: {utc_now_seconds}")
+                logging.info(f"Last updated time: {last_updated_seconds}")
+                logging.info(f"Pair {coin_pair} updated {last_updated} seconds ago")
 
-            if coin_gecko_price[coin_id]["last_updated_at"] > stale_price_time:
+                coin_pair = f"{COIN_DICT[coin_id]}/XRD"
                 coin_gecko_xrd_price = calculate_xrd_quote(
                     coin_gecko_price[coin_id]["usd"], coin_gecko_price["radix"]["usd"]
                 )
-                coin_gecko_prices[coin_pair] = coin_gecko_xrd_price
-                OracleTokenPrice.insert_price(
-                    coin_pair, coin_gecko_xrd_price, "CoinGecko"
+                if last_updated < Config.STALE_PERIOD_SECS:
+                    coin_gecko_prices[coin_pair] = coin_gecko_xrd_price
+                else:
+                    # if price is stale then we set it to 0
+                    coin_gecko_price = 0
+                OracleSourcePrice.insert_source_price(
+                    pair=coin_pair,
+                    quote=coin_gecko_xrd_price,
+                    quote_source="Gecko",
+                    last_updated=last_updated,
                 )
     except Exception as e:
         logging.info(str(e))
