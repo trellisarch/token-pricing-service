@@ -17,7 +17,7 @@ dag = DAG(
     "radix_charts_tokens_list",
     default_args=default_args,
     description="DAG to insert tokens into PostgreSQL",
-    schedule_interval=None,
+    schedule_interval=Config.TOKEN_PRICE_SCHEDULE_INTERVAL,
     catchup=False,
 )
 

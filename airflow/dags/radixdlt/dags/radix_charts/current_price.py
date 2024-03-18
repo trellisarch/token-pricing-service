@@ -17,7 +17,7 @@ dag = DAG(
     "radix_charts_current_price",
     default_args=default_args,
     description="DAG to fetch tokens price and save to PostgreSQL",
-    schedule_interval=None,
+    schedule_interval=Config.TOKEN_PRICE_SCHEDULE_INTERVAL,
     catchup=False,
 )
 

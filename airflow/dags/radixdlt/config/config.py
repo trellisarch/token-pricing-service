@@ -17,6 +17,7 @@ class Config:
     COIN_GECKO_API = getenv("COIN_GECKO_API", "https://api.coingecko.com/api/v3")
     COIN_GECKO_API_KEY = getenv("COIN_GECKO_API_KEY", "")
 
+    TOKEN_PRICE_SCHEDULE_INTERVAL = getenv("TOKEN_PRICE_SCHEDULE_INTERVAL", None)
     ORACLE_SCHEDULE_INTERVAL = getenv("ORACLE_SCHEDULE_INTERVAL", None)
     DAGS_SCHEDULE_INTERVAL = getenv("DAGS_SCHEDULE_INTERVAL", None)
     ORACLE_COIN_GECKO_IDS = "radix,bitcoin,ethereum,tether,usd-coin"
