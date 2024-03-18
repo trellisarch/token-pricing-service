@@ -1,7 +1,7 @@
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta
-
+from radixdlt.config.config import Config
 from radixdlt.models.radix_charts.token import RadixToken
 from radixdlt.models.radix_charts.token_price import RadixTokenPrice
 
