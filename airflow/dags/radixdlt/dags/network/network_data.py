@@ -19,7 +19,7 @@ default_args = {
 dag = DAG(
     "network",
     default_args=default_args,
-    schedule_interval=Config.DAGS_SCHEDULE_INTERVAL,
+    schedule_interval=Config.MARKETING_DAGS_SCHEDULE_INTERVAL,
     catchup=False,
 )
 
