@@ -7,7 +7,6 @@ from radixdlt.models.oracles.source_price import OracleSourcePrice
 
 
 class TestProcessCmcPrices:
-
     @patch.object(Config, "ORACLE_CMC_PAIRS")
     @patch.object(OracleSourcePrice, "insert_source_price")
     def test_successful_price_retrieval(self, mock_insert_price, mock_cmc_pairs):

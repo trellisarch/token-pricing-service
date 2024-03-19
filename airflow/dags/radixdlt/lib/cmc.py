@@ -36,11 +36,20 @@ def process_cmc_prices():
                 logging.info(f"Current time: {utc_now_seconds}")
                 logging.info(f"Last updated time: {last_updated_seconds}")
                 logging.info(f"Pair {pair} updated {last_updated} seconds ago")
-                if last_updated < Config.STALE_PERIOD_SECS:
-                    cmc_prices[pair] = cmc_price
+                if pair in Config.STALE_CHECK_PAIRS:
+                    logging.info(f"Checking pair: {pair} is not stale")
+                    if last_updated < Config.STALE_PERIOD_SECS:
+                        logging.info(
+                            f"Pair: {pair} updated {last_updated} seconds ago, not stale"
+                        )
+                        cmc_prices[pair] = cmc_price
+                    else:
+                        logging.info(
+                            f"Pair: {pair} updated {last_updated} seconds ago, stale"
+                        )
                 else:
-                    # If price stale then we set it to 0
-                    cmc_price = 0
+                    logging.info(f"Skipping stale check for pair: {pair}")
+                    cmc_prices[pair] = cmc_price
                 OracleSourcePrice.insert_source_price(
                     pair=pair,
                     quote=cmc_price,

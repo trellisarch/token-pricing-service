@@ -8,7 +8,6 @@ from pythclient.utils import get_key
 
 from radixdlt.lib.coingecko import calculate_xrd_quote
 from radixdlt.models.oracles.source_price import OracleSourcePrice
-from radixdlt.models.oracles.token_price import OracleTokenPrice
 
 
 async def get_pyth_prices():

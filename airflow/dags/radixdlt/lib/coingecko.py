@@ -55,11 +55,20 @@ def process_coin_gecko_prices():
                 coin_gecko_xrd_price = calculate_xrd_quote(
                     coin_gecko_price[coin_id]["usd"], coin_gecko_price["radix"]["usd"]
                 )
-                if last_updated < Config.STALE_PERIOD_SECS:
-                    coin_gecko_prices[coin_pair] = coin_gecko_xrd_price
+                if coin_pair in Config.STALE_CHECK_PAIRS:
+                    logging.info(f"Checking pair: {coin_pair} is not stale")
+                    if last_updated < Config.STALE_PERIOD_SECS:
+                        logging.info(
+                            f"Pair: {coin_pair} updated {last_updated} seconds ago, not stale"
+                        )
+                        coin_gecko_prices[coin_pair] = coin_gecko_xrd_price
+                    else:
+                        logging.info(
+                            f"Pair: {coin_pair} updated {last_updated} seconds ago, stale"
+                        )
                 else:
-                    # if price is stale then we set it to 0
-                    coin_gecko_price = 0
+                    logging.info(f"Skipping stale check for pair: {coin_pair}")
+                    coin_gecko_prices[coin_pair] = coin_gecko_xrd_price
                 OracleSourcePrice.insert_source_price(
                     pair=coin_pair,
                     quote=coin_gecko_xrd_price,

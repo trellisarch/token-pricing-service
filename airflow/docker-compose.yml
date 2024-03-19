@@ -143,6 +143,9 @@ services:
     image: postgres:13
     environment:
       DB_URI: postgresql+psycopg2://postgres:postgres@airflow-postgresql/dags
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: dags
     healthcheck:
       test: [ "CMD", "pg_isready", "-U", "postgres", "-d", "postgres" ]
       interval: 10s

@@ -13,7 +13,6 @@ COIN_DICT = {
 }
 
 if __name__ == "__main__":
-
     coin_gecko_prices = {}
     headers = {
         "accept": "application/json",
