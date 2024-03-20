@@ -99,3 +99,41 @@ spec:
       annotations:
         summary: "Slow Airflow task execution for {{ "{{$labels.dag_id}}" }} {{ "{{$labels.task_id}}" }}"
         description: "Task execution time is over 30 seconds on the 90th percentile"
+  - name: TokenPrice
+    rules:
+    - alert: TokenPriceIngressHighErrorRate
+      expr: sum(rate(nginx_ingress_controller_requests{status=~'5..', ingress="token-price"}[1m])) by (path) / sum(rate(nginx_ingress_controller_requests{ingress="token-price"}[1m])) by (path) > 50
+      for: 5m
+      labels:
+        severity: critical
+        tier: application
+        application: token-price
+      annotations:
+        summary: "High number of 5xx errors on the token-price requests"
+        description: "High number of 5xx errors on the token-price requests"
+        runbook_url: https://runbooks.extratools.works
+        dashboard: https://radixdlt.grafana.net/d/lFXqBGxWk/poc3a-airflow-cluster-dashboard?orgId=1&refresh=5s&var-prometheus=FQomEQz4k&var-namespace=airflow-prod&var-dag_id=All&var-task_id=All&var-loki=6OqgV0p4z
+    - alert: TokenPriceIngressHighLatency
+      expr: histogram_quantile(0.95,sum(rate(nginx_ingress_controller_request_duration_seconds_bucket{ingress="token-price"}[5m])) by (le,ingress)) > 2
+      for: 5m
+      labels:
+        severity: critical
+        tier: application
+        application: token-price
+      annotations:
+        summary: "High latency on the token-price requests"
+        description: "The p95 response times are over 2 seconds"
+        runbook_url: https://runbooks.extratools.works
+        dashboard: https://radixdlt.grafana.net/d/lFXqBGxWk/poc3a-airflow-cluster-dashboard?orgId=1&refresh=5s&var-prometheus=FQomEQz4k&var-namespace=airflow-prod&var-dag_id=All&var-task_id=All&var-loki=6OqgV0p4z
+    - alert: TokenPriceIngressHighRequestRate
+      expr: sum(rate(nginx_ingress_controller_requests{ingress="token-price"}[5m])) > 500
+      for: 5m
+      labels:
+        severity: warning
+        tier: application
+        application: token-price
+      annotations:
+        summary: "High number of incoming requests"
+        description: "There are more than 500 req/s on token price"
+        runbook_url: https://runbooks.extratools.works
+        dashboard: https://radixdlt.grafana.net/d/lFXqBGxWk/poc3a-airflow-cluster-dashboard?orgId=1&refresh=5s&var-prometheus=FQomEQz4k&var-namespace=airflow-prod&var-dag_id=All&var-task_id=All&var-loki=6OqgV0p4z
