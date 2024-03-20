@@ -30,7 +30,7 @@ class Config:
     ORACLE_LOCK_FEE = float(getenv("ORACLE_LOCK_FEE", 0.58434484845))
     ORACLE_CONFIG_FILE = getenv("ORACLE_CONFIG_FILE", "config-develop.json")
 
-    STALE_PERIOD_SECS = 300
+    STALE_PERIOD_SECS = 180
 
     STALE_CHECK_PAIRS = "BTC/XRD,ETH/XRD"
 
