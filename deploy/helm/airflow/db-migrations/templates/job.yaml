@@ -1,0 +1,21 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: db-migrations
+spec:
+  backoffLimit: 2
+  template:
+    spec:
+      imagePullSecrets:
+        - name: docker-hub-dev
+      containers:
+      - name: db-migrations
+        image: "{{ .Values.image.repo }}:{{ .Values.image.tag }}"
+        env:
+          - name: DB_URI
+            valueFrom:
+              secretKeyRef:
+                name: db-migration-postgres-secrets-formatted
+                key: connection
+        imagePullPolicy: IfNotPresent
+      restartPolicy: Never

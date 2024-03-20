@@ -50,6 +50,12 @@ releases:
     values:
       - environments/{{ .Environment.Name }}/token-price-values.yaml.gotmpl
 
+  - name: db-migrations
+    installed: {{ .StateValues | get "ci.RUN_DB_MIGRATIONS" "false" }}
+    chart: ./db-migrations
+    values:
+      - environments/{{ .Environment.Name }}/db-migrations.yaml.gotmpl
+
   - name: postgres
     chart: bitnami/postgresql
     installed: {{ .StateValues | get "ci.INSTALL_DB" "false" }}

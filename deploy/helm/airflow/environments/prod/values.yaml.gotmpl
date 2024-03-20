@@ -50,17 +50,6 @@ localDB:
 registry:
   secretName: docker-hub-dev
 
-workers:
-  extraInitContainers:
-    - name: db-migrations
-      image: radixdlt/airflow-migration:{{ .StateValues.ci.AIRFLOW_MIGRATION_IMAGE_TAG }}
-      env:
-        - name: DB_URI
-          valueFrom:
-            secretKeyRef:
-              name: db-migration-postgres-secrets-formatted
-              key: connection
-
 webserver:
   defaultUser:
     enabled: true
