@@ -1,6 +1,4 @@
-import sys
 from os import getenv
-
 from fastapi import FastAPI
 from app.api.price import price_router
 from app.api.test import test_router
