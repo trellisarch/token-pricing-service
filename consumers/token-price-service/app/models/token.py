@@ -1,8 +1,14 @@
-from sqlalchemy import Column, Integer, String, func, and_
+from time import sleep
+
+from sqlalchemy import Column, Integer, String
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import relationship, Session
+
+from app.logger.log import get_logger
 from app.models.base import Base, get_session, get_engine
 from app.models.token_price import TokenPrice
+
+logger = get_logger()
 
 
 class Token(Base):
@@ -30,6 +36,31 @@ class Token(Base):
             )
             return existing_token
 
+    @classmethod
+    def get_latest_prices(cls):
+        with Session(get_engine()) as session:
+            latest_prices = {}
+            tokens = session.query(cls).all()
+            for token in tokens:
+                latest_price = (
+                    session.query(TokenPrice)
+                    .filter_by(resource_address=token.resource_address)
+                    .order_by(TokenPrice.last_updated_at.desc())
+                    .first()
+                )
+                if latest_price:
+                    latest_prices[token.symbol] = {
+                        "id": latest_price.id,
+                        "resource_address": latest_price.resource_address,
+                        "name": token.name,
+                        "symbol": token.symbol,
+                        "usd_price": latest_price.usd_price,
+                        "usd_market_cap": latest_price.usd_market_cap,
+                        "usd_vol_24h": latest_price.usd_vol_24h,
+                        "last_updated_at": latest_price.last_updated_at,
+                    }
+            return latest_prices
+
 
 def get_price_for_resource_address(resource_address) -> TokenPrice:
     with Session(get_engine()) as session:
@@ -44,31 +75,3 @@ def get_price_for_resource_address(resource_address) -> TokenPrice:
                 return None
         else:
             return None
-
-
-def fetch_tokens_with_latest_price():
-    with Session(get_engine()) as session:
-        subq = (
-            session.query(
-                TokenPrice.resource_address,
-                func.max(TokenPrice.last_updated_at).label("max_date"),
-            )
-            .group_by(TokenPrice.resource_address)
-            .subquery()
-        )
-
-        query = (
-            session.query(Token, TokenPrice)
-            .join(TokenPrice, TokenPrice.resource_address == Token.resource_address)
-            .join(
-                subq,
-                and_(
-                    TokenPrice.resource_address == subq.c.resource_address,
-                    TokenPrice.last_updated_at == subq.c.max_date,
-                ),
-            )
-            .filter(TokenPrice.last_updated_at == subq.c.max_date)
-        )
-
-        tokens_with_latest_price = query.all()
-        return tokens_with_latest_price
