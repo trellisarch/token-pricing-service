@@ -1,9 +1,9 @@
 import datetime
 
 from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, Session
 
-from app.models.base import Base, get_session
+from app.models.base import Base, get_session, get_engine
 
 
 class TokenPrice(Base):
@@ -48,11 +48,11 @@ class LsuPrice:
 
 
 def get_latest_price(resource_address: str) -> TokenPrice:
-    latest_price = (
-        get_session()
-        .query(TokenPrice)
-        .filter(TokenPrice.resource_address == resource_address)
-        .order_by(TokenPrice.last_updated_at.desc())
-        .first()
-    )
-    return latest_price
+    with Session(get_engine()) as session:
+        latest_price = (
+            session.query(TokenPrice)
+            .filter(TokenPrice.resource_address == resource_address)
+            .order_by(TokenPrice.last_updated_at.desc())
+            .first()
+        )
+        return latest_price

@@ -4,7 +4,7 @@ services:
   app:
     build:
       context: .
-    entrypoint: uvicorn app.main:app --host 0.0.0.0 --port 8000 --log-level info --reload 
+    entrypoint: uvicorn app.main:app --workers 4 --host 0.0.0.0 --port 8000 --log-level info --reload
     environment:
       DB_PASSWORD: postgres
     ports:
