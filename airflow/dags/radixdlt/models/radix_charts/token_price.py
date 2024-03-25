@@ -42,22 +42,17 @@ class RadixTokenPrice(Base):
             logging.info(price_data)
 
             for resource_address in price_data.keys():
-                existing_price = (
-                    session.query(cls)
-                    .filter_by(resource_address=resource_address)
-                    .first()
+                logging.info(f"Saving price for resource: {resource_address}")
+                new_price = cls(
+                    resource_address=resource_address,
+                    usd_price=price_data[resource_address]["usd_price"],
+                    usd_market_cap=price_data[resource_address]["usd_market_cap"],
+                    usd_vol_24h=price_data[resource_address]["usd_vol_24h"],
+                    last_updated_at=datetime.fromtimestamp(
+                        price_data[resource_address]["last_updated_at"]
+                    ),
                 )
-                if not existing_price:
-                    new_price = cls(
-                        resource_address=resource_address,
-                        usd_price=price_data[resource_address]["usd_price"],
-                        usd_market_cap=price_data[resource_address]["usd_market_cap"],
-                        usd_vol_24h=price_data[resource_address]["usd_vol_24h"],
-                        last_updated_at=datetime.fromtimestamp(
-                            price_data[resource_address]["last_updated_at"]
-                        ),
-                    )
-                    session.add(new_price)
+                session.add(new_price)
 
         session.commit()
         session.close()
