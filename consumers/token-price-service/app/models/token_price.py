@@ -58,3 +58,14 @@ def get_latest_prices(resource_addresses: List[str]) -> List[TokenPrice]:
             .all()
         )
         return latest_prices
+
+
+def get_latest_price(resource_address: str) -> float:
+    with Session(get_engine()) as session:
+        latest_price = (
+            session.query(TokenPrice)
+            .filter_by(resource_address=resource_address)
+            .order_by(TokenPrice.last_updated_at.desc())
+            .first()
+        )
+        return latest_price.usd_price
