@@ -34,7 +34,10 @@ async def get_tokens_prices(data: TokenPricesRequest = Body(...)):
         if latest_price:
             token_prices.append(latest_price)
 
-    lsus_prices = get_lsu_redemption_values(addresses=lsus)
+    if len(lsus) > 0:
+        lsus_prices = get_lsu_redemption_values(addresses=lsus)
+    else:
+        lsus_prices = []
     logger.info(lsus_prices)
     token_price_response = TokenPricesResponse(
         tokens=[TokenPrice(**token_price.__dict__) for token_price in token_prices],
