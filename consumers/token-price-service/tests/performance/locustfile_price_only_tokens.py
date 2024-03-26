@@ -44,5 +44,5 @@ class WalletUser(FastHttpUser):
     def send_post_request(self):
         num_tokens = random.randint(5, 10)
         tokens_list = random.sample(TOKENS, num_tokens)
-        request_body = {"currency": "USD", "lsus": [], "tokens": [tokens_list[0]]}
+        request_body = {"currency": "USD", "lsus": [], "tokens": tokens_list}
         self.client.post("/price/tokens/", json=request_body)

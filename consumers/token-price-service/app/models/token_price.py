@@ -1,4 +1,5 @@
 import datetime
+from typing import List
 
 from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey
 from sqlalchemy.orm import relationship, Session
@@ -47,12 +48,13 @@ class LsuPrice:
         self.usd_price = xrd_price * self.xrd_redemption_value
 
 
-def get_latest_price(resource_address: str) -> TokenPrice:
+def get_latest_prices(resource_addresses: List[str]) -> List[TokenPrice]:
     with Session(get_engine()) as session:
-        latest_price = (
+        latest_prices = (
             session.query(TokenPrice)
-            .filter(TokenPrice.resource_address == resource_address)
-            .order_by(TokenPrice.last_updated_at.desc())
-            .first()
+            .filter(TokenPrice.resource_address.in_(resource_addresses))
+            .order_by(TokenPrice.resource_address, TokenPrice.last_updated_at.desc())
+            .distinct(TokenPrice.resource_address)
+            .all()
         )
-        return latest_price
+        return latest_prices
