@@ -39,6 +39,8 @@ releases:
           airflow:
             repository: radixdlt/airflow
             tag: {{ .StateValues.ci.tag }}
+      - webserver:
+          args: ["bash", "-c", "pip install airflow-exporter; exec airflow webserver"]
       - environments/{{ .Environment.Name }}/statsd-override-mappings.yaml.gotmpl
       - environments/{{ .Environment.Name }}/values.yaml.gotmpl
       - environments/{{ .Environment.Name }}/secrets.yaml.gotmpl
