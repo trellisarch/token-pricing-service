@@ -6,4 +6,4 @@ RUN pip install -r requirements.txt
 COPY app/ /app
 WORKDIR /
 
-ENTRYPOINT uvicorn app.main:app --workers 4 --host 0.0.0.0 --port 8000 --log-level info
+ENTRYPOINT uvicorn app.main:app --workers 6 --host 0.0.0.0 --port 8000 --log-level info

@@ -64,8 +64,8 @@ releases:
     version: 12.1.5
     values:
       - auth:
-          postgresPassword: secret@123
-          database: "token-price"
+          postgresPassword: postgres
+          database: "dags"
       - primary:
           persistence:
             enabled: false
