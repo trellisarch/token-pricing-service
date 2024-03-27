@@ -61,18 +61,3 @@ class Token(Base):
                 }
 
             return latest_prices
-
-
-def get_price_for_resource_address(resource_address) -> TokenPrice:
-    with Session(get_engine()) as session:
-        token = (
-            session.query(Token).filter_by(resource_address=resource_address).first()
-        )
-        if token:
-            prices = token.prices
-            if prices:
-                return prices[0].usd_price
-            else:
-                return None
-        else:
-            return None
