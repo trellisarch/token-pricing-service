@@ -13,19 +13,3 @@ spec:
     matchLabels:
       component: statsd
       tier: airflow
----
-apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
-metadata:
-  labels:
-    release: prometheus-operator
-  name: airflow-exporter
-spec:
-  endpoints:
-  - interval: 30s
-    port: airflow-ui
-    path: /admin/metrics/
-  selector:
-    matchLabels:
-      component: webserver
-      tier: airflow
