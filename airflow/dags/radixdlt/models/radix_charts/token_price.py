@@ -28,16 +28,13 @@ class RadixTokenPrice(Base):
 
         for chunk in chunked_tokens:
             addresses = ",".join(token[0] for token in chunk)
-
-            logging.info(addresses)
+            logging.info(f"Getting prices for {len(chunk)} addresses")
             params = {"resource_addresses": addresses}
             response = requests.get(
                 url=current_price_endpoint,
                 params=params,
                 headers=get_radix_charts_headers(),
             )
-            logging.info(response.text)
-            logging.info(get_radix_charts_headers())
             price_data = response.json()["data"]
             logging.info(price_data)
 
