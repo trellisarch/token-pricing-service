@@ -21,4 +21,3 @@ class Config:
     XRD_RESOURCE_ADDRESS = (
         "resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd"
     )
-    PRICES_UPDATE_THREADSHOLD = 300

@@ -1,11 +1,14 @@
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from typing import List
-
 from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey
-from sqlalchemy.orm import relationship, Session
+from sqlalchemy.orm import relationship, Session, joinedload
 
-from app.config.config import Config
+from app.logger.log import get_logger
 from app.models.base import Base, get_session, get_engine
+from app.models.token import Token
+
+
+logger = get_logger()
 
 
 class TokenPrice(Base):
@@ -28,7 +31,7 @@ class TokenPrice(Base):
             usd_price=usd_price,
             usd_market_cap=0,
             usd_vol_24h=0,
-            last_updated_at=datetime.datetime.now(),
+            last_updated_at=datetime.now(timezone.utc),
         )
 
         session.add(new_price)
@@ -51,16 +54,14 @@ class LsuPrice:
 
 def get_latest_prices(resource_addresses: List[str]) -> List[TokenPrice]:
     with Session(get_engine()) as session:
-        current_time_utc = datetime.now(timezone.utc)
-        last_update_threadshold = current_time_utc - timedelta(
-            seconds=Config.PRICES_UPDATE_THREADSHOLD
-        )
         latest_prices = (
             session.query(TokenPrice)
+            .join(Token)
             .filter(TokenPrice.resource_address.in_(resource_addresses))
-            .filter(TokenPrice.last_updated_at >= last_update_threadshold)
+            .filter(Token.whitelisted is True)
             .order_by(TokenPrice.resource_address, TokenPrice.last_updated_at.desc())
             .distinct(TokenPrice.resource_address)
+            .options(joinedload(TokenPrice.token))
             .all()
         )
         return latest_prices
@@ -75,3 +76,30 @@ def get_latest_price(resource_address: str) -> float:
             .first()
         )
         return latest_price.usd_price
+
+
+def get_whitelisted_tokens():
+    with Session(get_engine()) as session:
+        latest_prices = {}
+        tokens_with_latest_price = (
+            session.query(Token, TokenPrice)
+            .filter(Token.whitelisted == True)
+            .order_by(Token.id, TokenPrice.last_updated_at.desc())
+            .distinct(Token.id)
+            .all()
+        )
+
+        # Populate the dictionary with the results
+        for token, token_price in tokens_with_latest_price:
+            latest_prices[token.id] = {
+                "symbol": token.symbol,
+                "name": token.name,
+                "id": token.id,
+                "resource_address": token.resource_address,
+                "usd_price": token_price.usd_price,
+                "usd_market_cap": token_price.usd_market_cap,
+                "usd_vol_24h": token_price.usd_vol_24h,
+                "last_updated_at": token_price.last_updated_at,
+            }
+
+        return latest_prices
