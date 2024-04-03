@@ -1,9 +1,10 @@
-import datetime
+from datetime import datetime, timedelta, timezone
 from typing import List
 
 from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey
 from sqlalchemy.orm import relationship, Session
 
+from app.config.config import Config
 from app.models.base import Base, get_session, get_engine
 
 
@@ -50,9 +51,14 @@ class LsuPrice:
 
 def get_latest_prices(resource_addresses: List[str]) -> List[TokenPrice]:
     with Session(get_engine()) as session:
+        current_time_utc = datetime.now(timezone.utc)
+        last_update_threadshold = current_time_utc - timedelta(
+            seconds=Config.PRICES_UPDATE_THREADSHOLD
+        )
         latest_prices = (
             session.query(TokenPrice)
             .filter(TokenPrice.resource_address.in_(resource_addresses))
+            .filter(TokenPrice.last_updated_at >= last_update_threadshold)
             .order_by(TokenPrice.resource_address, TokenPrice.last_updated_at.desc())
             .distinct(TokenPrice.resource_address)
             .all()
