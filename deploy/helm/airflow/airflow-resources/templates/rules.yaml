@@ -21,6 +21,8 @@ spec:
         description: "Task '{{ "{{$labels.task_id}}" }}' in DAG '{{ "{{$labels.dag_id}}" }}' failed."
         runbook_url: https://runbooks.extratools.works
         dashboard: https://radixdlt.grafana.net/d/lFXqBGxWk/poc3a-airflow-cluster-dashboard?orgId=1&refresh=5s&var-prometheus=FQomEQz4k&var-namespace=airflow-prod&var-dag_id=All&var-task_id=All&var-loki=6OqgV0p4z
+        app_url: "{{ .Values.ui_url }}/dags/{{ "{{$labels.dag_id}}" }}/grid?num_runs=25"
+
     - alert: OracleTaskFailure
       expr: (changes(af_agg_ti_finish{dag_id="oracle_price",state="failed"}[2m]) > 0) unless (changes(af_agg_ti_finish{dag_id="oracle_price",state="success"}[1m]) > 0)
       for: 2m
@@ -33,7 +35,8 @@ spec:
         description: "Task '{{ "{{$labels.task_id}}" }}' in DAG '{{ "{{$labels.dag_id}}" }}' failed."
         runbook_url: https://runbooks.extratools.works
         dashboard: https://radixdlt.grafana.net/d/lFXqBGxWk/poc3a-airflow-cluster-dashboard?orgId=1&refresh=5s&var-prometheus=FQomEQz4k&var-namespace=airflow-prod&var-dag_id=All&var-task_id=All&var-loki=6OqgV0p4z
- 
+        app_url: "{{ .Values.ui_url }}/dags/{{ "{{$labels.dag_id}}" }}/grid?num_runs=25"
+
     - alert: AirflowDAGFailure
       expr: (changes(af_agg_dagrun_duration_failed_count[1d]) > 0) unless (changes(af_agg_dagrun_duration_success_count[1d]) > 0)
       for: 1m
@@ -44,6 +47,7 @@ spec:
       annotations:
         summary: "Airflow DAG failed: {{ "{{$labels.dag_id}}" }}"
         description: "DAG '{{ "{{$labels.dag_id}}" }}' failed."
+        app_url: "{{ .Values.ui_url }}/dags/{{ "{{$labels.dag_id}}" }}/grid?num_runs=25"
     
     - alert: OraclePriceDAGFailure
       expr: (changes(af_agg_dagrun_duration_failed_count{dag_id="oracle_price"}[2m]) > 0) unless (changes(af_agg_dagrun_duration_success_count{dag_id="oracle_price"}[1m]) > 0)
@@ -55,6 +59,7 @@ spec:
       annotations:
         summary: "Oracle Price DAG failed: {{ "{{$labels.dag_id}}" }}"
         description: "DAG '{{ "{{$labels.dag_id}}" }}' failed."
+        app_url: "{{ .Values.ui_url }}/dags/{{ "{{$labels.dag_id}}" }}/grid?num_runs=25"
 
     - alert: AirflowDAGImportErrors
       expr: airflow_dag_processing_import_errors > 0
@@ -66,6 +71,7 @@ spec:
       annotations:
         summary: "Airflow DAG import errors on DAG {{ "{{$labels.dag_id}}" }}"
         description: "DAG '{{ "{{$labels.dag_id}}" }}' import errored."
+        app_url: "{{ .Values.ui_url }}/dags/{{ "{{$labels.dag_id}}" }}/grid?num_runs=25"
 
     - alert: AirflowSlowDAGProcessing
       expr: af_agg_dag_processing_duration{quantile="0.9"} > 10
@@ -77,6 +83,7 @@ spec:
       annotations:
         summary: "Slow DAG processing on {{ "{{$labels.dag_id}}" }}"
         description: "DAG '{{ "{{$labels.dag_id}}" }}' processing time is over 10secs."
+        app_url: "{{ .Values.ui_url }}/dags/{{ "{{$labels.dag_id}}" }}/grid?num_runs=25"
 
     - alert: AirflowHighOperatorFailures
       expr: changes(airflow_operator_failures[2m]) > 5
@@ -99,6 +106,8 @@ spec:
       annotations:
         summary: "Slow Airflow task execution for {{ "{{$labels.dag_id}}" }} {{ "{{$labels.task_id}}" }}"
         description: "Task execution time is over 30 seconds on the 90th percentile"
+        app_url: "{{ .Values.ui_url }}/dags/{{ "{{$labels.dag_id}}" }}/grid?num_runs=25"
+
   - name: TokenPrice
     rules:
     - alert: TokenPriceIngressHighErrorRate
