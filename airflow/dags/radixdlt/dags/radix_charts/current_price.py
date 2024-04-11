@@ -25,7 +25,6 @@ default_args = {
     catchup=False,
 )
 def radix_charts_prices():
-
     @task
     def fetch_tokens_price_task():
         tokens = RadixToken.list_tokens()

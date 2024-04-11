@@ -1,6 +1,8 @@
 env:
   - name: DB_URI
     value: "postgresql://postgres:postgres@postgres-postgresql:5432/dags"
+  - name: GOOGLE_APPLICATION_CREDENTIALS
+    value: "/opt/airflow/service-account.json"
 
 docker:
   secrets:
