@@ -85,8 +85,6 @@ jobs:
       scan_image: false
       snyk_target_ref: ${{ github.ref_name }}
     secrets:
-      workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDP }}
-      service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
       role_to_assume: ${{ secrets.DOCKERHUB_RELEASER_ROLE }}
 
   build-token-service:
@@ -109,8 +107,6 @@ jobs:
       scan_image: false
       snyk_target_ref: ${{ github.ref_name }}
     secrets:
-      workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDP }}
-      service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
       role_to_assume: ${{ secrets.DOCKERHUB_RELEASER_ROLE }}
 
   build-airflow-migrations:
@@ -133,8 +129,6 @@ jobs:
       scan_image: false
       snyk_target_ref: ${{ github.ref_name }}
     secrets:
-      workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDP }}
-      service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
       role_to_assume: ${{ secrets.DOCKERHUB_RELEASER_ROLE }}
   
   deploy-airflow-dev:
