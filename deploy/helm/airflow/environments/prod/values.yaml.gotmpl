@@ -20,7 +20,9 @@ extraEnv: |
 
 ingress:
   enabled: true
+  className: nginx-internal
   annotations:
+    external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
   hosts:
     - host: airflow-service.radixdlt.com
       paths:

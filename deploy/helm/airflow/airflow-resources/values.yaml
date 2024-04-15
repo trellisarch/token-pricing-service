@@ -43,6 +43,9 @@ docker:
     region: eu-west-1
     name: docker.io/radixdlt
 
+ingress:
+  className: nginx
+
 serviceAccount:
   # Specifies whether a service account should be created
   create: true
