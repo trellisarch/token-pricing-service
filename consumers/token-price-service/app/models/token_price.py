@@ -58,7 +58,7 @@ def get_latest_prices(resource_addresses: List[str]) -> List[TokenPrice]:
             session.query(TokenPrice)
             .join(Token)
             .filter(TokenPrice.resource_address.in_(resource_addresses))
-            .filter(Token.whitelisted == True)
+            .filter(Token.allowlist == True)
             .order_by(TokenPrice.resource_address, TokenPrice.last_updated_at.desc())
             .distinct(TokenPrice.resource_address)
             .options(joinedload(TokenPrice.token))
@@ -83,7 +83,7 @@ def get_whitelisted_tokens():
         latest_prices = {}
         tokens_with_latest_price = (
             session.query(Token, TokenPrice)
-            .filter(Token.whitelisted == True)
+            .filter(Token.allowlist == True)
             .order_by(Token.id, TokenPrice.last_updated_at.desc())
             .distinct(Token.id)
             .all()

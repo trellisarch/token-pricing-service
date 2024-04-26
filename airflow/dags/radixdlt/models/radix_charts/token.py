@@ -13,7 +13,7 @@ class RadixToken(Base):
     resource_address = Column(String, unique=True, nullable=False)
     symbol = Column(String)
     name = Column(String)
-    whitelisted = Column(Boolean)
+    allowlist = Column(Boolean)
 
     @classmethod
     def insert_tokens(cls, tokens):
@@ -30,12 +30,12 @@ class RadixToken(Base):
                 token_data = tokens[existing_token.resource_address]
                 existing_token.symbol = token_data["symbol"]
                 existing_token.name = token_data["name"]
-                existing_token.whitelisted = True
+                existing_token.allowlist = True
             else:
                 logging.info(
                     f"Token: {existing_token.resource_address} not returned by radix charts. Removing from whitelist"
                 )
-                existing_token.whitelisted = False
+                existing_token.allowlist = False
 
         # Add new tokens
         for resource_address, token_data in tokens.items():
@@ -47,7 +47,7 @@ class RadixToken(Base):
                     resource_address=resource_address,
                     symbol=token_data["symbol"],
                     name=token_data["name"],
-                    whitelisted=True,  # By default, newly added tokens are whitelisted
+                    allowlist=True,  # By default, newly added tokens are whitelisted
                 )
                 session.add(new_token)
 
@@ -59,7 +59,7 @@ class RadixToken(Base):
         session = get_session()
         return (
             session.query(cls.resource_address)
-            .filter_by(whitelisted=True)
+            .filter_by(allowlist=True)
             .distinct()
             .all()
         )

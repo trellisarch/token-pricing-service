@@ -14,7 +14,7 @@ class Token(Base):
     resource_address = Column(String, unique=True)
     symbol = Column(String)
     name = Column(String)
-    whitelisted = Column(Boolean)
+    allowlist = Column(Boolean)
 
     prices = relationship("TokenPrice", back_populates="token")
 
