@@ -10,7 +10,7 @@ spec:
   - name: Airflow
     rules:
     - alert: AirflowTaskFailure
-      expr: (changes(airflow_task_status{dag_id!="oracle_price",status="failed"}) > 0) unless (changes(airflow_task_status{dag_id!="oracle_price",state="success"}) > 0)
+      expr: (changes(airflow_task_status{dag_id!="oracle_price",status="failed"}[1d]) > 0) unless (changes(airflow_task_status{dag_id!="oracle_price",state="success"}[1d]) > 0)
       for: 1m
       labels:
         severity: warning
@@ -24,7 +24,7 @@ spec:
         app_url: "{{ .Values.ui_url }}/dags/{{ "{{$labels.dag_id}}" }}/grid?num_runs=25"
 
     - alert: OracleTaskFailure
-      expr: (changes(airflow_task_status{dag_id="oracle_price",status="failed"}) > 0) unless (changes(airflow_task_status{dag_id="oracle_price",state="success"}) > 0)
+      expr: (changes(airflow_task_status{dag_id="oracle_price",status="failed"}[2m]) > 0) unless (changes(airflow_task_status{dag_id="oracle_price",state="success"}[1m]) > 0)
       for: 2m
       labels:
         severity: warning
@@ -38,7 +38,7 @@ spec:
         app_url: "{{ .Values.ui_url }}/dags/{{ "{{$labels.dag_id}}" }}/grid?num_runs=25"
 
     - alert: AirflowDAGFailure
-      expr: airflow_dag_last_status{dag_id!="oracle_price",state="failed"} > 0
+      expr: (airflow_dag_last_status{dag_id!="oracle_price",state="failed"} > 0)
       for: 1m
       labels:
         severity: warning
@@ -48,9 +48,9 @@ spec:
         summary: "Airflow DAG failed: {{ "{{$labels.dag_id}}" }}"
         description: "DAG '{{ "{{$labels.dag_id}}" }}' failed."
         app_url: "{{ .Values.ui_url }}/dags/{{ "{{$labels.dag_id}}" }}/grid?num_runs=25"
-    
+
     - alert: OraclePriceDAGFailure
-      expr: airflow_dag_last_status{dag_id="oracle_price",state="failed"} > 0
+      expr: (airflow_dag_last_status{dag_id="oracle_price",state="failed"} > 0)
       for: 2m
       labels:
         severity: critical
