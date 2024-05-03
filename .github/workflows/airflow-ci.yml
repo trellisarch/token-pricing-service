@@ -26,7 +26,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: RDXWorks-actions/checkout@main
       - uses: psf/black@stable
         with:
           options: "--check --verbose"
@@ -37,7 +37,7 @@ jobs:
     container:
       image: python:3.10
     steps:
-      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
+      - uses: RDXWorks-actions/checkout@main
       - name: unit tests
         run: |
           cd airflow 
@@ -51,7 +51,7 @@ jobs:
       airflow-labels: ${{ steps.docker-tags-airflow-service.outputs.labels }}
       airflow-json: ${{ steps.docker-tags-airflow-service.outputs.json }}
     steps:
-      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
+      - uses: RDXWorks-actions/checkout@main
         with:
           fetch-depth: 0
       - name: Docker tags
@@ -134,7 +134,7 @@ jobs:
   deploy-airflow-dev:
     if:  github.ref == 'refs/heads/develop'
     name: "Deploy Airflow Dev"
-    uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@v0.15.0
+    uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@main
     needs:
       - tags
       - build-airflow
@@ -165,7 +165,7 @@ jobs:
   deploy-airflow-prod:
     if:  github.ref == 'refs/heads/main'
     name: "Deploy Airflow Prod"
-    uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@v0.15.0
+    uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@main
     needs:
       - tags
       - build-airflow
@@ -194,7 +194,7 @@ jobs:
   deploy_pull_request_airflow:
     if: ${{ github.event.pull_request }}
     name: "Deploy PR airflow"
-    uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@v0.15.0
+    uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@main
     needs:
       - tags
       - build-airflow
