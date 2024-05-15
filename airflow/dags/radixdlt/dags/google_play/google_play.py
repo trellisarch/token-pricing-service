@@ -38,7 +38,6 @@ logging.basicConfig(level=logging.INFO)
     dag_id="google_play",
 )
 def google_play_stats():
-
     @task
     def get_service_account():
         service_account = getenv("GOOGLE_SERVICE_ACCOUNT")

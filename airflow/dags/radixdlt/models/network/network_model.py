@@ -44,23 +44,41 @@ class NetworkData(Base):
     ):
         # Extract relevant user information
         # Parse the JSON response
-        data_five = response_five.json()
+        if response_five.status_code == 200:
+            data_five = response_five.json()
+            price = data_five["data"]["price"]
+            hourly_burnt_amount = data_five["data"]["hourlyBurntAmount"]
+            daily_burnt_amount = data_five["data"]["dailyBurntAmount"]
+            weekly_burnt_amount = data_five["data"]["weeklyBurntAmount"]
+            monthly_burnt_amount = data_five["data"]["monthlyBurntAmount"]
+            annually_burnt_amount = data_five["data"]["annuallyBurntAmount"]
+        else:
+            logging.info(
+                f"Did not get a successful response from burn trucker: {response_five.status_code}"
+            )
+            price = 0
+            hourly_burnt_amount = 0
+            daily_burnt_amount = 0
+            weekly_burnt_amount = 0
+            monthly_burnt_amount = 0
+            annually_burnt_amount = 0
 
-        price = data_five["data"]["price"]
-        hourly_burnt_amount = data_five["data"]["hourlyBurntAmount"]
-        daily_burnt_amount = data_five["data"]["dailyBurntAmount"]
-        weekly_burnt_amount = data_five["data"]["weeklyBurntAmount"]
-        monthly_burnt_amount = data_five["data"]["monthlyBurntAmount"]
-        annually_burnt_amount = data_five["data"]["annuallyBurntAmount"]
-
-        data_burn = response_burn.json()
-
-        remaining_supply = data_burn["tokenDetail"][
-            "totalSupply"
-        ]  # For some reason the webpage uses totalSupply instead of remainingSupply
-        burnt_amount = data_burn["tokenDetail"]["burntAmount"]
-        max_supply = data_burn["tokenDetail"]["maxSupply"]
-        current_block = data_burn["tokenDetail"]["currentBlock"]
+        if response_burn.status_code == 200:
+            data_burn = response_burn.json()
+            remaining_supply = data_burn["tokenDetail"][
+                "totalSupply"
+            ]  # For some reason the webpage uses totalSupply instead of remainingSupply
+            burnt_amount = data_burn["tokenDetail"]["burntAmount"]
+            max_supply = data_burn["tokenDetail"]["maxSupply"]
+            current_block = data_burn["tokenDetail"]["currentBlock"]
+        else:
+            logging.info(
+                f"Did not get a successful response from burn trucker: {response_five.status_code}"
+            )
+            remaining_supply = 0
+            burnt_amount = 0
+            max_supply = 0
+            current_block = 0
 
         tvl = response_defillama.json()[-1]["tvl"]
         radixapi_stats = response_radixapi.json()
