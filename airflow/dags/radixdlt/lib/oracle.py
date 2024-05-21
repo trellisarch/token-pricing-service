@@ -5,11 +5,13 @@ from radixdlt.config.config import Config
 from radixdlt.lib.ret import create_transaction
 
 
-def update_oracle(coin_gecko_prices, cmc_prices, pyth_prices):
+def update_oracle(coin_gecko_prices, cmc_prices, pyth_prices, c9_prices):
     transaction_metadata = {"transactions": [], "txn_intent_hash": ""}
+    logging.info(f"C9 prices: {c9_prices}")
     logging.info(f"Gecko prices: {coin_gecko_prices}")
     logging.info(f"CMC prices: {cmc_prices}")
     logging.info(f"Pyth prices: {pyth_prices}")
+
     for pair, pyth_price in pyth_prices.items():
         cmc_price = cmc_prices.get(pair, None)
         gecko_price = coin_gecko_prices.get(pair, None)
@@ -53,6 +55,9 @@ def update_oracle(coin_gecko_prices, cmc_prices, pyth_prices):
                         transaction_metadata["transactions"].append(
                             {"base": pair.split("/")[0], "price": pyth_prices[pair]}
                         )
+    transaction_metadata["transactions"].append(
+        {"base": "LSULP", "price": c9_prices[0]["price"]}
+    )
     if len(transaction_metadata["transactions"]) > 0:
         logging.info(transaction_metadata)
         notarized_transaction_hex, address, txn_intent_hash = create_transaction(

@@ -21,6 +21,10 @@
     {
       "resource_address": "resource_tdx_2_1thltk578jr4v7axqpu5ceznhlha6ca2qtzcflqdmytgtf37xncu7l9",
       "symbol": "BTC"
+    },
+    {
+      "resource_address": "resource_tdx_2_1tkpwejwr35gg3xqc0advlv3c8nvs003nn0y80yw2757y5pcnf40qap",
+      "symbol": "LSULP"
     }
   ]
 }
