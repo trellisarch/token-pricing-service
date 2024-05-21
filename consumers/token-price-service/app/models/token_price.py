@@ -54,13 +54,21 @@ class LsuPrice:
 
 def get_latest_prices(resource_addresses: List[str]) -> List[TokenPrice]:
     with Session(get_engine()) as session:
+        # Subquery to get the latest price for each resource_address
+        subquery = (
+            session.query(TokenPrice.id)
+            .filter(TokenPrice.resource_address.in_(resource_addresses))
+            .order_by(TokenPrice.resource_address, TokenPrice.last_updated_at.desc())
+            .limit(1)
+            .subquery()
+        )
+
+        # Query to join with Token and filter by allowlist
         latest_prices = (
             session.query(TokenPrice)
+            .join(subquery, TokenPrice.id == subquery.c.id)
             .join(Token)
-            .filter(TokenPrice.resource_address.in_(resource_addresses))
             .filter(Token.allowlist == True)
-            .order_by(TokenPrice.resource_address, TokenPrice.last_updated_at.desc())
-            .distinct(TokenPrice.resource_address)
             .options(joinedload(TokenPrice.token))
             .all()
         )

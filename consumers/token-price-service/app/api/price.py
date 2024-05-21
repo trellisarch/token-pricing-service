@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Body, HTTPException
 from app.config.config import Config
 from app.logger.log import get_logger
-from app.models.token_price import get_latest_prices
+from app.models.token_price import get_latest_prices, get_latest_price
 from app.schemas.token_price import (
     TokenPricesResponse,
     TokenPricesRequest,
@@ -28,7 +28,8 @@ async def get_tokens_prices(data: TokenPricesRequest = Body(...)):
         )
 
     token_prices = []
-    token_prices.extend(get_latest_prices(tokens))
+    for token in tokens:
+        token_prices.append(get_latest_price(token))
 
     if len(lsus) > 0:
         lsus_prices = get_lsu_redemption_values(addresses=lsus)
