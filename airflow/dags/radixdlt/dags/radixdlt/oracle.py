@@ -62,8 +62,9 @@ def oracle_prices_dag():
         logging.info(transaction_metadata)
         # asserting that all CMC pairs are updated and c9 too
         # TODO: add a better way to do this assertion
-        assert len(transaction_metadata["transactions"]) == len(
-            Config.ORACLE_CMC_PAIRS.split(",") + 1
+        assert (
+            len(transaction_metadata["transactions"])
+            == len(Config.ORACLE_CMC_PAIRS.split(",")) + 1
         )
 
     assert_all_pairs_updated_task(
