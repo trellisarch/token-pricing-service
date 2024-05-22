@@ -59,10 +59,13 @@ def get_latest_prices(resource_addresses: List[str]) -> List[TokenPrice]:
             session.query(
                 TokenPrice.id,
                 TokenPrice.resource_address,
-                label('rank', func.row_number().over(
-                    partition_by=TokenPrice.resource_address,
-                    order_by=TokenPrice.last_updated_at.desc()
-                ))
+                label(
+                    "rank",
+                    func.row_number().over(
+                        partition_by=TokenPrice.resource_address,
+                        order_by=TokenPrice.last_updated_at.desc(),
+                    ),
+                ),
             )
             .filter(TokenPrice.resource_address.in_(resource_addresses))
             .subquery()
