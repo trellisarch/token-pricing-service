@@ -59,7 +59,7 @@ def get_latest_prices(resource_addresses: List[str]) -> List[TokenPrice]:
             session.query(TokenPrice.id)
             .filter(TokenPrice.resource_address.in_(resource_addresses))
             .order_by(TokenPrice.resource_address, TokenPrice.last_updated_at.desc())
-            .limit(1)
+            .limit(len(resource_addresses))
             .subquery()
         )
 
