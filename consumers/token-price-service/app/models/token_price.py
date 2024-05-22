@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 from typing import List
-from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, label, func
 from sqlalchemy.orm import relationship, Session, joinedload
 
 from app.logger.log import get_logger
@@ -56,17 +56,23 @@ def get_latest_prices(resource_addresses: List[str]) -> List[TokenPrice]:
     with Session(get_engine()) as session:
         # Subquery to get the latest price for each resource_address
         subquery = (
-            session.query(TokenPrice.id)
+            session.query(
+                TokenPrice.id,
+                TokenPrice.resource_address,
+                label('rank', func.row_number().over(
+                    partition_by=TokenPrice.resource_address,
+                    order_by=TokenPrice.last_updated_at.desc()
+                ))
+            )
             .filter(TokenPrice.resource_address.in_(resource_addresses))
-            .order_by(TokenPrice.resource_address, TokenPrice.last_updated_at.desc())
-            .limit(len(resource_addresses))
             .subquery()
         )
 
-        # Query to join with Token and filter by allowlist
+        # Query to get the latest prices
         latest_prices = (
             session.query(TokenPrice)
             .join(subquery, TokenPrice.id == subquery.c.id)
+            .filter(subquery.c.rank == 1)
             .join(Token)
             .filter(Token.allowlist == True)
             .options(joinedload(TokenPrice.token))
