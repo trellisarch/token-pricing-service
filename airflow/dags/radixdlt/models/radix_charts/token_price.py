@@ -50,6 +50,14 @@ class RadixTokenPrice(Base):
                     ),
                 )
                 session.add(new_price)
-
         session.commit()
-        session.close()
+
+        try:
+            logging.info("Refreshing materialized view")
+            session.execute("REFRESH MATERIALIZED VIEW latest_token_prices")
+            session.commit()
+        except Exception as e:
+            logging.error(f"Failed to refresh materialized view: {e}")
+            session.rollback()
+        finally:
+            session.close()
