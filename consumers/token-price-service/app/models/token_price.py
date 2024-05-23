@@ -1,6 +1,16 @@
 from datetime import datetime, timezone
 from typing import List
-from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, label, func
+from sqlalchemy import (
+    Column,
+    Integer,
+    String,
+    Float,
+    DateTime,
+    ForeignKey,
+    label,
+    func,
+    Boolean,
+)
 from sqlalchemy.orm import relationship, Session, joinedload
 
 from app.logger.log import get_logger
@@ -39,6 +49,27 @@ class TokenPrice(Base):
         return new_price
 
 
+class LatestTokenPrice(Base):
+    __tablename__ = "latest_token_prices"
+    id = Column(Integer, primary_key=True)
+    resource_address = Column(String)
+    usd_price = Column(Float)
+    last_updated_at = Column(DateTime)
+    allowlist = Column(Boolean)
+
+
+def get_latest_prices(resource_addresses: List[str]) -> List[LatestTokenPrice]:
+    with Session(get_engine()) as session:
+        # Query to get the latest prices filtered by resource addresses
+        latest_prices = (
+            session.query(LatestTokenPrice)
+            .filter(LatestTokenPrice.resource_address.in_(resource_addresses))
+            .filter(LatestTokenPrice.allowlist == True)
+            .all()
+        )
+        return latest_prices
+
+
 class LsuPrice:
     resource_address: str
     xrd_redemption_value: float
@@ -50,38 +81,6 @@ class LsuPrice:
         self.resource_address = resource_address
         self.xrd_redemption_value = xrd_redemption_value
         self.usd_price = xrd_price * self.xrd_redemption_value
-
-
-def get_latest_prices(resource_addresses: List[str]) -> List[TokenPrice]:
-    with Session(get_engine()) as session:
-        # Subquery to get the latest price for each resource_address
-        subquery = (
-            session.query(
-                TokenPrice.id,
-                TokenPrice.resource_address,
-                label(
-                    "rank",
-                    func.row_number().over(
-                        partition_by=TokenPrice.resource_address,
-                        order_by=TokenPrice.last_updated_at.desc(),
-                    ),
-                ),
-            )
-            .filter(TokenPrice.resource_address.in_(resource_addresses))
-            .subquery()
-        )
-
-        # Query to get the latest prices
-        latest_prices = (
-            session.query(TokenPrice)
-            .join(subquery, TokenPrice.id == subquery.c.id)
-            .filter(subquery.c.rank == 1)
-            .join(Token)
-            .filter(Token.allowlist == True)
-            .options(joinedload(TokenPrice.token))
-            .all()
-        )
-        return latest_prices
 
 
 def get_latest_price(resource_address: str) -> float:
