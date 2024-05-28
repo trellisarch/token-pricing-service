@@ -4,20 +4,21 @@ from os import getenv
 class Config:
     RADIX_TOKEN = "XRD"
 
+    CAVIAR_NINE_COMPONENT_ADDRESS = (
+        "component_rdx1cppy08xgra5tv5melsjtj79c0ngvrlmzl8hhs7vwtzknp9xxs63mfp"
+    )
+
     RADIX_CHARTS_TOKENS_PRICE_LIST = "https://api.radixapi.net/v1/token/price/list"
     RADIX_CHARTS_TOKEN_PRICE_CURRENT = "https://api.radixapi.net/v1/token/price/current"
     RADIX_CHARTS_ORACLE_TOKENS = "hug,defiplaza,floop,radix"
-    # RADIX_CHARTS_AUTHORIZATION_TOKEN = getenv("RADIX_CHARTS_AUTHORIZATION_TOKEN")
-    RADIX_CHARTS_AUTHORIZATION_TOKEN = "vp1r9w1gkOVKelMDAqVfLQ0hPVaLgzTo7EzYQF1VEJA"
+    RADIX_CHARTS_AUTHORIZATION_TOKEN = getenv("RADIX_CHARTS_AUTHORIZATION_TOKEN")
 
     DB_URI = getenv("DB_URI")
 
     NETWORK_ID = int(getenv("NETWORK_ID", 2))
     NETWORK_GATEWAY = getenv("NETWORK_GATEWAY", "https://stokenet.radixdlt.com")
 
-    # COINMARKETCAP_DEV_API_KEY = getenv("COINMARKETCAP_DEV_API_KEY")
-    COINMARKETCAP_DEV_API_KEY = "9146a524-628f-4bcd-a505-8b6013266c5e"
-
+    COINMARKETCAP_DEV_API_KEY = getenv("COINMARKETCAP_DEV_API_KEY")
     COIN_GECKO_API = getenv("COIN_GECKO_API", "https://api.coingecko.com/api/v3")
     COIN_GECKO_API_KEY = getenv("COIN_GECKO_API_KEY", "")
 

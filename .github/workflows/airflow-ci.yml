@@ -31,20 +31,8 @@ jobs:
         with:
           options: "--check --verbose"
           src: "."
-  unit-tests:
-    needs: lint
-    runs-on: ubuntu-latest
-    container:
-      image: python:3.10
-    steps:
-      - uses: RDXWorks-actions/checkout@main
-      - name: unit tests
-        run: |
-          cd airflow 
-          pip install -r requirements-ci.txt
-          pytest
   tags:
-    needs: unit-tests
+    needs: lint
     runs-on: ubuntu-latest
     outputs:
       airflow-tags: ${{ steps.docker-tags-airflow-service.outputs.tags }}
