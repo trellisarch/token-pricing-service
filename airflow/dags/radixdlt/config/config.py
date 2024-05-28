@@ -6,21 +6,25 @@ class Config:
 
     RADIX_CHARTS_TOKENS_PRICE_LIST = "https://api.radixapi.net/v1/token/price/list"
     RADIX_CHARTS_TOKEN_PRICE_CURRENT = "https://api.radixapi.net/v1/token/price/current"
-    RADIX_CHARTS_AUTHORIZATION_TOKEN = getenv("RADIX_CHARTS_AUTHORIZATION_TOKEN")
+    RADIX_CHARTS_ORACLE_TOKENS = "hug,defiplaza,floop,radix"
+    # RADIX_CHARTS_AUTHORIZATION_TOKEN = getenv("RADIX_CHARTS_AUTHORIZATION_TOKEN")
+    RADIX_CHARTS_AUTHORIZATION_TOKEN = "vp1r9w1gkOVKelMDAqVfLQ0hPVaLgzTo7EzYQF1VEJA"
 
     DB_URI = getenv("DB_URI")
 
     NETWORK_ID = int(getenv("NETWORK_ID", 2))
     NETWORK_GATEWAY = getenv("NETWORK_GATEWAY", "https://stokenet.radixdlt.com")
 
-    COINMARKETCAP_DEV_API_KEY = getenv("COINMARKETCAP_DEV_API_KEY")
+    # COINMARKETCAP_DEV_API_KEY = getenv("COINMARKETCAP_DEV_API_KEY")
+    COINMARKETCAP_DEV_API_KEY = "9146a524-628f-4bcd-a505-8b6013266c5e"
+
     COIN_GECKO_API = getenv("COIN_GECKO_API", "https://api.coingecko.com/api/v3")
     COIN_GECKO_API_KEY = getenv("COIN_GECKO_API_KEY", "")
 
     TOKEN_PRICE_SCHEDULE_INTERVAL = getenv("TOKEN_PRICE_SCHEDULE_INTERVAL", None)
     ORACLE_SCHEDULE_INTERVAL = getenv("ORACLE_SCHEDULE_INTERVAL", None)
     MARKETING_DAGS_SCHEDULE_INTERVAL = getenv("MARKETING_DAGS_SCHEDULE_INTERVAL", None)
-    ORACLE_COIN_GECKO_IDS = "radix,bitcoin,ethereum,tether,usd-coin"
+    ORACLE_COIN_GECKO_IDS = "radix,bitcoin,ethereum,tether,usd-coin,defiplaza,hug,floop"
     ORACLE_CMC_PAIRS = "BTC/XRD,ETH/XRD,USDT/XRD,USDC/XRD"
     ORACLE_PRICE_DIFF_TRIGGER = 0.05
     ORACLE_LOCK_FEE_ADDRESS = getenv(
@@ -29,7 +33,6 @@ class Config:
     )
     ORACLE_LOCK_FEE = float(getenv("ORACLE_LOCK_FEE", 0.58434484845))
     ORACLE_CONFIG_FILE = getenv("ORACLE_CONFIG_FILE", "config-develop.json")
-
     STALE_PERIOD_SECS = 180
 
     STALE_CHECK_PAIRS = "BTC/XRD,ETH/XRD"

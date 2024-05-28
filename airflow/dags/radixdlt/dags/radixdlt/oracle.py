@@ -1,14 +1,12 @@
 import logging
 from datetime import datetime
-from airflow import AirflowException
 from airflow.decorators import task, dag
 from radixdlt.config.config import Config
-from radixdlt.lib.c9 import process_c9_prices
-from radixdlt.lib.cmc import process_cmc_prices
-from radixdlt.lib.coingecko import process_coin_gecko_prices
+from radixdlt.lib.c9 import C9PriceProvider
 from radixdlt.lib.gateway import is_transaction_committed
-from radixdlt.lib.oracle import update_oracle
-from radixdlt.lib.pyth import process_pyth_prices
+from radixdlt.lib.oracle import OracleUpdater
+from radixdlt.lib.pyth import PythPriceProvider
+from radixdlt.lib.radix_charts import RadixChartsPriceProvider
 
 default_args = {
     "owner": "airflow",
@@ -24,27 +22,31 @@ default_args = {
     dag_id="oracle_price",
 )
 def oracle_prices_dag():
-    @task
-    def process_coin_gecko_prices_task():
-        return process_coin_gecko_prices()
-
-    @task
-    def process_cmc_prices_task():
-        return process_cmc_prices()
 
     @task
     def process_pyth_prices_task():
-        return process_pyth_prices()
+        pyth_price_provider = PythPriceProvider()
+        pyth_price_provider.process_prices()
+        return pyth_price_provider.prices
 
     @task
     def process_c9_prices_task():
-        return process_c9_prices()
+        c9_price_provider = C9PriceProvider()
+        c9_price_provider.process_prices()
+        return c9_price_provider.prices
 
     @task
-    def update_oracle_task(coin_gecko_prices, cmc_prices, pyth_prices, c9_prices):
-        if coin_gecko_prices == {} and cmc_prices == {}:
-            raise AirflowException("Both Gecko and CMC prices are empty")
-        return update_oracle(coin_gecko_prices, cmc_prices, pyth_prices, c9_prices)
+    def process_radix_charts_prices_task():
+        radix_charts_price_provider = RadixChartsPriceProvider()
+        radix_charts_price_provider.process_prices()
+        return radix_charts_price_provider.prices
+
+    @task
+    def update_oracle_task(pyth_prices, c9_prices, radix_charts_pricess):
+        oracle_updater = OracleUpdater()
+        return oracle_updater.update_prices(
+            pyth_prices, c9_prices, radix_charts_pricess
+        )
 
     @task
     def get_transaction_status_task(transaction_metadata):
@@ -70,10 +72,9 @@ def oracle_prices_dag():
     assert_all_pairs_updated_task(
         get_transaction_status_task(
             update_oracle_task(
-                process_coin_gecko_prices_task(),
-                process_cmc_prices_task(),
                 process_pyth_prices_task(),
                 process_c9_prices_task(),
+                process_radix_charts_prices_task(),
             )
         )
     )

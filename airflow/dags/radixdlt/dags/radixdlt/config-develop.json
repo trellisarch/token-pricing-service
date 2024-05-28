@@ -25,6 +25,21 @@
     {
       "resource_address": "resource_tdx_2_1tkpwejwr35gg3xqc0advlv3c8nvs003nn0y80yw2757y5pcnf40qap",
       "symbol": "LSULP"
+    },
+    {
+      "resource_address": "resource_rdx1t5kmyj54jt85malva7fxdrnpvgfgs623yt7ywdaval25vrdlmnwe97",
+      "symbol": "$HUG",
+      "price_source": "radixcharts"
+    },
+    {
+      "resource_address": "resource_rdx1t5pyvlaas0ljxy0wytm5gvyamyv896m69njqdmm2stukr3xexc2up9",
+      "symbol": "$FLOOP",
+      "price_source": "radixcharts"
+    },
+    {
+      "resource_address": "resource_rdx1t5ywq4c6nd2lxkemkv4uzt8v7x7smjcguzq5sgafwtasa6luq7fclq",
+      "symbol": "$DFP2",
+      "price_source": "radixcharts"
     }
   ]
 }

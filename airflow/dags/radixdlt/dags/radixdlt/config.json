@@ -9,23 +9,43 @@
   "base_resources": [
     {
       "resource_address": "resource_rdx1thrvr3xfs2tarm2dl9emvs26vjqxu6mqvfgvqjne940jv0lnrrg7rw",
-      "symbol": "USDT"
+      "symbol": "USDT",
+      "price_source": "pyth"
     },
     {
       "resource_address": "resource_rdx1th88qcj5syl9ghka2g9l7tw497vy5x6zaatyvgfkwcfe8n9jt2npww",
-      "symbol": "ETH"
+      "symbol": "ETH",
+      "price_source": "pyth"
     },
     {
       "resource_address": "resource_rdx1t4upr78guuapv5ept7d7ptekk9mqhy605zgms33mcszen8l9fac8vf",
-      "symbol": "USDC"
+      "symbol": "USDC",
+      "price_source": "pyth"
     },
     {
       "resource_address": "resource_rdx1t580qxc7upat7lww4l2c4jckacafjeudxj5wpjrrct0p3e82sq4y75",
-      "symbol": "BTC"
+      "symbol": "BTC",
+      "price_source": "pyth"
     },
     {
       "resource_address": "resource_rdx1thksg5ng70g9mmy9ne7wz0sc7auzrrwy7fmgcxzel2gvp8pj0xxfmf",
-      "symbol": "LSULP"
+      "symbol": "LSULP",
+      "price_source": "C9"
+    },
+    {
+      "resource_address": "resource_rdx1t5kmyj54jt85malva7fxdrnpvgfgs623yt7ywdaval25vrdlmnwe97",
+      "symbol": "$HUG",
+      "price_source": "radixcharts"
+    },
+    {
+      "resource_address": "resource_rdx1t5pyvlaas0ljxy0wytm5gvyamyv896m69njqdmm2stukr3xexc2up9",
+      "symbol": "$FLOOP",
+      "price_source": "radixcharts"
+    },
+    {
+      "resource_address": "resource_rdx1t5ywq4c6nd2lxkemkv4uzt8v7x7smjcguzq5sgafwtasa6luq7fclq",
+      "symbol": "$DFP2",
+      "price_source": "radixcharts"
     }
   ]
 }
