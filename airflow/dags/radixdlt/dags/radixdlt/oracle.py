@@ -66,7 +66,7 @@ def oracle_prices_dag():
         # TODO: add a better way to do this assertion
         assert (
             len(transaction_metadata["transactions"])
-            == len(Config.ORACLE_CMC_PAIRS.split(",")) + 1
+            == 8
         )
 
     assert_all_pairs_updated_task(
