@@ -54,6 +54,10 @@ def create_transaction(transaction_metadata):
                 for metadata in transaction_metadata
                 if metadata["base"] == quote["symbol"]
             ][0]
+            price_str = str(quote_price)
+            if len(price_str.split(".")[0]) > 18:
+                price_str = price_str[:-1]
+                quote_price = float(price_str)
             quotes += f"""
 Tuple(
     Address("{quote["resource_address"]}"),
