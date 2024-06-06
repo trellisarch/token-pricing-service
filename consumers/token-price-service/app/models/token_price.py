@@ -1,4 +1,3 @@
-from _decimal import Decimal
 from datetime import datetime, timezone
 from typing import List
 from sqlalchemy import (
@@ -57,11 +56,6 @@ class LatestTokenPrice(Base):
     usd_price = Column(Float)
     last_updated_at = Column(DateTime)
     allowlist = Column(Boolean)
-
-    def format_usd_price(self):
-        self.usd_price = Decimal(self.usd_price).quantize(
-            Decimal("1.000000000000000000")
-        )
 
 
 def get_latest_prices(resource_addresses: List[str]) -> List[LatestTokenPrice]:

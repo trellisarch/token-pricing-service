@@ -1,18 +1,12 @@
-from _decimal import Decimal, getcontext
 from datetime import datetime
 from typing import Optional, List
 from pydantic import BaseModel, Field
 
-getcontext().prec = 18
-
 
 class TokenPrice(BaseModel):
     resource_address: str
-    usd_price: Decimal
+    usd_price: float
     last_updated_at: datetime
-
-    class Config:
-        json_encoders = {Decimal: lambda v: format(v, "f")}
 
 
 class LsuPrice(BaseModel):
