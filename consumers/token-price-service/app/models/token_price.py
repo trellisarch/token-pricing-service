@@ -65,7 +65,7 @@ class LatestTokenPrice(Base):
                 decimal_usd_price = Decimal(self.usd_price)
                 precision_usd_price = decimal_usd_price.normalize()
                 logger.info(precision_usd_price)
-                self.usd_price = precision_usd_price
+                self.usd_price = float(precision_usd_price)
             else:
                 logger.error("usd_price is None")
         except InvalidOperation as e:
