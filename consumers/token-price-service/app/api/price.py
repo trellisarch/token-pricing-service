@@ -26,9 +26,12 @@ async def get_tokens_prices(data: TokenPricesRequest = Body(...)):
             detail=f"Currency: {currency} not supported. Supported currencies: "
             f"{Config.SUPPORTED_CURRENCIES}",
         )
-
     token_prices = []
     token_prices.extend(get_latest_prices(tokens))
+
+    for token_price in token_prices:
+        logger.info(token_price.usd_price)
+        token_price.format_usd_price()
 
     if len(lsus) > 0:
         lsus_prices = get_lsu_redemption_values(addresses=lsus)

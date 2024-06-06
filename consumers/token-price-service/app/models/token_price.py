@@ -1,3 +1,4 @@
+from _decimal import Decimal, InvalidOperation
 from datetime import datetime, timezone
 from typing import List
 from sqlalchemy import (
@@ -7,11 +8,9 @@ from sqlalchemy import (
     Float,
     DateTime,
     ForeignKey,
-    label,
-    func,
     Boolean,
 )
-from sqlalchemy.orm import relationship, Session, joinedload
+from sqlalchemy.orm import relationship, Session
 
 from app.logger.log import get_logger
 from app.models.base import Base, get_session, get_engine
@@ -56,6 +55,23 @@ class LatestTokenPrice(Base):
     usd_price = Column(Float)
     last_updated_at = Column(DateTime)
     allowlist = Column(Boolean)
+
+    def format_usd_price(self):
+        logger.info(self.usd_price)
+        try:
+            # Ensure usd_price is not None and is a valid number
+            if self.usd_price is not None:
+                logger.info(self.usd_price)
+                decimal_usd_price = Decimal(self.usd_price)
+                precision_usd_price = decimal_usd_price.normalize()
+                logger.info(precision_usd_price)
+                self.usd_price = precision_usd_price
+            else:
+                logger.error("usd_price is None")
+        except InvalidOperation as e:
+            logger.error(f"InvalidOperation: {str(e)}")
+        except Exception as e:
+            logger.error(f"Unexpected error: {e}")
 
 
 def get_latest_prices(resource_addresses: List[str]) -> List[LatestTokenPrice]:
