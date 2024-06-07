@@ -56,23 +56,6 @@ class LatestTokenPrice(Base):
     last_updated_at = Column(DateTime)
     allowlist = Column(Boolean)
 
-    def format_usd_price(self):
-        logger.info(self.usd_price)
-        try:
-            # Ensure usd_price is not None and is a valid number
-            if self.usd_price is not None:
-                logger.info(self.usd_price)
-                decimal_usd_price = Decimal(self.usd_price)
-                precision_usd_price = decimal_usd_price.normalize()
-                logger.info(precision_usd_price)
-                self.usd_price = float(precision_usd_price)
-            else:
-                logger.error("usd_price is None")
-        except InvalidOperation as e:
-            logger.error(f"InvalidOperation: {str(e)}")
-        except Exception as e:
-            logger.error(f"Unexpected error: {e}")
-
 
 def get_latest_prices(resource_addresses: List[str]) -> List[LatestTokenPrice]:
     with Session(get_engine()) as session:
@@ -83,6 +66,8 @@ def get_latest_prices(resource_addresses: List[str]) -> List[LatestTokenPrice]:
             .filter(LatestTokenPrice.allowlist == True)
             .all()
         )
+        for price in latest_prices:
+            price.usd_price = round(price.usd_price, 18)
         return latest_prices
 
 
