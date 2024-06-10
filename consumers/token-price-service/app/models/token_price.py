@@ -1,3 +1,4 @@
+from _decimal import Decimal, InvalidOperation
 from datetime import datetime, timezone
 from typing import List
 from sqlalchemy import (
@@ -9,10 +10,10 @@ from sqlalchemy import (
     ForeignKey,
     Boolean,
 )
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, Session
 
 from app.logger.log import get_logger
-from app.models.base import Base, get_session
+from app.models.base import Base, get_session, get_engine
 from app.models.token import Token
 
 
@@ -57,17 +58,17 @@ class LatestTokenPrice(Base):
 
 
 def get_latest_prices(resource_addresses: List[str]) -> List[LatestTokenPrice]:
-    session = get_session()
-    # Query to get the latest prices filtered by resource addresses
-    latest_prices = (
-        session.query(LatestTokenPrice)
-        .filter(LatestTokenPrice.resource_address.in_(resource_addresses))
-        .filter(LatestTokenPrice.allowlist == True)
-        .all()
-    )
-    for price in latest_prices:
-        price.usd_price = round(price.usd_price, 18)
-    return latest_prices
+    with Session(get_engine()) as session:
+        # Query to get the latest prices filtered by resource addresses
+        latest_prices = (
+            session.query(LatestTokenPrice)
+            .filter(LatestTokenPrice.resource_address.in_(resource_addresses))
+            .filter(LatestTokenPrice.allowlist == True)
+            .all()
+        )
+        for price in latest_prices:
+            price.usd_price = round(price.usd_price, 18)
+        return latest_prices
 
 
 class LsuPrice:
@@ -84,38 +85,38 @@ class LsuPrice:
 
 
 def get_latest_price(resource_address: str) -> float:
-    session = get_session()
-    latest_price = (
-        session.query(TokenPrice)
-        .filter_by(resource_address=resource_address)
-        .order_by(TokenPrice.last_updated_at.desc())
-        .first()
-    )
-    return latest_price.usd_price
+    with Session(get_engine()) as session:
+        latest_price = (
+            session.query(TokenPrice)
+            .filter_by(resource_address=resource_address)
+            .order_by(TokenPrice.last_updated_at.desc())
+            .first()
+        )
+        return latest_price.usd_price
 
 
 def get_whitelisted_tokens():
-    session = get_session()
-    latest_prices = {}
-    tokens_with_latest_price = (
-        session.query(Token, TokenPrice)
-        .filter(Token.allowlist == True)
-        .order_by(Token.id, TokenPrice.last_updated_at.desc())
-        .distinct(Token.id)
-        .all()
-    )
+    with Session(get_engine()) as session:
+        latest_prices = {}
+        tokens_with_latest_price = (
+            session.query(Token, TokenPrice)
+            .filter(Token.allowlist == True)
+            .order_by(Token.id, TokenPrice.last_updated_at.desc())
+            .distinct(Token.id)
+            .all()
+        )
 
-    # Populate the dictionary with the results
-    for token, token_price in tokens_with_latest_price:
-        latest_prices[token.id] = {
-            "symbol": token.symbol,
-            "name": token.name,
-            "id": token.id,
-            "resource_address": token.resource_address,
-            "usd_price": token_price.usd_price,
-            "usd_market_cap": token_price.usd_market_cap,
-            "usd_vol_24h": token_price.usd_vol_24h,
-            "last_updated_at": token_price.last_updated_at,
-        }
+        # Populate the dictionary with the results
+        for token, token_price in tokens_with_latest_price:
+            latest_prices[token.id] = {
+                "symbol": token.symbol,
+                "name": token.name,
+                "id": token.id,
+                "resource_address": token.resource_address,
+                "usd_price": token_price.usd_price,
+                "usd_market_cap": token_price.usd_market_cap,
+                "usd_vol_24h": token_price.usd_vol_24h,
+                "last_updated_at": token_price.last_updated_at,
+            }
 
-    return latest_prices
+        return latest_prices

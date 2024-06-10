@@ -14,5 +14,9 @@ Session = sessionmaker(bind=engine)
 Base = declarative_base()
 
 
+def get_engine():
+    return engine
+
+
 def get_session() -> Session:
     return Session()
