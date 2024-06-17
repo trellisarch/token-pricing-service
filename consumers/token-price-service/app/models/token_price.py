@@ -98,9 +98,8 @@ def get_whitelisted_tokens():
     with Session(get_engine()) as session:
         latest_prices = {}
         tokens_with_latest_price = (
-            session.query(Token, TokenPrice)
+            session.query(Token, LatestTokenPrice)
             .filter(Token.allowlist == True)
-            .order_by(Token.id, TokenPrice.last_updated_at.desc())
             .distinct(Token.id)
             .all()
         )
