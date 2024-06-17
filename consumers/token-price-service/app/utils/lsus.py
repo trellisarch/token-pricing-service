@@ -102,7 +102,7 @@ def get_lsu_redemption_values(addresses=[]):
             return {}
     logger.info("Getting the latest XRD price")
     xrd_price = get_latest_price(Config.XRD_RESOURCE_ADDRESS)
-    logger.info(f"Lattest XRD price: {xrd_price}")
+    logger.info(f"Latest XRD price: {xrd_price}")
     logger.info(f"LSUs redemption values: {lsu_redemption_values}")
     return [
         LsuPrice(
