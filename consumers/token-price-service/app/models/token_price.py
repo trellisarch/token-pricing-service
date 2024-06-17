@@ -112,8 +112,8 @@ def get_whitelisted_tokens():
                 "id": token.id,
                 "resource_address": token.resource_address,
                 "usd_price": token_price.usd_price,
-                "usd_market_cap": token_price.usd_market_cap,
-                "usd_vol_24h": token_price.usd_vol_24h,
+                "usd_market_cap": "",
+                "usd_vol_24h": "",
                 "last_updated_at": token_price.last_updated_at,
             }
 
