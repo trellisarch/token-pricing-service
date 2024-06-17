@@ -1,4 +1,3 @@
-from _decimal import Decimal, InvalidOperation
 from datetime import datetime, timezone
 from typing import List
 from sqlalchemy import (

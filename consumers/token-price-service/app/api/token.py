@@ -13,6 +13,7 @@ tokens_router = APIRouter()
 @tokens_router.post("", response_model=list[Token])
 async def get_tokens():
     mapped_tokens = []
+    logger.info("Getting whitelisted tokens...")
     tokens = get_whitelisted_tokens()
     for symbol, price in tokens.items():
         token_data = {
