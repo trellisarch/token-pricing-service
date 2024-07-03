@@ -18,6 +18,9 @@ from radixdlt.config.config import Config
 
 def create_transaction(transaction_metadata):
     private_key_bytes_hex = getenv("PRIVATE_KEY_BYTES")
+    logging.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+    logging.info(private_key_bytes_hex)
+    logging.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
     private_key_bytes = bytes.fromhex(private_key_bytes_hex)
     private_key = PrivateKey.new_secp256k1(private_key_bytes)
     address = derive_virtual_account_address_from_public_key(

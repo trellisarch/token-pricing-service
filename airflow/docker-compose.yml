@@ -50,7 +50,7 @@ x-airflow-common:
   # In order to add custom dependencies or upgrade provider packages you can use your extended image.
   # Comment the image line, place your Dockerfile in the directory where you placed the docker-compose.yaml
   # and uncomment the "build" line below, Then run `docker-compose build` to build the images.
-  image: local-airflow
+  image: local-airflow:latest
   platform: linux/amd64
   # build: .
   environment:
@@ -93,7 +93,7 @@ x-airflow-common:
     TELEGRAM_RADIX_DEVS_COMBOT_API_KEY: $TELEGRAM_RADIX_DEVS_COMBOT_API_KEY
     COIN_MARKET_CAP_TOKEN: $COIN_MARKET_CAP_TOKEN
     DB_URI: postgresql+psycopg2://postgres:postgres@airflow-postgresql/dags
-    PRIVATE_KEY_BYTES: "cdf9a35e9197cd200143a89c93e8d22c487332a5fd6651aa6e47e75d8ae634a0"
+    PRIVATE_KEY_BYTES: $PRIVATE_KEY_BYTES
     REDDIT_CLIENT_ID: $REDDIT_CLIENT_ID
     REDDIT_CLIENT_SECRET: $REDDIT_CLIENT_SECRET
     REDDIT_USER_AGENT: $REDDIT_USER_AGENT

@@ -149,7 +149,21 @@ jobs:
         ci.INSTALL_TOKEN_SERVICE=${{ true }},
         ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }}
-  
+ 
+  api-tests-dev:
+    needs: deploy-airflow-dev
+    runs-on: ubuntu-latest
+    container:
+      image: python:3.10
+    steps:
+      - uses: RDXWorks-actions/checkout@main
+      - name: api tests
+        run: |
+          cd consumers/token-price-service 
+          pip install pytest requests
+          export API_URL=https://dev-token-price.extratools.works
+          pytest --log-cli-level=INFO -v tests/api
+
   deploy-airflow-prod:
     if:  github.ref == 'refs/heads/main'
     name: "Deploy Airflow Prod"
@@ -178,6 +192,20 @@ jobs:
         ci.INSTALL_AIRFLOW=${{ true }},
         ci.INSTALL_TOKEN_SERVICE=${{ true }},
         ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }}
+
+  api-tests-prod:
+    needs: deploy-airflow-prod
+    runs-on: ubuntu-latest
+    container:
+      image: python:3.10
+    steps:
+      - uses: RDXWorks-actions/checkout@main
+      - name: api tests
+        run: |
+          cd consumers/token-price-service 
+          pip install pytest requests
+          export API_URL=https://token-price-service.radixdlt.com
+          pytest --log-cli-level=INFO -v tests/api
 
   deploy_pull_request_airflow:
     if: ${{ github.event.pull_request }}

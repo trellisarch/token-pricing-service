@@ -15,8 +15,8 @@ class Config:
 
     DB_URI = getenv("DB_URI")
 
-    NETWORK_ID = int(getenv("NETWORK_ID", 2))
-    NETWORK_GATEWAY = getenv("NETWORK_GATEWAY", "https://stokenet.radixdlt.com")
+    NETWORK_ID = int(getenv("NETWORK_ID", 1))
+    NETWORK_GATEWAY = getenv("NETWORK_GATEWAY", "https://mainnet.radixdlt.com")
 
     COINMARKETCAP_DEV_API_KEY = getenv("COINMARKETCAP_DEV_API_KEY")
     COIN_GECKO_API = getenv("COIN_GECKO_API", "https://api.coingecko.com/api/v3")
@@ -33,7 +33,7 @@ class Config:
         "component_tdx_2_1cptxxxxxxxxxfaucetxxxxxxxxx000527798379xxxxxxxxxyulkzl",
     )
     ORACLE_LOCK_FEE = float(getenv("ORACLE_LOCK_FEE", 0.58434484845))
-    ORACLE_CONFIG_FILE = getenv("ORACLE_CONFIG_FILE", "config-develop.json")
+    ORACLE_CONFIG_FILE = getenv("ORACLE_CONFIG_FILE", "config.json")
     STALE_PERIOD_SECS = 180
 
     STALE_CHECK_PAIRS = "BTC/XRD,ETH/XRD"
