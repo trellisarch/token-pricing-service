@@ -165,7 +165,7 @@ jobs:
           pytest --log-cli-level=INFO -v tests/api
 
   deploy-airflow-prod:
-    if:  github.ref == 'refs/heads/main'
+    if: github.event_name == 'release' && !github.event.release.prerelease
     name: "Deploy Airflow Prod"
     uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@main
     needs:
