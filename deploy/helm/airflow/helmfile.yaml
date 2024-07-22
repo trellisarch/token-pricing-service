@@ -32,9 +32,9 @@ releases:
   - name: airflow
     installed: {{ .StateValues | get "ci.INSTALL_AIRFLOW" "false" }}
     chart: apache-airflow/airflow
-    version: 1.11.0
+    version: 1.14.0
     values:
-      - airflowVersion: "2.8.1"
+      - airflowVersion: "2.9.2"
       - images:
           airflow:
             repository: radixdlt/airflow
