@@ -18,7 +18,11 @@ resources:
     memory: 768Mi
 
 metrics:
-  enabled: false
+  enabled: true
+  port: 5990
+  serviceMonitor:
+    enabled: true
+    interval: 60s
 
 envs:
   DB_HOST: "airflow-prod-rds-ro.rdx-works-main-prod.internal"

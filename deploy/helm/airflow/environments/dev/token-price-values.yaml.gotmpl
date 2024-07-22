@@ -11,7 +11,11 @@ autoscaling:
   targetMemoryUtilizationPercentage: 80
 
 metrics:
-  enabled: false
+  enabled: true
+  port: 5990
+  serviceMonitor:
+    enabled: true
+    interval: 60s
 
 resources:
   limits:
