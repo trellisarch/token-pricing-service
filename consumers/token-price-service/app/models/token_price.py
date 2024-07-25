@@ -100,7 +100,7 @@ def get_whitelisted_tokens():
         tokens_with_latest_price = (
             session.query(Token, LatestTokenPrice)
             .filter(Token.allowlist == True)
-            .distinct(Token.id)
+            .filter(Token.resource_address == LatestTokenPrice.resource_address)
             .all()
         )
 
