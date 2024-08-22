@@ -93,8 +93,6 @@ reddit_subreddit_task2 = subreddit_task("RadixValidators")
 
 reddit_subreddit_task3 = subreddit_task("RadixDevelopers")
 
-reddit_subreddit_task4 = subreddit_task("radix_dlt")
-
 reddit_subreddit_task5 = subreddit_task("scrypto")
 
 
