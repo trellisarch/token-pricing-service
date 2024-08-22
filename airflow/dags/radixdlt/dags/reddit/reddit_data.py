@@ -101,5 +101,4 @@ reddit_subreddit_task5 = subreddit_task("scrypto")
 reddit_redditor_task1 >> reddit_subreddit_task1
 reddit_redditor_task1 >> reddit_subreddit_task2
 reddit_redditor_task1 >> reddit_subreddit_task3
-reddit_redditor_task1 >> reddit_subreddit_task4
 reddit_redditor_task1 >> reddit_subreddit_task5
