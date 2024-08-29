@@ -83,3 +83,8 @@ class Config:
 
     GOOGLE_RADIX_PROJECT_ID = "radix-wallet-fe520"
     GOOGLE_RADIX_STATS_BUCKET_ID = "pubsite_prod_7136842257012583290"
+
+    COINGECKO_TOKEN_PRICES_SCHEDULE_INTERVAL = getenv(
+        "COINGECKO_TOKEN_PRICES_SCHEDULE_INTERVAL", None
+    )
+    COINGECKO_TOKENS = "radix,avalanche-2,e-radix,solana,polkadot,near,cardano,aptos,sui,sei-network,elrond-erd-2,the-open-network"

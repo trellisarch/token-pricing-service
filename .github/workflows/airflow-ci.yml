@@ -32,7 +32,6 @@ jobs:
           options: "--check --verbose"
           src: "."
   tags:
-    needs: lint
     runs-on: ubuntu-latest
     outputs:
       airflow-tags: ${{ steps.docker-tags-airflow-service.outputs.tags }}
@@ -163,6 +162,17 @@ jobs:
           pip install pytest requests
           export API_URL=https://dev-token-price.extratools.works
           pytest --log-cli-level=INFO -v tests/api
+  
+  run_unit_tests:
+    runs-on: ubuntu-latest
+    container:
+      image: python:3.10
+    steps:
+      - uses: RDXWorks-actions/checkout@main
+      - name: run pytest unit test
+        run: |
+          cd airflow
+          make ci-test
 
   deploy-airflow-prod:
     if: github.event_name == 'release' && !github.event.release.prerelease

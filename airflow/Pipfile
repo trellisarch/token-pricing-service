@@ -4,6 +4,20 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+tweepy = "*"
+pygithub = "*"
+radix-engine-toolkit = "*"
+praw = "*"
+pythclient = "*"
+requests = "*"
+google-auth = "*"
+google-api-python-client = "*"
+google-auth-oauthlib = "*"
+google-auth-httplib2 = "*"
+sqlalchemy = "*"
+pytest = "*"
+pytest-asyncio = "*"
+pytest-mock = "*"
 
 [dev-packages]
 

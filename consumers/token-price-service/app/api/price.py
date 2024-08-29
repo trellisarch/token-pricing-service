@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Body, HTTPException
 from app.config.config import Config
 from app.logger.log import get_logger
-from app.models.token_price import get_latest_prices, get_latest_price
+from app.models.token_price import get_latest_prices
 from app.schemas.token_price import (
     TokenPricesResponse,
     TokenPricesRequest,
