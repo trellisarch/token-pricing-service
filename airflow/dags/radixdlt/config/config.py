@@ -84,6 +84,11 @@ class Config:
     GOOGLE_RADIX_PROJECT_ID = "radix-wallet-fe520"
     GOOGLE_RADIX_STATS_BUCKET_ID = "pubsite_prod_7136842257012583290"
 
+    NPM_PACKAGES = getenv(
+        "NPM_PACKAGES",
+        "@radixdlt/babylon-gateway-api-sdk,@radixdlt/radix-connect-webrtc",
+    )
+
     COINGECKO_TOKEN_PRICES_SCHEDULE_INTERVAL = getenv(
         "COINGECKO_TOKEN_PRICES_SCHEDULE_INTERVAL", None
     )

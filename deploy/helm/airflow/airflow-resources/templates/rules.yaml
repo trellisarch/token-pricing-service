@@ -10,7 +10,7 @@ spec:
   - name: Airflow
     rules:
     - alert: AirflowTaskFailure
-      expr: (changes(airflow_task_status{dag_id!="oracle_price",status="failed"}[1d]) > 0) unless (changes(airflow_task_status{dag_id!="oracle_price",status="success"}[1d]) > 0)
+      expr: (changes(airflow_task_status{dag_id!~"oracle_price|radix_charts_current_price|radix_charts_tokens_list",status="failed"}[1d]) > 0) unless (changes(airflow_task_status{dag_id!~"oracle_price|radix_charts_current_price|radix_charts_tokens_list",status="success"}[1d]) > 0)
       for: 1m
       labels:
         severity: warning
@@ -20,7 +20,7 @@ spec:
         summary: "Airflow task failed: {{ "{{$labels.task_name}}" }}"
         description: "Task '{{ "{{$labels.task_id}}" }}' in DAG '{{ "{{$labels.dag_id}}" }}' failed."
         runbook_url: https://runbooks.extratools.works
-        dashboard: https://radixdlt.grafana.net/d/lFXqBGxWk/poc3a-airflow-cluster-dashboard?orgId=1&refresh=5s&var-prometheus=FQomEQz4k&var-namespace=airflow-prod&var-dag_id=All&var-task_id=All&var-loki=6OqgV0p4z
+        dashboard: https://radixdlt.grafana.net/d/lFXqBGxWk/poc3a-airflow-cluster-dashboard?orgId=1&refresh=5s&var-prometheus=FQomEQz4k&var-namespace="{{.Release.Namespace}}"&var-dag_id=All&var-task_id=All&var-loki=6OqgV0p4z
         app_url: "{{ .Values.ui_url }}/dags/{{ "{{$labels.dag_id}}" }}/grid?num_runs=25"
 
     - alert: OracleTaskFailure
@@ -34,9 +34,23 @@ spec:
         summary: "Oracle task failed: {{ "{{$labels.task_name}}" }}"
         description: "Task '{{ "{{$labels.task_id}}" }}' in DAG '{{ "{{$labels.dag_id}}" }}' failed."
         runbook_url: https://runbooks.extratools.works
-        dashboard: https://radixdlt.grafana.net/d/lFXqBGxWk/poc3a-airflow-cluster-dashboard?orgId=1&refresh=5s&var-prometheus=FQomEQz4k&var-namespace=airflow-prod&var-dag_id=All&var-task_id=All&var-loki=6OqgV0p4z
+        dashboard: https://radixdlt.grafana.net/d/lFXqBGxWk/poc3a-airflow-cluster-dashboard?orgId=1&refresh=5s&var-prometheus=FQomEQz4k&var-namespace="{{.Release.Namespace}}"&var-dag_id=All&var-task_id=All&var-loki=6OqgV0p4z
         app_url: "{{ .Values.ui_url }}/dags/{{ "{{$labels.dag_id}}" }}/grid?num_runs=25"
-
+    
+    - alert: RadixChartsCurrentPriceTaskFailure
+      expr: (changes(airflow_task_status{dag_id="radix_charts_current_price",status="failed"}[2m]) > 0) unless (changes(airflow_task_status{dag_id="radix_charts_current_price",status="success"}[1m]) > 0)
+      for: 2m
+      labels:
+        severity: warning
+        tier: application
+        application: airflow
+      annotations:
+        summary: "Radix Charts current price task failed: {{ "{{$labels.task_name}}" }}"
+        description: "Task '{{ "{{$labels.task_id}}" }}' in DAG '{{ "{{$labels.dag_id}}" }}' failed."
+        runbook_url: https://runbooks.extratools.works
+        dashboard: https://radixdlt.grafana.net/d/lFXqBGxWk/poc3a-airflow-cluster-dashboard?orgId=1&refresh=5s&var-prometheus=FQomEQz4k&var-namespace="{{.Release.Namespace}}"&var-dag_id=All&var-task_id=All&var-loki=6OqgV0p4z
+        app_url: "{{ .Values.ui_url }}/dags/{{ "{{$labels.dag_id}}" }}/grid?num_runs=25"
+    
     - alert: AirflowDAGFailure
       expr: (airflow_dag_last_status{dag_id!="oracle_price",status="failed"} > 0)
       for: 1m
@@ -121,7 +135,7 @@ spec:
         summary: "High number of 5xx errors on the token-price requests"
         description: "High number of 5xx errors on the token-price requests"
         runbook_url: https://runbooks.extratools.works
-        dashboard: https://radixdlt.grafana.net/d/lFXqBGxWk/poc3a-airflow-cluster-dashboard?orgId=1&refresh=5s&var-prometheus=FQomEQz4k&var-namespace=airflow-prod&var-dag_id=All&var-task_id=All&var-loki=6OqgV0p4z
+        dashboard: https://radixdlt.grafana.net/d/lFXqBGxWk/poc3a-airflow-cluster-dashboard?orgId=1&refresh=5s&var-prometheus=FQomEQz4k&var-namespace="{{.Release.Namespace}}"&var-dag_id=All&var-task_id=All&var-loki=6OqgV0p4z
     - alert: TokenPriceIngressHighLatency
       expr: histogram_quantile(0.95,sum(rate(nginx_ingress_controller_request_duration_seconds_bucket{ingress="token-price"}[5m])) by (le,ingress)) > 2
       for: 5m
@@ -133,7 +147,7 @@ spec:
         summary: "High latency on the token-price requests"
         description: "The p95 response times are over 2 seconds"
         runbook_url: https://runbooks.extratools.works
-        dashboard: https://radixdlt.grafana.net/d/lFXqBGxWk/poc3a-airflow-cluster-dashboard?orgId=1&refresh=5s&var-prometheus=FQomEQz4k&var-namespace=airflow-prod&var-dag_id=All&var-task_id=All&var-loki=6OqgV0p4z
+        dashboard: https://radixdlt.grafana.net/d/lFXqBGxWk/poc3a-airflow-cluster-dashboard?orgId=1&refresh=5s&var-prometheus=FQomEQz4k&var-namespace="{{.Release.Namespace}}"&var-dag_id=All&var-task_id=All&var-loki=6OqgV0p4z
     - alert: TokenPriceIngressHighRequestRate
       expr: sum(rate(nginx_ingress_controller_requests{ingress="token-price"}[5m])) > 500
       for: 5m
@@ -145,4 +159,4 @@ spec:
         summary: "High number of incoming requests"
         description: "There are more than 500 req/s on token price"
         runbook_url: https://runbooks.extratools.works
-        dashboard: https://radixdlt.grafana.net/d/lFXqBGxWk/poc3a-airflow-cluster-dashboard?orgId=1&refresh=5s&var-prometheus=FQomEQz4k&var-namespace=airflow-prod&var-dag_id=All&var-task_id=All&var-loki=6OqgV0p4z
+        dashboard: https://radixdlt.grafana.net/d/lFXqBGxWk/poc3a-airflow-cluster-dashboard?orgId=1&refresh=5s&var-prometheus=FQomEQz4k&var-namespace="{{.Release.Namespace}}"&var-dag_id=All&var-task_id=All&var-loki=6OqgV0p4z

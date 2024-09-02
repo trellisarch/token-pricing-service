@@ -7,6 +7,12 @@ lint:
 	pip install black
 	black .
 
+local-setup:
+	
+	cd .. && docker build -t migrations database -f database/Dockerfile
+	cd .. && docker build -t local-airflow airflow -f airflow/Dockerfile
+	cd .. && docker compose  -f airflow/docker-compose.yml up
+
 local-test:
 	pip install pipenv
 	pipenv install -r requirements.txt
