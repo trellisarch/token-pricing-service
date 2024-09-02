@@ -19,7 +19,7 @@ default_args = {
     dag_id="npm_metrics",
     default_args=default_args,
     description="DAG to fetch npm metrics",
-    schedule_interval=Config.TOKEN_PRICE_SCHEDULE_INTERVAL,
+    schedule_interval=Config.NPM_PACKAGES_SCHEDULE_INTERVAL,
     catchup=False,
 )
 def npm_metrics():

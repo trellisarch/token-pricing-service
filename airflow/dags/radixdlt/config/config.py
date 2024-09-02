@@ -86,8 +86,9 @@ class Config:
 
     NPM_PACKAGES = getenv(
         "NPM_PACKAGES",
-        "@radixdlt/babylon-gateway-api-sdk,@radixdlt/radix-connect-webrtc",
+        "@radixdlt/babylon-gateway-api-sdk,@radixdlt/radix-connect-webrtc,@radixdlt/babylon-core-api-sdk,@radixdlt/radix-engine-toolkit",
     )
+    NPM_PACKAGES_SCHEDULE_INTERVAL = getenv("NPM_PACKAGES_SCHEDULE_INTERVAL", None)
 
     COINGECKO_TOKEN_PRICES_SCHEDULE_INTERVAL = getenv(
         "COINGECKO_TOKEN_PRICES_SCHEDULE_INTERVAL", None
