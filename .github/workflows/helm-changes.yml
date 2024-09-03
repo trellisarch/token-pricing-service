@@ -1,0 +1,159 @@
+name: Helm changes
+
+on:
+  pull_request:
+    paths:
+      - "deploy/helm/airflow/**/*"
+    branches:
+      - develop
+  push:
+    paths:
+      - "deploy/helm/airflow/**/*"
+    branches:
+      - main
+
+permissions:
+  id-token: write
+  pull-requests: read
+  contents: read
+  deployments: write
+
+jobs:
+  changed-files:
+    name: Changed files?
+    runs-on: ubuntu-latest
+    outputs:
+      dev: ${{ steps.dev.outputs.any_changed }}
+      prod: ${{ steps.prod.outputs.any_changed }}
+    steps:
+      - name: Checkout
+        uses: RDXWorks-actions/checkout@main
+        with:
+          fetch-depth: 0
+      - name: Check dev files
+        id: dev
+        uses: RDXWorks-actions/changed-files@main
+        with:
+          files: |
+            deploy/helm/airflow/environments/dev/**
+            deploy/helm/airflow/helmfile.yaml
+            deploy/helm/airflow/airflow-resources/**/*
+            deploy/helm/airflow/db-migrations/**/*
+            deploy/helm/airflow/token-price/**/*
+      - name: Check prod files
+        id: prod
+        uses: RDXWorks-actions/changed-files@main
+        with:
+          files: |
+            deploy/helm/airflow/environments/dev/**
+            deploy/helm/airflow/helmfile.yaml
+            deploy/helm/airflow/airflow-resources/**/*
+            deploy/helm/airflow/db-migrations/**/*
+            deploy/helm/airflow/token-price/**/*
+
+  fetch-dev-tags:
+    name: DEV tags
+    if: github.event.pull_request && github.base_ref == 'develop' && needs.changed-files.outputs.dev == 'true'
+    uses: radixdlt/iac-resuable-artifacts/.github/workflows/fetch-deployment-tags.yml@DO-2704-helm-changes
+    needs:
+      - changed-files
+    with:
+      iam-role-arn: "arn:aws:iam::308190735829:role/gh-helm-changes-rwm-dev-radixdlt-org"
+      eks-cluster-name: "rdx-works-main-dev"
+      kubernetes-namespace: "airflow-dev"
+      kubernetes-deployment-name: "token-price"
+
+  diff-dev:
+    name: DEV diff
+    if: github.event.pull_request && github.base_ref == 'develop' && needs.changed-files.outputs.dev == 'true'
+    uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@main
+    needs:
+      - changed-files
+      - fetch-dev-tags
+    with:
+      app_name: airflow
+      env_name: dev
+      namespace: airflow-dev
+      create_subns: false
+      aws_region: eu-west-2
+      role_to_assume: "arn:aws:iam::308190735829:role/gh-helm-changes-rwm-dev-radixdlt-org"
+      eks_cluster: rdx-works-main-dev
+      helm_command: "diff"
+      helm_folder: "deploy/helm/airflow"
+      helmfile_extra_vars: >-
+        ci.tag=${{ needs.fetch-dev-tags.outputs.DOCKER_TAG }},
+        ci.environment=dev,
+        ci.HF_CREATE_NAMESPACES=false,
+        ci.INSTALL_DB=${{ false }},
+        ci.INSTALL_AIRFLOW=${{ true }},
+        ci.INSTALL_TOKEN_SERVICE=${{ true }},
+        ci.AIRFLOW_IMAGE_TAG=${{ needs.fetch-dev-tags.outputs.DOCKER_TAG }},
+        ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ needs.fetch-dev-tags.outputs.DOCKER_TAG }}
+      step_name: "diff-dev"
+
+  fetch-prod-tags:
+    name: PROD tags
+    if: ( github.event.push && github.ref == 'refs/heads/main' ) && needs.changed-files.outputs.prod == 'true'
+    uses: radixdlt/iac-resuable-artifacts/.github/workflows/fetch-deployment-tags.yml@DO-2704-helm-changes
+    needs:
+      - changed-files
+    with:
+      iam-role-arn: "arn:aws:iam::308190735829:role/gh-airflow-prod-deployer"
+      eks-cluster-name: "rdx-works-main-prod"
+      kubernetes-namespace: "airflow-prod"
+      kubernetes-deployment-name: "token-price"
+
+  diff-prod:
+    name: PROD diff
+    if: ( github.event.push && github.ref == 'refs/heads/main' ) && needs.changed-files.outputs.prod == 'true'
+    uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@main
+    needs:
+      - changed-files
+      - fetch-prod-tags
+    with:
+      app_name: airflow
+      env_name: prod
+      namespace: airflow-prod
+      create_subns: false
+      aws_region: eu-west-2
+      role_to_assume: "arn:aws:iam::308190735829:role/gh-airflow-prod-deployer"
+      eks_cluster: rdx-works-main-prod
+      helm_command: "diff"
+      helm_folder: "deploy/helm/airflow"
+      helmfile_extra_vars: >-
+        ci.tag=${{ needs.fetch-prod-tags.outputs.DOCKER_TAG }},
+        ci.environment=prod,
+        ci.HF_CREATE_NAMESPACES=false,
+        ci.INSTALL_DB=${{ false }},
+        ci.INSTALL_AIRFLOW=${{ true }},
+        ci.INSTALL_TOKEN_SERVICE=${{ true }},
+        ci.AIRFLOW_IMAGE_TAG=${{ needs.fetch-prod-tags.outputs.DOCKER_TAG }}
+      step_name: "diff-prod"
+
+  deploy-prod:
+    name: PROD deploy
+    if: ( github.event.push && github.ref == 'refs/heads/main' ) && needs.changed-files.outputs.prod == 'true'
+    uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@main
+    needs:
+      - changed-files
+      - fetch-prod-tags
+      - diff-prod
+    with:
+      app_name: airflow
+      github_environment: "helm-changes-prod"
+      env_name: prod
+      namespace: airflow-prod
+      create_subns: false
+      aws_region: eu-west-2
+      role_to_assume: "arn:aws:iam::308190735829:role/gh-airflow-prod-deployer"
+      eks_cluster: rdx-works-main-prod
+      helm_folder: "deploy/helm/airflow"
+      helmfile_extra_vars: >-
+        ci.tag=${{ needs.fetch-prod-tags.outputs.DOCKER_TAG }},
+        ci.environment=prod,
+        ci.HF_CREATE_NAMESPACES=false,
+        ci.INSTALL_DB=${{ false }},
+        ci.INSTALL_AIRFLOW=${{ true }},
+        ci.INSTALL_TOKEN_SERVICE=${{ true }},
+        ci.AIRFLOW_IMAGE_TAG=${{ needs.fetch-prod-tags.outputs.DOCKER_TAG }}
+      step_name: "diff-prod"
