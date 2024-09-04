@@ -84,4 +84,3 @@ releases:
     values:
       - project: token-price
       - environments/{{ .Environment.Name }}/developer-access.yaml.gotmpl
-
