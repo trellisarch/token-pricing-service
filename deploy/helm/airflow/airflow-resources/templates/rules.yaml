@@ -67,7 +67,7 @@ spec:
       expr: (airflow_dag_last_status{dag_id="oracle_price",status="failed"} > 0)
       for: 2m
       labels:
-        severity: critical
+        severity: warning
         tier: application
         application: airflow
       annotations:
