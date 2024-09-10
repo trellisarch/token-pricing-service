@@ -1,3 +1,9 @@
+environments:
+  default: {}
+  dev: {}
+  pr: {}
+  prod: {}
+---
 helmDefaults:
   verify: false
   wait: false
@@ -17,11 +23,6 @@ repositories:
     password: {{ requiredEnv "HELM_GH_PASS" }}
   - name: apache-airflow
     url: https://airflow.apache.org
-environments:
-  default: {}
-  dev: {}
-  pr: {}
-  prod: {}
 releases:
   - name: airflow-resources
     installed: {{ .StateValues | get "ci.INSTALL_AIRFLOW" "false" }}
@@ -29,6 +30,7 @@ releases:
     values:
       - environments/{{ .Environment.Name }}/values.yaml.gotmpl
       - environments/{{ .Environment.Name }}/secrets.yaml.gotmpl
+
   - name: airflow
     installed: {{ .StateValues | get "ci.INSTALL_AIRFLOW" "false" }}
     chart: apache-airflow/airflow
