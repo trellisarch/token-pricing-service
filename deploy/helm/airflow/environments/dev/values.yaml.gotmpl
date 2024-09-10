@@ -53,3 +53,14 @@ webserver:
     password: $(WEBSERVER_PASSWORD)
 
 webserverSecretKeySecretName: webserver-secret-key
+
+alerts:
+  dashboard_url: "https://radixdlt.grafana.net/d/lFXqBGxWk/airflow-cluster-dashboard?orgId=1&refresh=5s&var-prometheus=bdssasr7k&var-namespace=airflow-dev&var-loki=6OqgV0p4z&var-dag_id=$__all&var-task_id=$__all&from=now-1h&to=now"
+  labels:
+    cluster: rdx-works-main-dev
+    env: dev
+  aws_infrastructure_enabled: true
+  free_rds_ram_warning_threshold_in_bytes: "500000000"
+  free_rds_ram_warning_threshold: "500 MB"
+  free_rds_ram_critical_threshold_in_bytes: "250000000"
+  free_rds_ram_critical_threshold: "250 MB"

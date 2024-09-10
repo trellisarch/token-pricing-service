@@ -17,7 +17,6 @@ spec:
       {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
-        timestamp: {{ now | date "2006-01-02T15:04:05" | quote }}
       labels:
         {{- include "token-price.selectorLabels" . | nindent 8 }}
     spec:
