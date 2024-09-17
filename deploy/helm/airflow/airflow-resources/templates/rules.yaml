@@ -174,7 +174,7 @@ spec:
         dashboard: {{ .Values.alerts.dashboard_url }}
 
     - alert: TokenPriceIngressHighLatency
-      expr: histogram_quantile(0.95,sum(rate(nginx_ingress_controller_request_duration_seconds_bucket{ingress="token-price"}[5m])) by (le,ingress)) > 2
+      expr: histogram_quantile(0.95,sum(rate(token_price_request_duration_without_lsus_bucket[5m])) by (le)) > 2
       for: 5m
       labels:
         severity: critical
