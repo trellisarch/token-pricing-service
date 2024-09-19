@@ -18,6 +18,7 @@ sqlalchemy = "*"
 pytest = "*"
 pytest-asyncio = "*"
 pytest-mock = "*"
+statsd = "4.0.1"
 
 [dev-packages]
 

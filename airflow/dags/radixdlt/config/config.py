@@ -1,4 +1,5 @@
 from os import getenv
+import statsd
 
 
 class Config:
@@ -94,3 +95,12 @@ class Config:
         "COINGECKO_TOKEN_PRICES_SCHEDULE_INTERVAL", None
     )
     COINGECKO_TOKENS = "radix,avalanche-2,e-radix,solana,polkadot,near,cardano,aptos,sui,sei-network,elrond-erd-2,the-open-network"
+    STATSD_EXPORTER_INGEST_PORT = getenv(
+        "STATSD_EXPORTER_INGEST_PORT", 9125
+    )
+    
+    STATSD_HOST = getenv(
+        "STATSD_HOST","airflow-statsd"
+    )
+    statsDClient =  statsd.StatsClient('localhost', 8125)
+    

@@ -22,12 +22,23 @@ class RadixChartsPriceProvider(BasePriceProvider):
             )
             params = {"resource_addresses": resources_addresses}
             logging.info(params)
-            charts_prices = requests.get(
+            response = requests.get(
                 url=current_price_endpoint,
                 params=params,
                 headers=get_radix_charts_headers(),
-            ).json()["data"]
-
+            )
+            
+            
+            
+            if(response.status_code != 200):  
+                Config.statsDClient.incr("dag_oracle_radixchart_failed")  
+                raise Exception("Radixchart returned error") 
+            
+            Config.statsDClient.incr("dag_oracle_radixchart_passed") 
+            charts_prices = response.json()["data"]
+            
+            add_statsd_metrics(charts_prices)
+            
             for resource_address in charts_prices:
                 if charts_prices[resource_address]["symbol"] != "$XRD":
                     usd_price = charts_prices[resource_address]["usd_price"]
@@ -37,6 +48,7 @@ class RadixChartsPriceProvider(BasePriceProvider):
                     self.prices[f'{charts_prices[resource_address]["symbol"]}/XRD'] = (
                         usd_price / xrd_price
                     )
+                 
             logging.info(self.prices)
         except Exception:
             raise
@@ -68,3 +80,27 @@ def validate_prices(prices):
             valid_quotes.append({"base": pair.split("/")[0], "price": quote})
     logging.info(f"radix charts quotes: {valid_quotes}")
     return valid_quotes
+
+def add_statsd_metrics(radixchart_response):
+    
+    for key, value in RADIX_CHARTS_TOKENS.items():
+        resource_address = value['resource_address']
+        symbol = value['symbol']
+
+        # Skip if symbol is "XRD"
+        if symbol == "XRD":
+            continue
+    
+        found = False
+        for item in radixchart_response:
+            if resource_address in item:
+                found = True
+                break
+
+        # If the resource_address is not found, increment the metric
+        if not found:
+            print(f"No price returned for {key}: {symbol} (Resource Address: {resource_address})")
+            Config.statsDClient.inc(f'dag_oracle_radixchart_fetch_{symbol}_failed')
+        else:
+            Config.statsDClient.inc(f'dag_oracle_radixchart_fetch_{symbol}_passed')
+                

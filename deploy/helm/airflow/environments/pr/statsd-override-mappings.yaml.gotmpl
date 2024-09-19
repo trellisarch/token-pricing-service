@@ -258,3 +258,16 @@ statsd:
       labels:
         airflow_id: "$1"
         dag_id: "$2"
+    - match: "dag_oracle_*_fetch_*_*"
+      match_metric_type: counter
+      name: "oracle_fetch_passed"
+      labels:
+        external_service: "$1"
+        symbol: "$2"
+        status: "$3"
+    - match: "dag_oracle_*_*"
+      match_metric_type: counter
+      name: "oracle_fetch_passed"
+      labels:
+        external_service: "$1"
+        status: "$2"
