@@ -31,10 +31,10 @@ class RadixChartsPriceProvider(BasePriceProvider):
             
             
             if(response.status_code != 200):  
-                Config.statsDClient.incr("dag_oracle_radixchart_failed")  
+                Config.statsDClient.incr("dag_oracle.radixchart.failed")  
                 raise Exception("Radixchart returned error") 
-            
-            Config.statsDClient.incr("dag_oracle_radixchart_passed") 
+
+            Config.statsDClient.incr("dag_oracle.radixchart.passed") 
             charts_prices = response.json()["data"]
             
             add_statsd_metrics(charts_prices)
@@ -100,7 +100,7 @@ def add_statsd_metrics(radixchart_response):
         # If the resource_address is not found, increment the metric
         if not found:
             print(f"No price returned for {key}: {symbol} (Resource Address: {resource_address})")
-            Config.statsDClient.incr(f'dag_oracle_radixchart_fetch_{symbol}_failed')
+            Config.statsDClient.incr(f'dag_oracle.radixchart.fetch.{symbol}.failed')
         else:
-            Config.statsDClient.incr(f'dag_oracle_radixchart_fetch_{symbol}_passed')
+            Config.statsDClient.incr(f'dag_oracle.radixchart.fetch.{symbol}.passed')
                 
