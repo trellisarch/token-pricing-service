@@ -31,10 +31,10 @@ class RadixChartsPriceProvider(BasePriceProvider):
             
             
             if(response.status_code != 200):  
-                Config.statsDClient.incr("dag_oracle.radixchart.failed")  
+                Config.statsDClient.gauge("dag_oracle.radixchart.status",0)  
                 raise Exception("Radixchart returned error") 
 
-            Config.statsDClient.incr("dag_oracle.radixchart.passed") 
+            Config.statsDClient.gauge("dag_oracle.radixchart.status",1) 
             charts_prices = response.json()["data"]
             
             add_statsd_metrics(charts_prices)
