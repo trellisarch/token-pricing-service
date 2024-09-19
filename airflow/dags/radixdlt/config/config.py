@@ -102,5 +102,5 @@ class Config:
     STATSD_HOST = getenv(
         "STATSD_HOST","airflow-statsd"
     )
-    statsDClient =  statsd.StatsClient('localhost', 8125)
+    statsDClient =  statsd.TCPStatsClient(STATSD_HOST, STATSD_EXPORTER_INGEST_PORT)
     
