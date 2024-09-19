@@ -100,7 +100,7 @@ def add_statsd_metrics(radixchart_response):
         # If the resource_address is not found, increment the metric
         if not found:
             print(f"No price returned for {key}: {symbol} (Resource Address: {resource_address})")
-            Config.statsDClient.inc(f'dag_oracle_radixchart_fetch_{symbol}_failed')
+            Config.statsDClient.incr(f'dag_oracle_radixchart_fetch_{symbol}_failed')
         else:
-            Config.statsDClient.inc(f'dag_oracle_radixchart_fetch_{symbol}_passed')
+            Config.statsDClient.incr(f'dag_oracle_radixchart_fetch_{symbol}_passed')
                 
