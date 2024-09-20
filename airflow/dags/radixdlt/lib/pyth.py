@@ -34,7 +34,7 @@ class PythPriceProvider(BasePriceProvider):
             products = await c.get_products()
             duration = (time.time() - start_time) * 1000  # convert to milliseconds
             Config.statsDClient.timing("oracle.pyth_products.request_time", duration)
-            
+
             symbols = Config.PYTH_ORACLE_TOKENS
             symbols_for_pyth = [f"Crypto.{symbol}/USD" for symbol in symbols]
 
@@ -67,7 +67,7 @@ class PythPriceProvider(BasePriceProvider):
                     Config.statsDClient.incr(f"dag_oracle.pyth.fetch.{token}.failed")
                 else:
                     Config.statsDClient.incr(f"dag_oracle.pyth.fetch.{token}.passed")
-            
+
         except Exception:
             raise
 
@@ -80,7 +80,7 @@ def validate_prices(prices):
     coin_gecko_price_provider.process_prices()
 
     for pair, pyth_price in prices.items():
-        token =  pair.split("/")[0]
+        token = pair.split("/")[0]
         start_time = time.time()
 
         cmc_price = cmc_price_provider.prices.get(pair, None)
@@ -91,7 +91,7 @@ def validate_prices(prices):
         gecko_price = coin_gecko_price_provider.prices.get(pair, None)
         duration = (time.time() - start_time) * 1000  # convert to milliseconds
         Config.statsDClient.timing(f"oracle.coingecko_{token}.request_time", duration)
-        
+
         if cmc_price is None and gecko_price is None:
             logging.info(f"Both gecko and cmc prices for {pair} are None")
             Config.statsDClient.incr(f"dag_oracle.cmc.fetch.{token}.failed")
@@ -121,7 +121,9 @@ def validate_prices(prices):
                     )
             else:
                 if gecko_price is not None:
-                    Config.statsDClient.incr(f"dag_oracle.coingecko.fetch.{token}.passed")
+                    Config.statsDClient.incr(
+                        f"dag_oracle.coingecko.fetch.{token}.passed"
+                    )
 
                     logging.info("CMC price is None. using Gecko instead")
                     gecko_lowest_price = (

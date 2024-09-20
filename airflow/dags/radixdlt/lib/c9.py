@@ -53,16 +53,18 @@ class C9PriceProvider(BasePriceProvider):
             )
             # Record the duration in milliseconds
             duration = (time.time() - start_time) * 1000  # convert to milliseconds
-            Config.statsDClient.timing('oracle.c9_txn_preview.request_time', duration)
-            
+            Config.statsDClient.timing("oracle.c9_txn_preview.request_time", duration)
+
             if response.status_code not in (200, 204):
                 Config.statsDClient.incr("dag_oracle.c9_txn_preview.failed")
                 raise Exception("Cavirnine returned error")
 
             Config.statsDClient.incr("dag_oracle.c9_txn_preview.passed")
-                        
-            outputs =response.json()["receipt"]["output"]
-            dex_valuation_xrd: Decimal = Decimal(outputs[0]["programmatic_json"]["value"])
+
+            outputs = response.json()["receipt"]["output"]
+            dex_valuation_xrd: Decimal = Decimal(
+                outputs[0]["programmatic_json"]["value"]
+            )
             liquidity_token_total_supply: Decimal = Decimal(
                 outputs[1]["programmatic_json"]["value"]
             )
@@ -74,7 +76,7 @@ class C9PriceProvider(BasePriceProvider):
         except Exception:
             Config.statsDClient.incr("dag_oracle.c9_txn_preview.failed")
             Config.statsDClient.incr(f"dag_oracle.c9_txn_preview.fetch.lslup.failed")
-            
+
             raise
 
     def process_prices(self):
