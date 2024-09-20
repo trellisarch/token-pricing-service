@@ -1,7 +1,7 @@
 import logging
 import requests
 
-from airflow.dags.radixdlt.lib.const import RADIX_CHARTS_TOKENS
+from radixdlt.lib.const import RADIX_CHARTS_TOKENS
 from radixdlt.config.config import Config
 from radixdlt.lib.c9 import build_quotes
 from radixdlt.lib.pyth import validate_prices
