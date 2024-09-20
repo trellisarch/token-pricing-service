@@ -1,4 +1,5 @@
 import logging
+import time
 import requests
 from radixdlt.config.config import Config
 from radixdlt.lib.coingecko import GeckoPriceProvider
@@ -13,6 +14,7 @@ class RadixChartsPriceProvider(BasePriceProvider):
         self.prices = {}
 
     def process_prices(self):
+        start_time = time.time()
         try:
             current_price_endpoint = Config.RADIX_CHARTS_TOKEN_PRICE_CURRENT
             resources_names = Config.RADIX_CHARTS_ORACLE_TOKENS.split(",")
@@ -27,14 +29,15 @@ class RadixChartsPriceProvider(BasePriceProvider):
                 params=params,
                 headers=get_radix_charts_headers(),
             )
+            duration = (time.time() - start_time) * 1000  # convert to milliseconds
+            Config.statsDClient.timing('oracle.radixcharts.request_time', duration)
             
             
-            
-            if(response.status_code != 200):  
-                Config.statsDClient.incr("dag_oracle.radixchart.status")  
+            if(response.status_code not in (200, 204) ):  
+                Config.statsDClient.incr("dag_oracle.radixchart.failed")  
                 raise Exception("Radixchart returned error") 
 
-            Config.statsDClient.incr("dag_oracle.radixchart.status") 
+            Config.statsDClient.incr("dag_oracle.radixchart.passed") 
             charts_prices = response.json()["data"]
             
             add_statsd_metrics(charts_prices)
@@ -47,10 +50,14 @@ class RadixChartsPriceProvider(BasePriceProvider):
                     ]["usd_price"]
                     self.prices[f'{charts_prices[resource_address]["symbol"]}/XRD'] = (
                         usd_price / xrd_price
-                    )
+                    )   
                  
             logging.info(self.prices)
-        except Exception:
+        except Exception as e:
+
+            # Increment the failure counter
+            Config.statsDClient.incr('dag_oracle.radixchart.failed')
+            print(f"Error fetching data from external service radixchart: {e}")
             raise
 
 
