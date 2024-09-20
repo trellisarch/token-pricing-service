@@ -1,6 +1,7 @@
 import logging
 import requests
 
+from airflow.dags.radixdlt.lib.const import RADIX_CHARTS_TOKENS
 from radixdlt.config.config import Config
 from radixdlt.lib.c9 import build_quotes
 from radixdlt.lib.pyth import validate_prices
@@ -39,3 +40,24 @@ class OracleUpdater:
         else:
             logging.info("Nothing to update")
             raise
+
+    @staticmethod
+    def check_add_missing_quotes(transaction_metadata):
+        expectedSymbols = [
+            value["symbol"].replace("$", "") for value in RADIX_CHARTS_TOKENS.values()
+        ] + Config.PYTH_ORACLE_TOKENS
+
+        existing_symbols = []
+        missing_symbols = []
+
+        for symbol in expectedSymbols:
+            found = any(
+                quote["base"] == symbol for quote in transaction_metadata["quotes"]
+            )
+            if found:
+                Config.statsDClient.incr(f"dag_oracle.update.{symbol}.passed")
+                existing_symbols.append(symbol)
+            else:
+                if symbol != "XRD":
+                    Config.statsDClient.incr(f"dag_oracle.update.{symbol}.missed")
+                    missing_symbols.append(symbol)

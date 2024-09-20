@@ -1,6 +1,5 @@
 import logging
 from datetime import datetime
-from airflow.dags.radixdlt.lib.const import RADIX_CHARTS_TOKENS
 from airflow.decorators import task, dag
 from radixdlt.config.config import Config
 from radixdlt.lib.c9 import C9PriceProvider
@@ -63,24 +62,7 @@ def oracle_prices_dag():
     @task
     def assert_all_pairs_updated_task(transaction_metadata):
         logging.info(transaction_metadata)
-        expectedSymbols = [
-            value["symbol"].replace("$", "") for value in RADIX_CHARTS_TOKENS.values()
-        ] + Config.PYTH_ORACLE_TOKENS
-
-        existing_symbols = []
-        missing_symbols = []
-
-        for symbol in expectedSymbols:
-            found = any(
-                quote["base"] == symbol for quote in transaction_metadata["quotes"]
-            )
-            if found:
-                Config.statsDClient.incr(f"dag_oracle.update.{symbol}.passed")
-                existing_symbols.append(symbol)
-            else:
-                if symbol != "XRD":
-                    Config.statsDClient.incr(f"dag_oracle.update.{symbol}.missed")
-                    missing_symbols.append(symbol)
+        OracleUpdater.check_add_missing_quotes(transaction_metadata)
 
     assert_all_pairs_updated_task(
         get_transaction_status_task(
