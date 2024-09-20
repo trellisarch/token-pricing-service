@@ -44,7 +44,7 @@ class OracleUpdater:
     @staticmethod
     def check_add_missing_quotes(transaction_metadata):
         expectedSymbols = [
-            value["symbol"].replace("$", "") for value in RADIX_CHARTS_TOKENS.values()
+            value["symbol"] for value in RADIX_CHARTS_TOKENS.values()
         ] + Config.PYTH_ORACLE_TOKENS
 
         existing_symbols = []
@@ -54,10 +54,11 @@ class OracleUpdater:
             found = any(
                 quote["base"] == symbol for quote in transaction_metadata["quotes"]
             )
+            cleansed_symbol = symbol.replace("$", "")
             if found:
-                Config.statsDClient.incr(f"dag_oracle.update.{symbol}.passed")
+                Config.statsDClient.incr(f"dag_oracle.update.{cleansed_symbol}.passed")
                 existing_symbols.append(symbol)
             else:
                 if symbol != "XRD":
-                    Config.statsDClient.incr(f"dag_oracle.update.{symbol}.missed")
+                    Config.statsDClient.incr(f"dag_oracle.update.{cleansed_symbol}.missed")
                     missing_symbols.append(symbol)
