@@ -12,6 +12,7 @@ class Config:
     RADIX_CHARTS_TOKENS_PRICE_LIST = "https://api.radixapi.net/v1/token/price/list"
     RADIX_CHARTS_TOKEN_PRICE_CURRENT = "https://api.radixapi.net/v1/token/price/current"
     RADIX_CHARTS_ORACLE_TOKENS = "hug,defiplaza,floop,radix"
+    PYTH_ORACLE_TOKENS = ['BTC', 'XRD', 'ETH', 'USDT', 'USDC']
     RADIX_CHARTS_AUTHORIZATION_TOKEN = getenv("RADIX_CHARTS_AUTHORIZATION_TOKEN")
 
     DB_URI = getenv("DB_URI")
