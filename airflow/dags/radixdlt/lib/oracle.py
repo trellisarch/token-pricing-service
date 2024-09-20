@@ -43,9 +43,11 @@ class OracleUpdater:
 
     @staticmethod
     def check_add_missing_quotes(transaction_metadata):
-        expectedSymbols = [
-            value["symbol"] for value in RADIX_CHARTS_TOKENS.values()
-        ] + Config.PYTH_ORACLE_TOKENS + ['LSULP']
+        expectedSymbols = (
+            [value["symbol"] for value in RADIX_CHARTS_TOKENS.values()]
+            + Config.PYTH_ORACLE_TOKENS
+            + ["LSULP"]
+        )
 
         existing_symbols = []
         missing_symbols = []
@@ -60,5 +62,9 @@ class OracleUpdater:
                 existing_symbols.append(symbol)
             else:
                 if symbol != "XRD":
-                    Config.statsDClient.incr(f"dag_oracle.update.{cleansed_symbol}.missed")
+                    Config.statsDClient.incr(
+                        f"dag_oracle.update.{cleansed_symbol}.missed"
+                    )
                     missing_symbols.append(symbol)
+            logging.info(f"These token symbols are present in quote {existing_symbols}")
+            logging.info(f"These token symbols are missing in quote {missing_symbols}")
