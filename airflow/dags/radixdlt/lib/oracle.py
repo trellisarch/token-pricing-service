@@ -45,7 +45,7 @@ class OracleUpdater:
     def check_add_missing_quotes(transaction_metadata):
         expectedSymbols = [
             value["symbol"] for value in RADIX_CHARTS_TOKENS.values()
-        ] + Config.PYTH_ORACLE_TOKENS
+        ] + Config.PYTH_ORACLE_TOKENS + ['LSULP']
 
         existing_symbols = []
         missing_symbols = []
