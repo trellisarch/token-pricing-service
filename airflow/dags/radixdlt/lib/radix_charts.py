@@ -109,6 +109,6 @@ def add_statsd_metrics(radixchart_response):
             print(
                 f"No price returned for {key}: {symbol} (Resource Address: {resource_address})"
             )
-            Config.statsDClient.incr(f"dag_oracle.radixchart.fetch.{symbol}.failed")
+            Config.statsDClient.incr(f"dag_oracle.radixchart.fetch.{symbol.replace("$","")}.failed")
         else:
-            Config.statsDClient.incr(f"dag_oracle.radixchart.fetch.{symbol}.passed")
+            Config.statsDClient.incr(f"dag_oracle.radixchart.fetch.{symbol.replace("$","")}.passed")

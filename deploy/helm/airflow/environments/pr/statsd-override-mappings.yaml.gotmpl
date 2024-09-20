@@ -265,6 +265,12 @@ statsd:
         external_service: "$1"
         symbol: "$2"
         status: "$3"
+    - match: "dag_oracle.update.*.*"
+      match_metric_type: counter
+      name: "oracle_update_token_status"
+      labels:
+        symbol: "$1"
+        status: "$2"
     - match: "dag_oracle.*.*"
       match_metric_type: counter
       name: "oracle_fetch_api_status"

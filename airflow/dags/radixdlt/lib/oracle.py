@@ -35,6 +35,7 @@ class OracleUpdater:
             logging.info(response.text)
             transaction_metadata["txn_intent_hash"] = txn_intent_hash
             return transaction_metadata
+
         else:
             logging.info("Nothing to update")
             raise
