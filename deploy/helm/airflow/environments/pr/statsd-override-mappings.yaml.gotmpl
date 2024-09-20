@@ -271,7 +271,7 @@ statsd:
       labels:
         external_service: "$1"
         status: "$2"
-    - match: "oracle.$1.request_time"
+    - match: "oracle.*.request_time"
       match_metric_type: observer
       name: "oracle_external_service_duration"
       labels:
