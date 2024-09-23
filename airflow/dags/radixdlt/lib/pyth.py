@@ -1,6 +1,7 @@
 import asyncio
 import logging
 from datetime import datetime, timezone
+import time
 from pythclient.pythclient import PythClient
 from pythclient.solana import PYTHNET_HTTP_ENDPOINT
 from pythclient.utils import get_key
@@ -28,15 +29,17 @@ class PythPriceProvider(BasePriceProvider):
             solana_endpoint=PYTHNET_HTTP_ENDPOINT,
         ) as c:
             pyth_prices = {}
+            start_time = time.time()
+
             products = await c.get_products()
+            duration = (time.time() - start_time) * 1000  # convert to milliseconds
+            Config.statsDClient.timing("oracle.pyth_products.request_time", duration)
+
+            symbols = Config.PYTH_ORACLE_TOKENS
+            symbols_for_pyth = [f"Crypto.{symbol}/USD" for symbol in symbols]
+
             for p in products:
-                if p.symbol in [
-                    "Crypto.BTC/USD",
-                    "Crypto.XRD/USD",
-                    "Crypto.ETH/USD",
-                    "Crypto.USDT/USD",
-                    "Crypto.USDC/USD",
-                ]:
+                if p.symbol in symbols_for_pyth:
                     pair = p.symbol.split("Crypto.")[1]
                     pyth_prices[pair] = {}
                     prices = await p.get_prices()
@@ -58,6 +61,13 @@ class PythPriceProvider(BasePriceProvider):
                         pyth_prices[pair]["price"] / pyth_prices["XRD/USD"]["price"]
                     )
                     self.prices[f'{pair.split("/")[0]}/XRD'] = pyth_xrd_price
+            retrieved_prices = set(pyth_prices.keys())
+            for token in Config.PYTH_ORACLE_TOKENS:
+                if f"{token}/USD" not in retrieved_prices:
+                    Config.statsDClient.incr(f"dag_oracle.pyth.fetch.{token}.failed")
+                else:
+                    Config.statsDClient.incr(f"dag_oracle.pyth.fetch.{token}.passed")
+
         except Exception:
             raise
 
@@ -70,11 +80,22 @@ def validate_prices(prices):
     coin_gecko_price_provider.process_prices()
 
     for pair, pyth_price in prices.items():
+        token = pair.split("/")[0]
+        start_time = time.time()
+
         cmc_price = cmc_price_provider.prices.get(pair, None)
+        duration = (time.time() - start_time) * 1000  # convert to milliseconds
+        Config.statsDClient.timing(f"oracle.cmc_{token}.request_time", duration)
+
+        start_time = time.time()
         gecko_price = coin_gecko_price_provider.prices.get(pair, None)
+        duration = (time.time() - start_time) * 1000  # convert to milliseconds
+        Config.statsDClient.timing(f"oracle.coingecko_{token}.request_time", duration)
 
         if cmc_price is None and gecko_price is None:
             logging.info(f"Both gecko and cmc prices for {pair} are None")
+            Config.statsDClient.incr(f"dag_oracle.cmc.fetch.{token}.failed")
+            Config.statsDClient.incr(f"dag_oracle.coingecko.fetch.{token}.failed")
         else:
             logging.info(f"Checking pair: {pair}")
             logging.info(f"Gecko price: {gecko_price}")
@@ -83,6 +104,8 @@ def validate_prices(prices):
 
             logging.info("Using CMC price as primary source. Using CMC to compare pyth")
             if cmc_price is not None:
+                Config.statsDClient.incr(f"dag_oracle.cmc.fetch.{token}.passed")
+
                 cmc_lowest_price = (
                     cmc_price - cmc_price * Config.ORACLE_PRICE_DIFF_TRIGGER
                 )
@@ -98,6 +121,10 @@ def validate_prices(prices):
                     )
             else:
                 if gecko_price is not None:
+                    Config.statsDClient.incr(
+                        f"dag_oracle.coingecko.fetch.{token}.passed"
+                    )
+
                     logging.info("CMC price is None. using Gecko instead")
                     gecko_lowest_price = (
                         gecko_price - gecko_price * Config.ORACLE_PRICE_DIFF_TRIGGER

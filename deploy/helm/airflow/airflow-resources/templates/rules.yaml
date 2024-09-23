@@ -204,6 +204,36 @@ spec:
         description: "There are more than 500 req/s on token price"
         runbook_url: https://runbooks.extratools.works
         dashboard: {{ .Values.alerts.dashboard_url }}
+    - alert: OracleDAGExternalServiceFetchFailed
+      expr: sum by (external_service) (rate(oracle_fetch_api_status{namespace="{{ .Release.Namespace }}", status="failed"}[5m])) > 0
+      for: 5m
+      labels:
+        severity: critical
+        tier: application
+        application: token-price
+        namespace: {{ .Release.Namespace }}
+        cluster: {{ .Values.alerts.labels.cluster }}
+        env: {{ .Values.alerts.labels.env }}
+      annotations:
+        summary: "Oracle DAG, call to external service {{ "{{$labels.external_service}}" }} "
+        description: "Oracle DAG, call to external service {{ "{{$labels.external_service}}" }} "
+        runbook_url: https://runbooks.extratools.works
+        dashboard: {{ .Values.alerts.dashboard_url }} 
+    - alert: OracleDAGTokenUpdateFailures
+      expr: sum by (symbol) (rate(oracle_update_token_status{status="missed"}[5m])) > 2
+      for: 5m
+      labels:
+        severity: critical
+        tier: application
+        application: token-price
+        namespace: {{ .Release.Namespace }}
+        cluster: {{ .Values.alerts.labels.cluster }}
+        env: {{ .Values.alerts.labels.env }}
+      annotations:
+        summary: "Oracle DAG, call to external service {{ "{{$labels.symbol}}" }} "
+        description: "Oracle DAG, call to external service {{ "{{$labels.symbol}}" }} "
+        runbook_url: https://runbooks.extratools.works
+        dashboard: {{ .Values.alerts.dashboard_url }} 
 
 {{- if .Values.alerts.aws_infrastructure_enabled }}
 

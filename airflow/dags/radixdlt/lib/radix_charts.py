@@ -1,4 +1,5 @@
 import logging
+import time
 import requests
 from radixdlt.config.config import Config
 from radixdlt.lib.coingecko import GeckoPriceProvider
@@ -13,6 +14,7 @@ class RadixChartsPriceProvider(BasePriceProvider):
         self.prices = {}
 
     def process_prices(self):
+        start_time = time.time()
         try:
             current_price_endpoint = Config.RADIX_CHARTS_TOKEN_PRICE_CURRENT
             resources_names = Config.RADIX_CHARTS_ORACLE_TOKENS.split(",")
@@ -22,11 +24,22 @@ class RadixChartsPriceProvider(BasePriceProvider):
             )
             params = {"resource_addresses": resources_addresses}
             logging.info(params)
-            charts_prices = requests.get(
+            response = requests.get(
                 url=current_price_endpoint,
                 params=params,
                 headers=get_radix_charts_headers(),
-            ).json()["data"]
+            )
+            duration = (time.time() - start_time) * 1000  # convert to milliseconds
+            Config.statsDClient.timing("oracle.radixcharts.request_time", duration)
+
+            if response.status_code not in (200, 204):
+                Config.statsDClient.incr("dag_oracle.radixchart.failed")
+                raise Exception("Radixchart returned error")
+
+            Config.statsDClient.incr("dag_oracle.radixchart.passed")
+            charts_prices = response.json()["data"]
+
+            add_statsd_metrics(charts_prices)
 
             for resource_address in charts_prices:
                 if charts_prices[resource_address]["symbol"] != "$XRD":
@@ -37,8 +50,13 @@ class RadixChartsPriceProvider(BasePriceProvider):
                     self.prices[f'{charts_prices[resource_address]["symbol"]}/XRD'] = (
                         usd_price / xrd_price
                     )
+
             logging.info(self.prices)
-        except Exception:
+        except Exception as e:
+
+            # Increment the failure counter
+            Config.statsDClient.incr("dag_oracle.radixchart.failed")
+            print(f"Error fetching data from external service radixchart: {e}")
             raise
 
 
@@ -68,3 +86,34 @@ def validate_prices(prices):
             valid_quotes.append({"base": pair.split("/")[0], "price": quote})
     logging.info(f"radix charts quotes: {valid_quotes}")
     return valid_quotes
+
+
+def add_statsd_metrics(radixchart_response):
+
+    for key, value in RADIX_CHARTS_TOKENS.items():
+        resource_address = value["resource_address"]
+        symbol = value["symbol"]
+
+        # Skip if symbol is "XRD"
+        if symbol == "XRD":
+            continue
+
+        found = False
+        for item in radixchart_response:
+            if resource_address in item:
+                found = True
+                break
+        symbol_fixed = symbol.replace("$", "")
+
+        # If the resource_address is not found, increment the metric
+        if not found:
+            print(
+                f"No price returned for {key}: {symbol} (Resource Address: {resource_address})"
+            )
+            Config.statsDClient.incr(
+                f"dag_oracle.radixchart.fetch.{symbol_fixed}.failed"
+            )
+        else:
+            Config.statsDClient.incr(
+                f"dag_oracle.radixchart.fetch.{symbol_fixed}.passed"
+            )

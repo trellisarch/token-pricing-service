@@ -1,6 +1,7 @@
 import logging
 import requests
 
+from radixdlt.lib.const import RADIX_CHARTS_TOKENS
 from radixdlt.config.config import Config
 from radixdlt.lib.c9 import build_quotes
 from radixdlt.lib.pyth import validate_prices
@@ -35,6 +36,35 @@ class OracleUpdater:
             logging.info(response.text)
             transaction_metadata["txn_intent_hash"] = txn_intent_hash
             return transaction_metadata
+
         else:
             logging.info("Nothing to update")
             raise
+
+    @staticmethod
+    def check_add_missing_quotes(transaction_metadata):
+        expectedSymbols = (
+            [value["symbol"] for value in RADIX_CHARTS_TOKENS.values()]
+            + Config.PYTH_ORACLE_TOKENS
+            + ["LSULP"]
+        )
+
+        existing_symbols = []
+        missing_symbols = []
+
+        for symbol in expectedSymbols:
+            found = any(
+                quote["base"] == symbol for quote in transaction_metadata["quotes"]
+            )
+            cleansed_symbol = symbol.replace("$", "")
+            if found:
+                Config.statsDClient.incr(f"dag_oracle.update.{cleansed_symbol}.passed")
+                existing_symbols.append(symbol)
+            else:
+                if symbol != "XRD":
+                    Config.statsDClient.incr(
+                        f"dag_oracle.update.{cleansed_symbol}.missed"
+                    )
+                    missing_symbols.append(symbol)
+            logging.info(f"These token symbols are present in quote {existing_symbols}")
+            logging.info(f"These token symbols are missing in quote {missing_symbols}")
