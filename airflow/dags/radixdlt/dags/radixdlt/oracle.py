@@ -66,13 +66,13 @@ def oracle_prices_dag():
         oracle_updater.check_add_missing_quotes(transaction_metadata)
 
     assert_all_pairs_updated_task(
-        # get_transaction_status_task(
-        update_oracle_task(
-            process_pyth_prices_task(),
-            process_c9_prices_task(),
-            process_radix_charts_prices_task(),
+        get_transaction_status_task(
+            update_oracle_task(
+                process_pyth_prices_task(),
+                process_c9_prices_task(),
+                process_radix_charts_prices_task(),
+            )
         )
-        # )
     )
 
 
