@@ -60,12 +60,12 @@ def oracle_prices_dag():
         return transaction_metadata
 
     @task
-    def assert_all_pairs_updated_task(transaction_metadata):
+    def add_metrics_all_pairs_updated_task(transaction_metadata):
         logging.info(transaction_metadata)
         oracle_updater = OracleUpdater()
         oracle_updater.check_add_missing_quotes(transaction_metadata)
 
-    assert_all_pairs_updated_task(
+    add_metrics_all_pairs_updated_task(
         get_transaction_status_task(
             update_oracle_task(
                 process_pyth_prices_task(),
