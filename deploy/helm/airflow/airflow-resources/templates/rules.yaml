@@ -214,7 +214,6 @@ spec:
         namespace: {{ .Release.Namespace }}
         cluster: {{ .Values.alerts.labels.cluster }}
         env: {{ .Values.alerts.labels.env }}
-        external_service: {{ "{{$labels.external_service}}" }}
       annotations:
         summary: "Oracle DAG, call to external service {{ "{{$labels.external_service}}" }} "
         description: "Oracle DAG, call to external service {{ "{{$labels.external_service}}" }} "
@@ -230,7 +229,6 @@ spec:
         namespace: {{ .Release.Namespace }}
         cluster: {{ .Values.alerts.labels.cluster }}
         env: {{ .Values.alerts.labels.env }}
-        symbol: {{ "{{$labels.symbol}}" }}
       annotations:
         summary: "Oracle DAG, call to external service {{ "{{$labels.symbol}}" }} "
         description: "Oracle DAG, call to external service {{ "{{$labels.symbol}}" }} "
