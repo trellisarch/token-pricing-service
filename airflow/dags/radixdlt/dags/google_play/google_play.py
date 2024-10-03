@@ -12,9 +12,9 @@ from pandas import DataFrame
 from radixdlt.config.config import Config
 from airflow.decorators import task, dag
 
-from radixdlt.models.goodle_play.stats_install import GooglePlayInstalls
-from radixdlt.models.goodle_play.stats_ratings import GooglePlayRatings
-from radixdlt.models.goodle_play.stats_store_performance import (
+from radixdlt.models.google_play.stats_install import GooglePlayInstalls
+from radixdlt.models.google_play.stats_ratings import GooglePlayRatings
+from radixdlt.models.google_play.stats_store_performance import (
     GooglePlayStorePerformance,
 )
 

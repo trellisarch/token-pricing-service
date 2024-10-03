@@ -59,7 +59,6 @@ spec:
         runbook_url: https://runbooks.extratools.works
         dashboard: {{ .Values.alerts.dashboard_url }}
         app_url: "{{ .Values.ui_url }}/dags/{{ "{{$labels.dag_id}}" }}/grid?num_runs=25"
-    
     - alert: AirflowDAGFailure
       expr: (airflow_dag_last_status{dag_id!="oracle_price",status="failed"} > 0)
       for: 1m
@@ -88,6 +87,37 @@ spec:
         env: {{ .Values.alerts.labels.env }}
       annotations:
         summary: "Oracle Price DAG failed: {{ "{{$labels.dag_id}}" }}"
+        description: "DAG '{{ "{{$labels.dag_id}}" }}' failed."
+        app_url: "{{ .Values.ui_url }}/dags/{{ "{{$labels.dag_id}}" }}/grid?num_runs=25"
+        dashboard: {{ .Values.alerts.dashboard_url }}
+
+    - alert: WatchdogDAGFailure
+      expr: increase(airflow_dag_last_status{dag_id="watchdog",status="success"}[1m]) == 0
+      labels:
+        severity: warning
+        tier: application
+        application: airflow
+        namespace: {{ .Release.Namespace }}
+        cluster: {{ .Values.alerts.labels.cluster }}
+        env: {{ .Values.alerts.labels.env }}
+      annotations:
+        summary: "Watchdog DAG failed: {{ "{{$labels.dag_id}}" }}"
+        description: "DAG '{{ "{{$labels.dag_id}}" }}' failed."
+        app_url: "{{ .Values.ui_url }}/dags/{{ "{{$labels.dag_id}}" }}/grid?num_runs=25"
+        dashboard: {{ .Values.alerts.dashboard_url }}
+
+    - alert: WatchdogDAGFailure
+      expr: increase(airflow_dag_last_status{dag_id="watchdog",status="success"}[1m]) == 0
+      for: 10m
+      labels:
+        severity: critical
+        tier: application
+        application: airflow
+        namespace: {{ .Release.Namespace }}
+        cluster: {{ .Values.alerts.labels.cluster }}
+        env: {{ .Values.alerts.labels.env }}
+      annotations:
+        summary: "Watchdog DAG failed: {{ "{{$labels.dag_id}}" }}"
         description: "DAG '{{ "{{$labels.dag_id}}" }}' failed."
         app_url: "{{ .Values.ui_url }}/dags/{{ "{{$labels.dag_id}}" }}/grid?num_runs=25"
         dashboard: {{ .Values.alerts.dashboard_url }}
