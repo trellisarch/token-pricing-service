@@ -4,10 +4,8 @@ on:
   push:
     branches:
       - main
-      - develop
   pull_request:
     branches:
-      - develop
       - main
     types:
       - opened
@@ -119,7 +117,7 @@ jobs:
       role_to_assume: ${{ secrets.DOCKERHUB_RELEASER_ROLE }}
   
   deploy-airflow-dev:
-    if:  github.ref == 'refs/heads/develop'
+    if:  github.ref == 'refs/heads/main'
     name: "Deploy Airflow Dev"
     uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@main
     needs:
