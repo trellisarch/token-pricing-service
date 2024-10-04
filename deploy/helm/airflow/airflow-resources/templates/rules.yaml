@@ -93,6 +93,7 @@ spec:
 
     - alert: WatchdogDAGFailure
       expr: increase(dag_watchdog_custom_counter_passed[1m]) == 0
+      for: 5m
       labels:
         severity: warning
         tier: application
