@@ -92,7 +92,7 @@ spec:
         dashboard: {{ .Values.alerts.dashboard_url }}
 
     - alert: WatchdogDAGFailure
-      expr: increase(airflow_dag_last_status{dag_id="watchdog",status="success"}[1m]) == 0
+      expr: increase(dag_watchdog_custom_counter_passed[1m]) == 0
       labels:
         severity: warning
         tier: application
@@ -107,7 +107,7 @@ spec:
         dashboard: {{ .Values.alerts.dashboard_url }}
 
     - alert: WatchdogDAGFailure
-      expr: increase(airflow_dag_last_status{dag_id="watchdog",status="success"}[1m]) == 0
+      expr: increase(dag_watchdog_custom_counter_passed[1m]) == 0
       for: 10m
       labels:
         severity: critical

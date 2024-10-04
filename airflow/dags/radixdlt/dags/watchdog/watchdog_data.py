@@ -1,7 +1,8 @@
 import logging
-from airflow import DAG
+from airflow.decorators import task, dag
 from datetime import datetime, timedelta
-from airflow.operators.dummy_operator import DummyOperator
+from radixdlt.config.config import Config
+
 
 # DAG configuration
 default_args = {
@@ -12,18 +13,21 @@ default_args = {
     "retry_delay": timedelta(minutes=5),
 }
 
-dag = DAG(
-    "watchdog",
+
+@dag(
+    dag_id="watchdog",
     default_args=default_args,
+    description="DAG to fetch token prices from coingecko",
     schedule_interval="* * * * *",
     catchup=False,
 )
+def watchdog_task():
+    @task
+    def watchdog_counter():
+        logging.info("Watchdog counter increased")
+        Config.statsDClient.incr(f"dag_watchdog.custom_counter.passed")
 
-logging.basicConfig(level=logging.INFO)
+    watchdog_counter()
 
 
-# Define a task (Dummy task for now)
-start = DummyOperator(
-    task_id="start_task",
-    dag=dag,
-)
+watchdog_task()
