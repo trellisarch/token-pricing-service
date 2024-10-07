@@ -5,7 +5,7 @@ on:
     paths:
       - "deploy/helm/airflow/**/*"
     branches:
-      - develop
+      - main
   push:
     paths:
       - "deploy/helm/airflow/**/*"
@@ -55,7 +55,7 @@ jobs:
 
   fetch-dev-tags:
     name: DEV tags
-    if: github.event.pull_request && github.base_ref == 'develop' && needs.changed-files.outputs.dev == 'true'
+    if: github.event.pull_request && github.base_ref == 'main' && needs.changed-files.outputs.dev == 'true'
     uses: radixdlt/iac-resuable-artifacts/.github/workflows/fetch-deployment-tags.yml@main
     needs:
       - changed-files
@@ -67,7 +67,7 @@ jobs:
 
   diff-dev:
     name: DEV diff
-    if: github.event.pull_request && github.base_ref == 'develop' && needs.changed-files.outputs.dev == 'true'
+    if: github.event.pull_request && github.base_ref == 'main' && needs.changed-files.outputs.dev == 'true'
     uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@main
     needs:
       - changed-files

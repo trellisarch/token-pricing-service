@@ -17,7 +17,7 @@ default_args = {
 @dag(
     dag_id="watchdog",
     default_args=default_args,
-    description="DAG to fetch token prices from coingecko",
+    description="DAG to check proper behaviour of Scheduler ",
     schedule_interval="* * * * *",
     catchup=False,
 )
