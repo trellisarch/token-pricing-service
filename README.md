@@ -35,3 +35,10 @@ This project employs Apache Airflow to gather data from multiple APIs such as Co
 
 ## Setup and Configuration
 
+## Oracle Price DAG Environments
+
+- Pull-request: Is connected to Stokenet via /airflow/dags/radixdlt/dags/config-develop.json, although tokens addresses on that config file are from mainnet network, this will cause failure in case of running oracle_price dag on pull-request environment.
+
+- Dev: Is connected to Stokenet via /airflow/dags/radixdlt/dags/config-develop.json, although tokens addresses on that config file are from mainnet network, this will cause failure in case of running oracle_price dag on dev environment.
+
+- Prod: Connects to mainnet, should be working properly.

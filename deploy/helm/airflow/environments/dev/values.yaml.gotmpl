@@ -4,6 +4,14 @@ env:
   - name: GOOGLE_APPLICATION_CREDENTIALS
     value: "/opt/airflow/service-account.json"
 
+extraEnv: |
+  - name: NETWORK_ID
+    value: "2"
+  - name: NETWORK_GATEWAY
+    value: 'https://stokenet.radixdlt.com'
+  - name: ORACLE_CONFIG_FILE
+    value: 'config-develop.json'
+
 ingress:
   enabled: true
   hosts:
