@@ -81,12 +81,12 @@ def repo_task(user_name, bot_id, combot_id, combot_api_key):
     )
 
 
-telegram_user_task1 = repo_task(
-    "radix_dlt",
-    Config.TELEGRAM_RADIX_DLT_BOT_ID,
-    Config.TELEGRAM_RADIX_DLT_COMBOT_ID,
-    Config.TELEGRAM_RADIX_DLT_COMBOT_API_KEY,
-)
+# telegram_user_task1 = repo_task(
+#     "radix_dlt",
+#     Config.TELEGRAM_RADIX_DLT_BOT_ID,
+#     Config.TELEGRAM_RADIX_DLT_COMBOT_ID,
+#     Config.TELEGRAM_RADIX_DLT_COMBOT_API_KEY,
+# )
 telegram_user_task2 = repo_task(
     "RadixDevelopers",
     Config.TELEGRAM_RADIX_DEVS_BOT_ID,
@@ -94,6 +94,6 @@ telegram_user_task2 = repo_task(
     Config.TELEGRAM_RADIX_DEVS_COMBOT_API_KEY,
 )
 
-telegram_user_task1
+##telegram_user_task1
 
 telegram_user_task2
