@@ -37,48 +37,48 @@ class NetworkData(Base):
     @classmethod
     def fetch_and_save_data(
         cls,
-        response_five,
-        response_burn,
+        ##response_five,
+        ##response_burn,
         response_defillama,
         response_radixapi,
     ):
         # Extract relevant user information
         # Parse the JSON response
-        if response_five.status_code == 200:
-            data_five = response_five.json()
-            price = data_five["data"]["price"]
-            hourly_burnt_amount = data_five["data"]["hourlyBurntAmount"]
-            daily_burnt_amount = data_five["data"]["dailyBurntAmount"]
-            weekly_burnt_amount = data_five["data"]["weeklyBurntAmount"]
-            monthly_burnt_amount = data_five["data"]["monthlyBurntAmount"]
-            annually_burnt_amount = data_five["data"]["annuallyBurntAmount"]
-        else:
-            logging.info(
-                f"Did not get a successful response from burn trucker: {response_five.status_code}"
-            )
-            price = 0
-            hourly_burnt_amount = 0
-            daily_burnt_amount = 0
-            weekly_burnt_amount = 0
-            monthly_burnt_amount = 0
-            annually_burnt_amount = 0
+        # if response_five.status_code == 200:
+        #     data_five = response_five.json()
+        #     price = data_five["data"]["price"]
+        #     hourly_burnt_amount = data_five["data"]["hourlyBurntAmount"]
+        #     daily_burnt_amount = data_five["data"]["dailyBurntAmount"]
+        #     weekly_burnt_amount = data_five["data"]["weeklyBurntAmount"]
+        #     monthly_burnt_amount = data_five["data"]["monthlyBurntAmount"]
+        #     annually_burnt_amount = data_five["data"]["annuallyBurntAmount"]
+        # else:
+        #     logging.info(
+        #         f"Did not get a successful response from burn trucker: {response_five.status_code}"
+        #     )
+        #     price = 0
+        #     hourly_burnt_amount = 0
+        #     daily_burnt_amount = 0
+        #     weekly_burnt_amount = 0
+        #     monthly_burnt_amount = 0
+        #     annually_burnt_amount = 0
 
-        if response_burn.status_code == 200:
-            data_burn = response_burn.json()
-            remaining_supply = data_burn["tokenDetail"][
-                "totalSupply"
-            ]  # For some reason the webpage uses totalSupply instead of remainingSupply
-            burnt_amount = data_burn["tokenDetail"]["burntAmount"]
-            max_supply = data_burn["tokenDetail"]["maxSupply"]
-            current_block = data_burn["tokenDetail"]["currentBlock"]
-        else:
-            logging.info(
-                f"Did not get a successful response from burn trucker: {response_five.status_code}"
-            )
-            remaining_supply = 0
-            burnt_amount = 0
-            max_supply = 0
-            current_block = 0
+        # if response_burn.status_code == 200:
+        #     data_burn = response_burn.json()
+        #     remaining_supply = data_burn["tokenDetail"][
+        #         "totalSupply"
+        #     ]  # For some reason the webpage uses totalSupply instead of remainingSupply
+        #     burnt_amount = data_burn["tokenDetail"]["burntAmount"]
+        #     max_supply = data_burn["tokenDetail"]["maxSupply"]
+        #     current_block = data_burn["tokenDetail"]["currentBlock"]
+        # else:
+        #     logging.info(
+        #         f"Did not get a successful response from burn trucker: {response_five.status_code}"
+        #     )
+        #     remaining_supply = 0
+        #     burnt_amount = 0
+        #     max_supply = 0
+        #     current_block = 0
 
         tvl = response_defillama.json()[-1]["tvl"]
         radixapi_stats = response_radixapi.json()
@@ -103,20 +103,21 @@ class NetworkData(Base):
                 tx_count_total: {tx_count_total},
                 created_accounts_total: {created_accounts_total},
                 tvl: {tvl},
-                staked_xrd: {staked_xrd},
-                hourly_burnt_amount: {hourly_burnt_amount},
-                daily_burnt_amount: {daily_burnt_amount},
-                weekly_burnt_amount: {weekly_burnt_amount},
-                monthly_burnt_amount: {monthly_burnt_amount},
-                annually_burnt_amount: {annually_burnt_amount},
-                remaining_supply: {remaining_supply},
-                burnt_amount: {burnt_amount},
-                max_supply: {max_supply},
-                current_block: {current_block},
-                price: {price},
+                staked_xrd: {staked_xrd}
             """
         )
 
+        ##Deleted logging
+        # hourly_burnt_amount: {hourly_burnt_amount},
+        # daily_burnt_amount: {daily_burnt_amount},
+        # weekly_burnt_amount: {weekly_burnt_amount},
+        # monthly_burnt_amount: {monthly_burnt_amount},
+        # annually_burnt_amount: {annually_burnt_amount},
+        # remaining_supply: {remaining_supply},
+        # burnt_amount: {burnt_amount},
+        # max_supply: {max_supply},
+        # current_block: {current_block},
+        # price: {price},
         try:
             session = get_session()
 
@@ -131,17 +132,20 @@ class NetworkData(Base):
                 created_accounts_total=created_accounts_total,
                 tvl=tvl,
                 staked_xrd=staked_xrd,
-                hourly_burnt_amount=hourly_burnt_amount,
-                daily_burnt_amount=daily_burnt_amount,
-                weekly_burnt_amount=weekly_burnt_amount,
-                monthly_burnt_amount=monthly_burnt_amount,
-                annually_burnt_amount=annually_burnt_amount,
-                remaining_supply=remaining_supply,
-                burnt_amount=burnt_amount,
-                max_supply=max_supply,
-                current_block=current_block,
-                price=price,
             )
+
+            ### Deleted burn:
+            # hourly_burnt_amount=hourly_burnt_amount,
+            # daily_burnt_amount=daily_burnt_amount,
+            # weekly_burnt_amount=weekly_burnt_amount,
+            # monthly_burnt_amount=monthly_burnt_amount,
+            # annually_burnt_amount=annually_burnt_amount,
+            # remaining_supply=remaining_supply,
+            # burnt_amount=burnt_amount,
+            # max_supply=max_supply,
+            # current_block=current_block,
+            # price=price,
+
             session.add(new_info)
             logging.info("Data inserted successfully.")
             session.commit()

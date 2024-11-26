@@ -30,16 +30,16 @@ def get_network():
 
     try:
         # Make a GET request to the API
-        response_five = requests.get(Config.BURNTRACKER_FIVE_BURN)
-        response_burn = requests.get(Config.BURNTRACKER_BURNDATA)
+        ##response_five = requests.get(Config.BURNTRACKER_FIVE_BURN)
+        ##response_burn = requests.get(Config.BURNTRACKER_BURNDATA)
         response_defillama = requests.get(Config.DEFILAMA_TVL)
         response_radixapi = requests.get(
             Config.RADIX_API_STATS, headers=get_radix_charts_headers()
         )
 
         NetworkData.fetch_and_save_data(
-            response_five,
-            response_burn,
+            ##response_five,
+            ##response_burn,
             response_defillama,
             response_radixapi,
         )

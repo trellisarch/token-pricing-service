@@ -3,7 +3,6 @@ from airflow.decorators import task, dag
 from datetime import datetime, timedelta
 from radixdlt.config.config import Config
 
-
 # DAG configuration
 default_args = {
     "owner": "airflow",
@@ -12,8 +11,6 @@ default_args = {
     "retries": 1,
     "retry_delay": timedelta(minutes=5),
 }
-
-
 @dag(
     dag_id="watchdog",
     default_args=default_args,
