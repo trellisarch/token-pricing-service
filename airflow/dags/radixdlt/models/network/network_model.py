@@ -154,3 +154,6 @@ class NetworkData(Base):
         except SQLAlchemyError as e:
             session.rollback()
             logging.error(f"Error occurred: {e}")
+            raise
+        finally:
+            session.close()
