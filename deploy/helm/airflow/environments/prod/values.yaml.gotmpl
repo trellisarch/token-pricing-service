@@ -82,3 +82,15 @@ alerts:
   free_rds_ram_warning_threshold: "500 MB"
   free_rds_ram_critical_threshold_in_bytes: "250000000"
   free_rds_ram_critical_threshold: "250 MB"
+
+webserver:
+  livenessProbe:
+    initialDelaySeconds: 40
+    periodSeconds: 30
+
+  readinessProbe:
+    initialDelaySeconds: 40
+    periodSeconds: 30
+
+  startupProbe:
+    periodSeconds: 30
