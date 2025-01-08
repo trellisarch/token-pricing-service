@@ -21,10 +21,11 @@ class NpmMetricsModel(Base):
 
     @classmethod
     def fetch_and_save_data(cls, package):
-        period = "last-month"
+        period = "last-day"
         logging.info(f"Getting metrics for package: {package}")
         url = f"https://api.npmjs.org/downloads/point/{period}/{package}"
         response = requests.get(url)
+
         if response.status_code == 200:
             downloads = response.json()["downloads"]
         else:
