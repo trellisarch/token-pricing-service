@@ -1,6 +1,6 @@
 tweepy
 PyGithub
-radix-engine-toolkit
+radix-engine-toolkit==2.1.2
 praw
 pythclient
 requests

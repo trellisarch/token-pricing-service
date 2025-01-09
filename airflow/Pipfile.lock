@@ -1017,7 +1017,7 @@
             ],
             "index": "pypi",
             "markers": "python_version >= '3.6'",
-            "version": "==2.1.1"
+            "version": "==2.1.2"
         },
         "requests": {
             "hashes": [
