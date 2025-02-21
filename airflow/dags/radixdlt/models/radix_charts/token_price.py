@@ -1,10 +1,10 @@
 import logging
-
 import requests
-from sqlalchemy import Column, String, Float, DateTime
-from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 
+from sqlalchemy import Column, String, Float, DateTime, Integer
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.dialects.postgresql import insert
 from radixdlt.config.config import Config
 from radixdlt.lib.http import get_radix_charts_headers
 from radixdlt.models.base import get_session
@@ -14,12 +14,27 @@ Base = declarative_base()
 
 class RadixTokenPrice(Base):
     __tablename__ = "radix_token_prices"
-    resource_address = Column(String, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    resource_address = Column(String)
     usd_price = Column(Float)
     usd_market_cap = Column(Float)
     usd_vol_24h = Column(Float)
-    last_updated_at = Column(DateTime)
+    last_updated_at = Column(DateTime(timezone=False))
+    token_id = Column(Integer)
 
+
+class RadixTokenPriceLatest(Base):
+    __tablename__ = "radix_token_prices_latest"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    resource_address = Column(String)
+    usd_price = Column(Float)
+    usd_market_cap = Column(Float)
+    usd_vol_24h = Column(Float)
+    last_updated_at = Column(DateTime(timezone=False))
+    token_id = Column(Integer, unique=True)
+
+
+class PriceFetcher:
     @classmethod
     def fetch_and_save_prices(cls, tokens):
         session = get_session()
@@ -28,6 +43,7 @@ class RadixTokenPrice(Base):
 
         for chunk in chunked_tokens:
             addresses = ",".join(token[0] for token in chunk)
+            token_map = {token[0]: token[1] for token in chunk}
             logging.info(f"Getting prices for {len(chunk)} addresses")
             params = {"resource_addresses": addresses}
             response = requests.get(
@@ -35,21 +51,51 @@ class RadixTokenPrice(Base):
                 params=params,
                 headers=get_radix_charts_headers(),
             )
-            price_data = response.json()["data"]
+            price_data = response.json().get("data", {})
             logging.info(price_data)
 
-            for resource_address in price_data.keys():
-                logging.info(f"Saving price for resource: {resource_address}")
-                new_price = cls(
+            for resource_address, data in price_data.items():
+                token_id = token_map.get(resource_address)
+                if token_id is None:
+                    logging.warning(
+                        f"No token_id found for resource_address: {resource_address}"
+                    )
+                    continue
+
+                dt = datetime.fromtimestamp(data["last_updated_at"])
+
+                new_price = RadixTokenPrice(
                     resource_address=resource_address,
-                    usd_price=price_data[resource_address]["usd_price"],
-                    usd_market_cap=price_data[resource_address]["usd_market_cap"],
-                    usd_vol_24h=price_data[resource_address]["usd_vol_24h"],
-                    last_updated_at=datetime.fromtimestamp(
-                        price_data[resource_address]["last_updated_at"]
-                    ),
+                    token_id=token_id,
+                    usd_price=data["usd_price"],
+                    usd_market_cap=data["usd_market_cap"],
+                    usd_vol_24h=data["usd_vol_24h"],
+                    last_updated_at=dt,
                 )
                 session.add(new_price)
+
+                stmt = (
+                    insert(RadixTokenPriceLatest)
+                    .values(
+                        resource_address=resource_address,
+                        token_id=token_id,
+                        usd_price=data["usd_price"],
+                        usd_market_cap=data["usd_market_cap"],
+                        usd_vol_24h=data["usd_vol_24h"],
+                        last_updated_at=dt,
+                    )
+                    .on_conflict_do_update(
+                        index_elements=["token_id"],
+                        set_={
+                            "resource_address": resource_address,
+                            "usd_price": data["usd_price"],
+                            "usd_market_cap": data["usd_market_cap"],
+                            "usd_vol_24h": data["usd_vol_24h"],
+                            "last_updated_at": dt,
+                        },
+                    )
+                )
+                session.execute(stmt)
         session.commit()
 
         try:
