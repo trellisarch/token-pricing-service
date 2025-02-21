@@ -26,12 +26,12 @@ class RadixTokenPrice(Base):
 class RadixTokenPriceLatest(Base):
     __tablename__ = "radix_token_prices_latest"
     id = Column(Integer, primary_key=True, autoincrement=True)
-    resource_address = Column(String)
+    resource_address = Column(String, unique=True)
     usd_price = Column(Float)
     usd_market_cap = Column(Float)
     usd_vol_24h = Column(Float)
     last_updated_at = Column(DateTime(timezone=False))
-    token_id = Column(Integer, unique=True)
+    token_id = Column(Integer)
 
 
 class PriceFetcher:

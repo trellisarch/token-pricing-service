@@ -23,12 +23,12 @@ def upgrade():
     op.create_table(
         "radix_token_prices_latest",
         sa.Column("id", sa.Integer, primary_key=True, autoincrement=True),
-        sa.Column("resource_address", sa.String, nullable=False),
+        sa.Column("resource_address", sa.String, unique=True, nullable=False),
         sa.Column("usd_price", sa.Float),
         sa.Column("usd_market_cap", sa.Float),
         sa.Column("usd_vol_24h", sa.Float),
         sa.Column("last_updated_at", sa.DateTime(timezone=False)),
-        sa.Column("token_id", sa.Integer, unique=True, nullable=False),
+        sa.Column("token_id", sa.Integer),
     )
 
 
