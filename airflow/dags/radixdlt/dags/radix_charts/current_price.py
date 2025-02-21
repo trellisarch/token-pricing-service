@@ -1,10 +1,9 @@
 import logging
-
 from airflow.decorators import task, dag
 from datetime import datetime, timedelta
 from radixdlt.config.config import Config
 from radixdlt.models.radix_charts.token import RadixToken
-from radixdlt.models.radix_charts.token_price import RadixTokenPrice
+from radixdlt.models.radix_charts.token_price import PriceFetcher
 
 logging.basicConfig(level=logging.INFO)
 
@@ -28,7 +27,7 @@ def radix_charts_prices():
     @task
     def fetch_tokens_price_task():
         tokens = RadixToken.list_tokens()
-        RadixTokenPrice.fetch_and_save_prices(tokens)
+        PriceFetcher.fetch_and_save_prices(tokens)
 
     fetch_tokens_price_task()
 
