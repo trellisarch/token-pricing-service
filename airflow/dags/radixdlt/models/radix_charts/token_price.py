@@ -43,7 +43,6 @@ class PriceFetcher:
 
         for chunk in chunked_tokens:
             addresses = ",".join(token[0] for token in chunk)
-            token_map = {token[0]: token[0] for token in chunk}
             logging.info(f"Getting prices for {len(chunk)} addresses")
             params = {"resource_addresses": addresses}
             response = requests.get(
@@ -55,18 +54,11 @@ class PriceFetcher:
             logging.info(price_data)
 
             for resource_address, data in price_data.items():
-                token_id = token_map.get(resource_address)
-                if token_id is None:
-                    logging.warning(
-                        f"No token_id found for resource_address: {resource_address}"
-                    )
-                    continue
-
                 dt = datetime.fromtimestamp(data["last_updated_at"])
 
                 new_price = RadixTokenPrice(
                     resource_address=resource_address,
-                    token_id=token_id,
+                    token_id=None,
                     usd_price=data["usd_price"],
                     usd_market_cap=data["usd_market_cap"],
                     usd_vol_24h=data["usd_vol_24h"],
@@ -78,14 +70,14 @@ class PriceFetcher:
                     insert(RadixTokenPriceLatest)
                     .values(
                         resource_address=resource_address,
-                        token_id=token_id,
+                        token_id=None,
                         usd_price=data["usd_price"],
                         usd_market_cap=data["usd_market_cap"],
                         usd_vol_24h=data["usd_vol_24h"],
                         last_updated_at=dt,
                     )
                     .on_conflict_do_update(
-                        index_elements=["token_id"],
+                        index_elements=["resource_address"],
                         set_={
                             "resource_address": resource_address,
                             "usd_price": data["usd_price"],
