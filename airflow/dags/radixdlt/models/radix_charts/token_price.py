@@ -43,7 +43,7 @@ class PriceFetcher:
 
         for chunk in chunked_tokens:
             addresses = ",".join(token[0] for token in chunk)
-            token_map = {token[0]: token[1] for token in chunk}
+            token_map = {token[0]: token[0] for token in chunk}
             logging.info(f"Getting prices for {len(chunk)} addresses")
             params = {"resource_addresses": addresses}
             response = requests.get(
