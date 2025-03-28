@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+from airflow.dags.radixdlt.lib.cmc import CmcPriceProvider
 from airflow.decorators import task, dag
 from radixdlt.config.config import Config
 from radixdlt.lib.c9 import C9PriceProvider
@@ -24,10 +25,10 @@ default_args = {
 def oracle_prices_dag():
 
     @task
-    def process_pyth_prices_task():
-        pyth_price_provider = PythPriceProvider()
-        pyth_price_provider.process_prices()
-        return pyth_price_provider.prices
+    def process_cmc_prices_task():
+        cmc_price_provider = CmcPriceProvider()
+        cmc_price_provider.process_prices()
+        return cmc_price_provider.prices
 
     @task
     def process_c9_prices_task():
@@ -42,11 +43,9 @@ def oracle_prices_dag():
         return radix_charts_price_provider.prices
 
     @task
-    def update_oracle_task(pyth_prices, c9_prices, radix_charts_pricess):
+    def update_oracle_task(cmc_prices, c9_prices, radix_charts_pricess):
         oracle_updater = OracleUpdater()
-        return oracle_updater.update_prices(
-            pyth_prices, c9_prices, radix_charts_pricess
-        )
+        return oracle_updater.update_prices(cmc_prices, c9_prices, radix_charts_pricess)
 
     @task
     def get_transaction_status_task(transaction_metadata):
@@ -68,7 +67,7 @@ def oracle_prices_dag():
     add_metrics_all_pairs_updated_task(
         get_transaction_status_task(
             update_oracle_task(
-                process_pyth_prices_task(),
+                process_cmc_prices_task(),
                 process_c9_prices_task(),
                 process_radix_charts_prices_task(),
             )

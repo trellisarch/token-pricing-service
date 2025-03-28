@@ -4,6 +4,7 @@ import requests
 from radixdlt.lib.const import RADIX_CHARTS_TOKENS
 from radixdlt.config.config import Config
 from radixdlt.lib.c9 import build_quotes
+from radixdlt.lib.cmc import get_quotes
 from radixdlt.lib.pyth import validate_prices
 from radixdlt.lib.radix_charts import validate_prices as validate_charts_prices
 from radixdlt.lib.ret import create_transaction
@@ -12,10 +13,10 @@ from radixdlt.lib.ret import create_transaction
 class OracleUpdater:
 
     @staticmethod
-    def update_prices(pyth_prices, c9_prices, radix_charts_prices):
+    def update_prices(cmc_prices, c9_prices, radix_charts_prices):
         quotes = []
 
-        quotes.extend(validate_prices(pyth_prices))
+        quotes.extend(get_quotes(cmc_prices))
         quotes.extend(build_quotes(c9_prices))
         quotes.extend(validate_charts_prices(radix_charts_prices))
 
