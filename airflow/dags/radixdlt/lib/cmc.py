@@ -18,7 +18,7 @@ class CmcPriceProvider(BasePriceProvider):
         #     "BTC/XRD": 12345.67,
         #     "ETH/XRD": 2345.89,
         # }
-        self.prices = {} 
+        self.prices = {}
 
     def process_prices(self):
         utc_now_seconds = int(datetime.utcnow().timestamp())
@@ -73,7 +73,8 @@ class CmcPriceProvider(BasePriceProvider):
             logging.info(str(e))
         logging.info(f"CMC prices: {self.prices}")
 
-def get_quotes(prices) -> list:   
+
+def get_quotes(prices) -> list:
     quotes = []
     for pair, price in prices.items():
         base = pair.split("/")[0]

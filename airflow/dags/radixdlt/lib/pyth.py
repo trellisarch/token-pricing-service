@@ -15,7 +15,7 @@ from radixdlt.lib.price_provider import BasePriceProvider
 class PythPriceProvider(BasePriceProvider):
 
     def __init__(self):
-        # self.prices is a dictionary where the keys are trading pairs (e.g., "BTC/XRD") 
+        # self.prices is a dictionary where the keys are trading pairs (e.g., "BTC/XRD")
         # and the values are the corresponding prices calculated using PYTH data.
         self.prices = {}
 
@@ -76,11 +76,11 @@ class PythPriceProvider(BasePriceProvider):
 
 def validate_prices(prices):
     """
-    Validates the given prices against data from CMC (CoinMarketCap) and CoinGecko 
-    price providers, ensuring that the prices fall within an acceptable range 
+    Validates the given prices against data from CMC (CoinMarketCap) and CoinGecko
+    price providers, ensuring that the prices fall within an acceptable range
     defined by a configurable price difference trigger.
     Args:
-        prices (dict): A dictionary where the keys are trading pairs (e.g., "BTC/USD") 
+        prices (dict): A dictionary where the keys are trading pairs (e.g., "BTC/USD")
                        and the values are the corresponding PYTH prices.
     Returns:
         list: A list of valid quotes. Each valid quote is a dictionary with the following shape:
@@ -94,10 +94,10 @@ def validate_prices(prices):
     Notes:
         - The function uses CMC as the primary price source and CoinGecko as a fallback.
         - If both CMC and CoinGecko prices are unavailable for a pair, the pair is skipped.
-        - The function logs detailed information about the validation process, including 
+        - The function logs detailed information about the validation process, including
           request times and price comparisons.
-        - The acceptable price range is determined by the `Config.ORACLE_PRICE_DIFF_TRIGGER` 
-          parameter, which defines the percentage difference allowed between the PYTH price 
+        - The acceptable price range is determined by the `Config.ORACLE_PRICE_DIFF_TRIGGER`
+          parameter, which defines the percentage difference allowed between the PYTH price
           and the provider prices.
     """
     valid_quotes = []
@@ -167,5 +167,5 @@ def validate_prices(prices):
                             {"base": pair.split("/")[0], "price": prices[pair]}
                         )
     logging.info(f"PYTH quotes: {valid_quotes}")
-    
+
     return valid_quotes

@@ -45,9 +45,7 @@ def oracle_prices_dag():
     @task
     def update_oracle_task(cmc_prices, c9_prices, radix_charts_pricess):
         oracle_updater = OracleUpdater()
-        return oracle_updater.update_prices(
-            cmc_prices, c9_prices, radix_charts_pricess
-        )
+        return oracle_updater.update_prices(cmc_prices, c9_prices, radix_charts_pricess)
 
     @task
     def get_transaction_status_task(transaction_metadata):
