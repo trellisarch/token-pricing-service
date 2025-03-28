@@ -8,7 +8,17 @@ from radixdlt.lib.price_provider import BasePriceProvider
 class CmcPriceProvider(BasePriceProvider):
 
     def __init__(self):
-        self.prices = {}
+        # The self.prices dictionary will have the following structure:
+        # {
+        #     "PAIR_NAME": PRICE_VALUE,
+        #     ...
+        # }
+        # Example:
+        # {
+        #     "BTC/XRD": 12345.67,
+        #     "ETH/XRD": 2345.89,
+        # }
+        self.prices = {} 
 
     def process_prices(self):
         utc_now_seconds = int(datetime.utcnow().timestamp())
@@ -62,3 +72,10 @@ class CmcPriceProvider(BasePriceProvider):
         except Exception as e:
             logging.info(str(e))
         logging.info(f"CMC prices: {self.prices}")
+
+def get_quotes(prices) -> list:   
+    quotes = []
+    for pair, price in prices.items():
+        base = pair.split("/")[0]
+        quotes.append({"base": base, "price": price})
+    return quotes
