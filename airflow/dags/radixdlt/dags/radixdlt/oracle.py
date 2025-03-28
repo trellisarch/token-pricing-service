@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-from airflow.dags.radixdlt.lib.cmc import CmcPriceProvider
+from radixdlt.lib.cmc import CmcPriceProvider
 from airflow.decorators import task, dag
 from radixdlt.config.config import Config
 from radixdlt.lib.c9 import C9PriceProvider
