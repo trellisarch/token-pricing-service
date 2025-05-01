@@ -1,0 +1,96 @@
+env:
+  - name: "AIRFLOW__METRICS__METRICS_ALLOW_LIST"
+    value: “scheduler,executor,dagrun,dag,pool,task,ti,sla,operator"
+  - name: GOOGLE_APPLICATION_CREDENTIALS
+    value: "/opt/airflow/service-account.json"
+
+extraEnv: |
+  - name: COIN_GECKO_API
+    value: 'https://pro-api.coingecko.com/api/v3'
+  - name: NETWORK_ID
+    value: "1"
+  - name: NETWORK_GATEWAY
+    value: 'https://mainnet.radixdlt.com'
+  - name: ORACLE_SCHEDULE_INTERVAL
+    value: '*/1 * * * *'
+  - name: TOKEN_PRICE_SCHEDULE_INTERVAL
+    value: '*/1 * * * *'
+  - name: ORACLE_CONFIG_FILE
+    value: 'config.json'
+  - name: MARKETING_DAGS_SCHEDULE_INTERVAL
+    value: "0 0 * * *"
+  - name: COINGECKO_TOKEN_PRICES_SCHEDULE_INTERVAL
+    value: "0 6 * * *"  
+  - name: NPM_PACKAGES_SCHEDULE_INTERVAL
+    value: "0 6 * * *"
+
+ingress:
+  enabled: true
+  className: nginx-internal
+  annotations:
+    external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
+  hosts:
+    - host: airflow-service.radixdlt.com
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+          backend:
+            service:
+              name: airflow-webserver
+              port:
+                number: 8080
+  tls: []
+docker:
+  secrets:
+    region: eu-west-1
+    name: docker.io/radixdlt
+pgbouncer:
+  enabled: true
+postgresql:
+  enabled: false
+
+data:
+  metadataSecretName: postgres-secrets-formatted
+
+localDB:
+  enabled: false
+
+registry:
+  secretName: docker-hub-dev
+
+ui_url: https://airflow-service.radixdlt.com
+
+webserver:
+  defaultUser:
+    enabled: true
+    role: Admin
+    username: $(WEBSERVER_USERNAME)
+    email: team-devops@rdx.works
+    firstName: team-devops
+    lastName: team-devops
+    password: $(WEBSERVER_PASSWORD)
+
+webserverSecretKeySecretName: webserver-secret-key
+
+alerts:
+  dashboard_url: "https://radixdlt.grafana.net/d/lFXqBGxWk/airflow-cluster-dashboard?orgId=1&refresh=5s&var-prometheus=FQomEQz4k&var-namespace=airflow-prod&var-loki=6OqgV0p4z&var-dag_id=$__all&var-task_id=$__all&from=now-1h&to=now"
+  labels:
+    cluster: rdx-works-main-prod
+    env: prod
+  aws_infrastructure_enabled: true
+  free_rds_ram_warning_threshold_in_bytes: "500000000"
+  free_rds_ram_warning_threshold: "500 MB"
+  free_rds_ram_critical_threshold_in_bytes: "250000000"
+  free_rds_ram_critical_threshold: "250 MB"
+
+webserver:
+  livenessProbe:
+    initialDelaySeconds: 40
+    periodSeconds: 30
+
+  readinessProbe:
+    initialDelaySeconds: 40
+    periodSeconds: 30
+
+  startupProbe:
+    periodSeconds: 30

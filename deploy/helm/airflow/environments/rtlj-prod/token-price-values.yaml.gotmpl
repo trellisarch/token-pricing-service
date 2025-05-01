@@ -1,0 +1,50 @@
+replicaCount: 5
+
+image: 
+  tag: {{ .StateValues.ci.tag }}
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 60
+  targetMemoryUtilizationPercentage: 60
+
+resources:
+  limits:
+    memory: 1024Mi
+  requests:
+    cpu: 400m
+    memory: 768Mi
+
+metrics:
+  enabled: true
+  port: 5990
+  serviceMonitor:
+    enabled: true
+    interval: 60s
+
+envs:
+  DB_HOST: "airflow-prod-rds-ro.rdx-works-main-prod.internal"
+  DB_NAME: "dags"
+
+ingress:
+  enabled: true
+  annotations:
+  hosts:
+    - host: token-price-service.radixdlt.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+secrets:
+  - name: rds-username
+    variable: "DB_USER"
+    path: "rdx-works-main-prod/airflow/postgres-prod"
+    secretProperty: "postgresqlUsername"
+    secretName: "database-username"
+  - name: rds-password
+    variable: "DB_PASSWORD"
+    path: "rdx-works-main-prod/airflow/postgres-prod"
+    secretProperty: "postgresql-password"
+    secretName: "database-password"
