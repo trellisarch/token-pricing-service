@@ -14,8 +14,8 @@ resources:
   limits:
     memory: 1024Mi
   requests:
-    cpu: 400m
-    memory: 768Mi
+    cpu: 200m
+    memory: 512Mi
 
 metrics:
   enabled: true
@@ -25,26 +25,27 @@ metrics:
     interval: 60s
 
 envs:
-  DB_HOST: "airflow-prod-rds-ro.rdx-works-main-prod.internal"
+  DB_HOST: "airflow-prod-rds-ro.rtlj-prod.internal"
   DB_NAME: "dags"
 
 ingress:
   enabled: true
   annotations:
   hosts:
-    - host: token-price-service.radixdlt.com
+    - host: token-price-service-rtlj.radixdlt.com
       paths:
         - path: /
           pathType: Prefix
   tls: []
+
 secrets:
-  - name: rds-username
+  - external_secret_name: rds-username
     variable: "DB_USER"
-    path: "rdx-works-main-prod/airflow/postgres-prod"
-    secretProperty: "postgresqlUsername"
+    aws_secret_name: "rtlj-prod/airflow/prod/postgres"
+    aws_secret_key: "postgresqlUsername"
     secretName: "database-username"
-  - name: rds-password
+  - external_secret_name: rds-password
     variable: "DB_PASSWORD"
-    path: "rdx-works-main-prod/airflow/postgres-prod"
-    secretProperty: "postgresql-password"
+    aws_secret_name: "rtlj-prod/airflow/prod/postgres"
+    aws_secret_key: "postgresql-password"
     secretName: "database-password"

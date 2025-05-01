@@ -40,6 +40,6 @@ envs:
 secrets:
   - name: rds-password
     variable: "DB_PASSWORD"
-    path: "rdx-works-main-dev/airflow/postgres-dev"
-    secretProperty: "postgresql-password"
-    secretName: "database-password"
+    aws_secret_name: "rdx-works-main-dev/airflow/postgres-dev"
+    aws_secret_key: "postgresql-password"
+    external_secret_name: "database-password"

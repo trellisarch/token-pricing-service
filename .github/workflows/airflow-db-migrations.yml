@@ -10,6 +10,7 @@ on:
         options:
           - dev
           - prod
+          - rtlj-prod
 
 permissions:
   id-token: write
@@ -64,7 +65,7 @@ jobs:
 
   deploy-airflow-migrations-prod:
     if: github.event.inputs.environment == 'prod'
-    name: "Deploy Airflow Migrations (PROD)"
+    name: "(PROD) Deploy Airflow Migrations"
     uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@main
     needs:
       - tags
@@ -89,9 +90,36 @@ jobs:
         ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.RUN_DB_MIGRATIONS=true
 
+  deploy-airflow-migrations-rtlj-prod:
+    if: github.event.inputs.environment == 'prod'
+    name: "(RTLJ-PROD) Deploy Airflow Migrations"
+    uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@main
+    needs:
+      - tags
+      - build-airflow-migrations
+    with:
+      app_name: 'airflow'
+      step_name: 'deploy-airflow-rtlj-prod'
+      env_name: rtlj-prod
+      namespace: airflow-prod
+      helm_command: "apply"
+      create_subns: false
+      restart_pods: false
+      aws_region: eu-west-2
+      role_to_assume: arn:aws:iam::821496737932:role/gh-airflow-prod-deployer
+      eks_cluster: rtlj-prod
+      helm_folder: "deploy/helm/airflow"
+      helm_chart: "db-migrations"
+      helmfile_extra_vars: >-
+        ci.tag=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
+        ci.environment=rtlj-prod,
+        ci.HF_CREATE_NAMESPACES=false,
+        ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
+        ci.RUN_DB_MIGRATIONS=true
+
   deploy-airflow-migrations-dev:
     if: github.event.inputs.environment == 'dev'
-    name: "Deploy Airflow Migrations (DEV)"
+    name: "(DEV) Deploy Airflow Migrations"
     uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@main
     needs:
       - tags

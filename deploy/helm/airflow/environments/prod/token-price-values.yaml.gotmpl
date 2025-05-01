@@ -38,13 +38,13 @@ ingress:
           pathType: Prefix
   tls: []
 secrets:
-  - name: rds-username
+  - external_secret_name: rds-username
     variable: "DB_USER"
-    path: "rdx-works-main-prod/airflow/postgres-prod"
-    secretProperty: "postgresqlUsername"
+    aws_secret_name: "rdx-works-main-prod/airflow/postgres-prod"
+    aws_secret_key: "postgresqlUsername"
     secretName: "database-username"
-  - name: rds-password
+  - external_secret_name: rds-password
     variable: "DB_PASSWORD"
-    path: "rdx-works-main-prod/airflow/postgres-prod"
-    secretProperty: "postgresql-password"
+    aws_secret_name: "rdx-works-main-prod/airflow/postgres-prod"
+    aws_secret_key: "postgresql-password"
     secretName: "database-password"
