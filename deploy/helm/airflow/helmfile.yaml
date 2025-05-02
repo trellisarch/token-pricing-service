@@ -3,11 +3,12 @@ environments:
   dev: {}
   pr: {}
   prod: {}
+  rtlj-prod: {}
 ---
 helmDefaults:
   verify: false
   wait: false
-  timeout: 600
+  timeout: 180
   recreatePods: false
   force: false
   createNamespace: false

@@ -38,8 +38,8 @@ envs:
   DB_USER: "postgres"
 
 secrets:
-  - name: rds-password
+  - external_secret_name: rds-password
     variable: "DB_PASSWORD"
-    path: "rdx-works-main-dev/airflow/postgres-dev"
-    secretProperty: "postgresql-password"
-    secretName: "database-password"
+    aws_secret_name: "rdx-works-main-dev/airflow/postgres-dev"
+    aws_secret_key: "postgresql-password"
+    k8s_secret_data_key: "database-password"

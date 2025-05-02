@@ -1,7 +1,7 @@
 """initial db version
 
 Revision ID: a3e526d3066f
-Revises: 
+Revises:
 Create Date: 2023-12-18 14:36:39.846219
 
 """
