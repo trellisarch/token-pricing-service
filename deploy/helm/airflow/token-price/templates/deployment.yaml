@@ -43,7 +43,7 @@ spec:
             valueFrom:
               secretKeyRef:
                 name: {{ $secret.external_secret_name }}
-                key: {{ $secret.secretName }}
+                key: {{ $secret.k8s_secret_data_key }}
           {{- end }}
           ports:
             - name: http
