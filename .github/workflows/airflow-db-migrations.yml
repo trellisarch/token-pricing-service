@@ -91,7 +91,7 @@ jobs:
         ci.RUN_DB_MIGRATIONS=true
 
   deploy-airflow-migrations-rtlj-prod:
-    if: github.event.inputs.environment == 'prod'
+    if: github.event.inputs.environment == 'rtlj-prod'
     name: "(RTLJ-PROD) Deploy Airflow Migrations"
     uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@main
     needs:
