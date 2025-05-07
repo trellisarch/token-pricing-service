@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: db-migrations
+  name: radixdlt-db-migrations
 spec:
   backoffLimit: 2
   template:
@@ -9,13 +9,13 @@ spec:
       imagePullSecrets:
         - name: docker-hub-dev
       containers:
-      - name: db-migrations
+      - name: radixdlt-db-migrations
         image: "{{ .Values.image.repo }}:{{ .Values.image.tag }}"
         env:
           - name: DB_URI
             valueFrom:
               secretKeyRef:
-                name: db-migration-postgres-secrets-formatted
-                key: connection
+                name: dags-db-connection-string
+                key: dags_db_connection_string
         imagePullPolicy: IfNotPresent
       restartPolicy: Never

@@ -40,6 +40,7 @@ ingress:
               port:
                 number: 8080
   tls: []
+
 docker:
   secrets:
     region: eu-west-1
@@ -50,7 +51,7 @@ postgresql:
   enabled: false
 
 data:
-  metadataSecretName: postgres-secrets-formatted
+  metadataSecretName: run-airflow-migration-job-airflow-conn-string
 
 localDB:
   enabled: false
@@ -70,7 +71,7 @@ webserver:
     lastName: team-devops
     password: $(WEBSERVER_PASSWORD)
 
-webserverSecretKeySecretName: webserver-secret-key
+webserverSecretKeySecretName: main-secret
 
 alerts:
   dashboard_url: "https://radixdlt.grafana.net/d/lFXqBGxWk/airflow-cluster-dashboard?orgId=1&refresh=5s&var-prometheus=FQomEQz4k&var-namespace=airflow-prod&var-loki=6OqgV0p4z&var-dag_id=$__all&var-task_id=$__all&from=now-1h&to=now"

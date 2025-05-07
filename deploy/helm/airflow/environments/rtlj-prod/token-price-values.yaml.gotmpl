@@ -36,16 +36,20 @@ ingress:
       paths:
         - path: /
           pathType: Prefix
+    - host: token-price-service-race.radixdlt.com
+      paths:
+        - path: /
+          pathType: Prefix
   tls: []
 
 secrets:
   - external_secret_name: rds-username
     variable: "DB_USER"
-    aws_secret_name: "rtlj-prod/airflow/prod/postgres"
+    aws_secret_name: "rtlj-prod/airflow/prod/rds"
     aws_secret_key: "postgresqlUsername"
-    secretName: "database-username"
+    k8s_secret_data_key: "database-username"
   - external_secret_name: rds-password
     variable: "DB_PASSWORD"
-    aws_secret_name: "rtlj-prod/airflow/prod/postgres"
+    aws_secret_name: "rtlj-prod/airflow/prod/rds"
     aws_secret_key: "postgresql-password"
-    secretName: "database-password"
+    k8s_secret_data_key: "database-password"
