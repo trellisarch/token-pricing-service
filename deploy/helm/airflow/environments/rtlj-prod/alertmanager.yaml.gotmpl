@@ -1,9 +1,0 @@
-alertmanager:
-  env: "prod"
-  nameOverride: "airflow-amcfg"
-  slackConfig:
-    channel: "feed--alerts-airflow-prod"
-  secrets:
-    region: eu-west-2
-    name: "rtlj-prod/eks/airflow/prod/alertmanager-integration-keys"
-  enable_pagerduty_notifications: true

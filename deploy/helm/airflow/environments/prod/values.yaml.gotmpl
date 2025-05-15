@@ -30,7 +30,7 @@ ingress:
   annotations:
     external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
   hosts:
-    - host: airflow-service.radixdlt.com
+    - host: airflow-ui.radixdlt.com
       paths:
         - path: /
           pathType: ImplementationSpecific
@@ -40,6 +40,7 @@ ingress:
               port:
                 number: 8080
   tls: []
+
 docker:
   secrets:
     region: eu-west-1
@@ -50,7 +51,7 @@ postgresql:
   enabled: false
 
 data:
-  metadataSecretName: postgres-secrets-formatted
+  metadataSecretName: run-airflow-migration-job-airflow-conn-string
 
 localDB:
   enabled: false
@@ -58,7 +59,7 @@ localDB:
 registry:
   secretName: docker-hub-dev
 
-ui_url: https://airflow-service.radixdlt.com
+ui_url: https://airflow-ui.radixdlt.com
 
 webserver:
   defaultUser:
@@ -70,12 +71,12 @@ webserver:
     lastName: team-devops
     password: $(WEBSERVER_PASSWORD)
 
-webserverSecretKeySecretName: webserver-secret-key
+webserverSecretKeySecretName: main-secret
 
 alerts:
   dashboard_url: "https://radixdlt.grafana.net/d/lFXqBGxWk/airflow-cluster-dashboard?orgId=1&refresh=5s&var-prometheus=FQomEQz4k&var-namespace=airflow-prod&var-loki=6OqgV0p4z&var-dag_id=$__all&var-task_id=$__all&from=now-1h&to=now"
   labels:
-    cluster: rdx-works-main-prod
+    cluster: rtlj-prod
     env: prod
   aws_infrastructure_enabled: true
   free_rds_ram_warning_threshold_in_bytes: "500000000"
