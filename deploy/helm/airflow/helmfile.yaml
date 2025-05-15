@@ -3,7 +3,6 @@ environments:
   dev: {}
   pr: {}
   prod: {}
-  rtlj-prod: {}
 ---
 helmDefaults:
   verify: false
