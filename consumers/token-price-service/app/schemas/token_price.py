@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional, List, Dict
 from pydantic import BaseModel, Field
 
 
@@ -18,6 +18,20 @@ class LsuPrice(BaseModel):
 class TokenPricesResponse(BaseModel):
     tokens: Optional[list[TokenPrice]] = Field(default=None)
     lsus: Optional[list[LsuPrice]] = Field(default=None)
+
+
+class HistoricalPriceRequest(BaseModel):
+    tokens: List[str]
+    timestamp: int  # Unix timestamp (seconds)
+
+
+class HistoricalTokenPrice(BaseModel):
+    usd_price: float
+    last_updated_at: datetime
+
+
+class HistoricalPriceResponse(BaseModel):
+    prices: Dict[str, HistoricalTokenPrice]
 
 
 class TokenPricesRequest(BaseModel):

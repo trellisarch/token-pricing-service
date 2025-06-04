@@ -8,6 +8,7 @@ from sqlalchemy import (
     DateTime,
     ForeignKey,
     Boolean,
+    func,
 )
 from sqlalchemy.orm import relationship, Session
 
@@ -17,6 +18,31 @@ from app.models.token import Token
 
 
 logger = get_logger()
+
+
+def get_prices_closest_to_timestamp(resource_addresses: list, timestamp: int):
+    """
+    For each resource_address, find the price record from radix_token_prices
+    with the closest last_updated_at to the given timestamp.
+    Returns a dict: {resource_address: TokenPrice}
+    """
+    with Session(get_engine()) as session:
+        result = {}
+        for address in resource_addresses:
+            # Find the closest record by absolute time difference
+            closest = (
+                session.query(TokenPrice)
+                .filter(TokenPrice.resource_address == address)
+                .order_by(
+                    func.abs(
+                        func.extract("epoch", TokenPrice.last_updated_at) - timestamp
+                    )
+                )
+                .first()
+            )
+            if closest:
+                result[address] = closest
+        return result
 
 
 class TokenPrice(Base):

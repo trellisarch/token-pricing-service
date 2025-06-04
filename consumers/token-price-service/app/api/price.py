@@ -1,12 +1,15 @@
 from fastapi import APIRouter, Body, HTTPException
 from app.config.config import Config
 from app.logger.log import get_logger
-from app.models.token_price import get_latest_prices
+from app.models.token_price import get_latest_prices, get_prices_closest_to_timestamp
 from app.schemas.token_price import (
     TokenPricesResponse,
     TokenPricesRequest,
     TokenPrice,
     LsuPrice,
+    HistoricalPriceRequest,
+    HistoricalPriceResponse,
+    HistoricalTokenPrice,
 )
 from app.utils.lsus import get_lsu_redemption_values
 from prometheus_client import Histogram
@@ -62,3 +65,26 @@ async def get_tokens_prices(data: TokenPricesRequest = Body(...)):
         request_duration_without_lsus.observe(time.time() - start_time)
 
     return token_price_response
+
+
+@price_router.post("/historicalPrice", response_model=HistoricalPriceResponse)
+async def get_historical_price(data: HistoricalPriceRequest = Body(...)):
+    """
+    Returns price for each token at the time closest to the given timestamp.
+    """
+    if not data.tokens or not isinstance(data.tokens, list) or len(data.tokens) == 0:
+        raise HTTPException(status_code=400, detail="Token list must be provided.")
+    if not isinstance(data.timestamp, int):
+        raise HTTPException(
+            status_code=400, detail="Timestamp must be an integer (unix seconds)."
+        )
+
+    prices = get_prices_closest_to_timestamp(data.tokens, data.timestamp)
+
+    resp = {}
+    for token, price in prices.items():
+        resp[token] = HistoricalTokenPrice(
+            usd_price=price.usd_price,
+            last_updated_at=price.last_updated_at,
+        )
+    return HistoricalPriceResponse(prices=resp)

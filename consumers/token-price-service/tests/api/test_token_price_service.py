@@ -1,6 +1,7 @@
 from os import getenv
 
 import requests
+import time
 
 API_URL = getenv("API_URL", "https://dev-token-price.extratools.works")
 
@@ -43,3 +44,23 @@ def test_get_prices_for_multiple_token():
             price for price in prices["tokens"] if price["resource_address"] == token
         ][0]
         assert token_price["usd_price"] > 0
+
+
+def test_historical_price():
+    tokens = [
+        "resource_rdx1thrvr3xfs2tarm2dl9emvs26vjqxu6mqvfgvqjne940jv0lnrrg7rw"  # xUSDT
+    ]
+    timestamp = int(time.time()) - 86400  # 1 day ago
+    body = {
+        "tokens": tokens,
+        "timestamp": timestamp,
+    }
+    resp = requests.post(f"{API_URL}/price/historicalPrice", json=body)
+    assert resp.status_code == 200
+    data = resp.json()
+    assert "prices" in data
+    assert tokens[0] in data["prices"]
+    price_info = data["prices"][tokens[0]]
+    assert price_info["usd_price"] > 0
+    assert "last_updated_at" in price_info
+    assert "resource_address" not in price_info
