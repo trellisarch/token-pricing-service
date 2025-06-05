@@ -51,7 +51,7 @@ def test_historical_price():
     tokens = [
         "resource_rdx1thrvr3xfs2tarm2dl9emvs26vjqxu6mqvfgvqjne940jv0lnrrg7rw"  # xUSDT
     ]
-    timestamp = int(time.time()) - 86400  # 1 day ago
+    timestamp = 1712142074
     body = {
         "tokens": tokens,
         "timestamp": timestamp,
