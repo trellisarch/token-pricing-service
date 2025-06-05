@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Body, HTTPException
+from fastapi import APIRouter, Body, HTTPException, Depends, Header
 from app.config.config import Config
 from app.logger.log import get_logger
 from app.models.token_price import get_latest_prices, get_prices_closest_to_timestamp
@@ -67,8 +67,16 @@ async def get_tokens_prices(data: TokenPricesRequest = Body(...)):
     return token_price_response
 
 
+def api_key_auth(x_api_key: str = Header(...)):
+    if x_api_key != Config.API_KEY:
+        raise HTTPException(status_code=401, detail="Invalid or missing API Key")
+
+
 @price_router.post("/historicalPrice", response_model=HistoricalPriceResponse)
-async def get_historical_price(data: HistoricalPriceRequest = Body(...)):
+async def get_historical_price(
+    data: HistoricalPriceRequest = Body(...),
+    _: None = Depends(api_key_auth),
+):
     """
     Returns price for each token at the time closest to the given timestamp.
     """

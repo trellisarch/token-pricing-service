@@ -4,6 +4,7 @@ from urllib.parse import quote_plus
 
 class Config:
     current_dir = os.path.dirname(os.path.abspath(__file__))
+    API_KEY = os.environ.get("API_KEY", "SsNUTBBoJKg5tINqUKv9")
     POSTGRES_HOST = os.environ.get("DB_HOST", "postgres")
     POSTGRES_USER = os.environ.get("DB_USER", "postgres")
     POSTGRES_PASSWORD = os.environ.get("DB_PASSWORD", "postgres@123")

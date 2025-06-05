@@ -26,13 +26,22 @@ def get_prices_closest_to_timestamp(resource_addresses: list, timestamp: int):
     with the closest last_updated_at to the given timestamp.
     Returns a dict: {resource_address: TokenPrice}
     """
+    from datetime import datetime, timedelta
+
+    # Convert timestamp to date (YYYY-MM-DD)
+    date = datetime.utcfromtimestamp(timestamp).date()
+    start_dt = datetime.combine(date - timedelta(days=1), datetime.min.time())
+    end_dt = datetime.combine(date + timedelta(days=1), datetime.max.time())
+
     with Session(get_engine()) as session:
         result = {}
         for address in resource_addresses:
-            # Find the closest record by absolute time difference
+            # Only consider records within +/- 1 day of the date
             closest = (
                 session.query(TokenPrice)
                 .filter(TokenPrice.resource_address == address)
+                .filter(TokenPrice.last_updated_at > start_dt)
+                .filter(TokenPrice.last_updated_at < end_dt)
                 .order_by(
                     func.abs(
                         func.extract("epoch", TokenPrice.last_updated_at) - timestamp
