@@ -1,6 +1,7 @@
 from os import getenv
 
 import requests
+from app.config.config import Config
 import time
 
 API_URL = getenv("API_URL", "https://dev-token-price.extratools.works")
@@ -55,7 +56,8 @@ def test_historical_price():
         "tokens": tokens,
         "timestamp": timestamp,
     }
-    resp = requests.post(f"{API_URL}/price/historicalPrice", json=body)
+    headers = {"x-api-key": Config.API_KEY}
+    resp = requests.post(f"{API_URL}/price/historicalPrice", json=body, headers=headers)
     assert resp.status_code == 200
     data = resp.json()
     assert "prices" in data
