@@ -89,6 +89,15 @@ async def get_historical_price(
 
     prices = get_prices_closest_to_timestamp(data.tokens, data.timestamp)
 
+    missing_tokens = [
+        token for token in data.tokens if token not in prices or prices[token] is None
+    ]
+    if missing_tokens:
+        raise HTTPException(
+            status_code=424,
+            detail=f"Price missing for tokens: {', '.join(missing_tokens)}",
+        )
+
     resp = {}
     for token, price in prices.items():
         resp[token] = HistoricalTokenPrice(
