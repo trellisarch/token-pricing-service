@@ -4,6 +4,7 @@ import random
 from os import getenv
 from os.path import abspath, dirname, join
 import requests
+from decimal import Decimal, ROUND_DOWN
 from radix_engine_toolkit import (
     PrivateKey,
     derive_virtual_account_address_from_public_key,
@@ -14,6 +15,10 @@ from radix_engine_toolkit import (
 )
 
 from radixdlt.config.config import Config
+
+def limit_decimal_places(value, places=18):
+    quantize_str = '.' + '0' * (places - 1) + '1'
+    return Decimal(str(value)).quantize(Decimal(quantize_str), rounding=ROUND_DOWN)
 
 
 def create_transaction(transaction_metadata):
@@ -54,10 +59,7 @@ def create_transaction(transaction_metadata):
                 for metadata in transaction_metadata
                 if metadata["base"] == quote["symbol"]
             ][0]
-            price_str = str(quote_price)
-            if len(price_str.split(".")[1]) > 18:
-                price_str = price_str[:-1]
-                quote_price = float(price_str)
+            quote_price = limit_decimal_places(quote_price, 18)
             quotes += f"""
 Tuple(
     Address("{quote["resource_address"]}"),
