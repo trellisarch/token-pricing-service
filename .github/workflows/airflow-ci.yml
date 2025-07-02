@@ -20,6 +20,7 @@ permissions:
   contents: read
   deployments: write
   packages: write
+  issues: write
 jobs:
   lint:
     runs-on: ubuntu-latest
