@@ -16,8 +16,9 @@ from radix_engine_toolkit import (
 
 from radixdlt.config.config import Config
 
+
 def limit_decimal_places(value, places=18):
-    quantize_str = '.' + '0' * (places - 1) + '1'
+    quantize_str = "." + "0" * (places - 1) + "1"
     return Decimal(str(value)).quantize(Decimal(quantize_str), rounding=ROUND_DOWN)
 
 
