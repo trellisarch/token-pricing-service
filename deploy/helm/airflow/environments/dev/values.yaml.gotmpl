@@ -1,8 +1,6 @@
 env:
   - name: "AIRFLOW__METRICS__METRICS_ALLOW_LIST"
-    value: “scheduler,executor,dagrun,dag,pool,task,ti,sla,operator"
-  - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONNECT_ARGS
-    value: '{"connect_args": {"keepalives": 1, "keepalives_idle": 60, "keepalives_interval": 30, "keepalives_count": 5}}'
+    value: "scheduler,executor,dagrun,dag,pool,task,ti,sla,operator"
   - name: AIRFLOW__CELERY__OPERATION_TIMEOUT
     value: "10.0"
   - name: AIRFLOW__CELERY__TASK_PUBLISH_MAX_RETRIES
