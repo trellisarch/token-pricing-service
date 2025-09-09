@@ -1,6 +1,24 @@
 env:
   - name: "AIRFLOW__METRICS__METRICS_ALLOW_LIST"
-    value: “scheduler,executor,dagrun,dag,pool,task,ti,sla,operator"
+    value: "scheduler,executor,dagrun,dag,pool,task,ti,sla,operator"
+  - name: AIRFLOW__CELERY__OPERATION_TIMEOUT
+    value: "10.0"
+  - name: AIRFLOW__CELERY__TASK_PUBLISH_MAX_RETRIES
+    value: "5"
+  - name: AIRFLOW__DATABASE__SQL_ALCHEMY_POOL_PRE_PING
+    value: "True"
+  - name: AIRFLOW__DATABASE__SQL_ALCHEMY_POOL_RECYCLE
+    value: "600"
+  - name: AIRFLOW__CELERY_BROKER_TRANSPORT_OPTIONS__VISIBILITY_TIMEOUT
+    value: "43200"
+  - name: AIRFLOW__CELERY_BROKER_TRANSPORT_OPTIONS__SOCKET_CONNECT_TIMEOUT
+    value: "5"
+  - name: AIRFLOW__CELERY_BROKER_TRANSPORT_OPTIONS__SOCKET_TIMEOUT
+    value: "5"
+  - name: AIRFLOW__CELERY_BROKER_TRANSPORT_OPTIONS__RETRY_ON_TIMEOUT
+    value: "True"
+  - name: AIRFLOW__CELERY_BROKER_TRANSPORT_OPTIONS__SOCKET_KEEPALIVE
+    value: "True"
   - name: GOOGLE_APPLICATION_CREDENTIALS
     value: "/opt/airflow/service-account.json"
 
