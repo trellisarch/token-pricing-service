@@ -1,5 +1,33 @@
 from os import getenv
+import logging
 import statsd
+
+
+class SafeStats:
+    def __init__(self, client):
+        self._c = client
+        self._logged_error = False
+
+    def _safe(self, fn, *a, **kw):
+        try:
+            return fn(*a, **kw)
+        except Exception:
+            # optionally log once
+            if not self._logged_error:
+                logging.exception(
+                    "StatsD client error encountered; suppressing further errors"
+                )
+                self._logged_error = True
+            return None
+
+    def timing(self, *a, **kw):
+        return self._safe(self._c.timing, *a, **kw)
+
+    def incr(self, *a, **kw):
+        return self._safe(self._c.incr, *a, **kw)
+
+    def gauge(self, *a, **kw):
+        return self._safe(self._c.gauge, *a, **kw)
 
 
 class Config:
@@ -99,4 +127,6 @@ class Config:
     STATSD_EXPORTER_INGEST_PORT = getenv("STATSD_EXPORTER_INGEST_PORT", 9125)
 
     STATSD_HOST = getenv("STATSD_HOST", "airflow-statsd")
-    statsDClient = statsd.TCPStatsClient(STATSD_HOST, STATSD_EXPORTER_INGEST_PORT)
+    statsDClient = SafeStats(
+        statsd.TCPStatsClient(STATSD_HOST, STATSD_EXPORTER_INGEST_PORT)
+    )
