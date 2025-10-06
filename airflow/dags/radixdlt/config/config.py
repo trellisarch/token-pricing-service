@@ -12,7 +12,6 @@ class SafeStats:
         try:
             return fn(*a, **kw)
         except Exception:
-            # optionally log once
             if not self._logged_error:
                 logging.exception(
                     "StatsD client error encountered; suppressing further errors"
@@ -74,14 +73,16 @@ class Config:
     TWITTER_RADIXDLT_ACCESS_TOKEN_SECRET = getenv(
         "TWITTER_RADIXDLT_ACCESS_TOKEN_SECRET"
     )
-    TWITTER_RADIXDLT_BAERER_TOKEN = getenv("TWITTER_RADIXDLT_BAERER_TOKEN")
+    TWITTER_RADIXDLT_BEARER_TOKEN = getenv("TWITTER_RADIXDLT_BEARER_TOKEN")
+
     TWITTER_SCRYPTOLANG_API_KEY = getenv("TWITTER_SCRYPTOLANG_API_KEY")
     TWITTER_SCRYPTOLANG_API_KEY_SECRET = getenv("TWITTER_SCRYPTOLANG_API_KEY_SECRET")
     TWITTER_SCRYPTOLANG_ACCESS_TOKEN = getenv("TWITTER_SCRYPTOLANG_ACCESS_TOKEN")
     TWITTER_SCRYPTOLANG_ACCESS_TOKEN_SECRET = getenv(
         "TWITTER_SCRYPTOLANG_ACCESS_TOKEN_SECRET"
     )
-    TWITTER_SCRYPTOLANG_BAERER_TOKEN = getenv("TWITTER_SCRYPTOLANG_BAERER_TOKEN")
+    TWITTER_SCRYPTOLANG_BEARER_TOKEN = getenv("TWITTER_SCRYPTOLANG_BEARER_TOKEN")
+
     GITHUB_TOKEN = getenv("GITHUB_TOKEN")
     TELEGRAM_RADIX_DLT_BOT_ID = getenv("TELEGRAM_RADIX_DLT_BOT_ID")
     TELEGRAM_RADIX_DLT_COMBOT_ID = getenv("TELEGRAM_RADIX_DLT_COMBOT_ID")
@@ -116,17 +117,23 @@ class Config:
 
     NPM_PACKAGES = getenv(
         "NPM_PACKAGES",
-        "@radixdlt/babylon-gateway-api-sdk,@radixdlt/radix-connect-webrtc,@radixdlt/babylon-core-api-sdk,@radixdlt/radix-engine-toolkit,@radixdlt/rola,@radixdlt/radix-dapp-toolkit",
+        "@radixdlt/babylon-gateway-api-sdk,@radixdlt/radix-connect-webrtc,"
+        "@radixdlt/babylon-core-api-sdk,@radixdlt/radix-engine-toolkit,"
+        "@radixdlt/rola,@radixdlt/radix-dapp-toolkit",
     )
     NPM_PACKAGES_SCHEDULE_INTERVAL = getenv("NPM_PACKAGES_SCHEDULE_INTERVAL", None)
 
     COINGECKO_TOKEN_PRICES_SCHEDULE_INTERVAL = getenv(
         "COINGECKO_TOKEN_PRICES_SCHEDULE_INTERVAL", None
     )
-    COINGECKO_TOKENS = "radix,avalanche-2,e-radix,solana,polkadot,near,cardano,aptos,sui,sei-network,elrond-erd-2,the-open-network"
-    STATSD_EXPORTER_INGEST_PORT = getenv("STATSD_EXPORTER_INGEST_PORT", 9125)
+    COINGECKO_TOKENS = (
+        "radix,avalanche-2,e-radix,solana,polkadot,near,cardano,aptos,sui,"
+        "sei-network,elrond-erd-2,the-open-network"
+    )
 
+    STATSD_EXPORTER_INGEST_PORT = int(getenv("STATSD_EXPORTER_INGEST_PORT", "9125"))
     STATSD_HOST = getenv("STATSD_HOST", "airflow-statsd")
+
     statsDClient = SafeStats(
-        statsd.TCPStatsClient(STATSD_HOST, STATSD_EXPORTER_INGEST_PORT)
+        statsd.StatsClient(host=STATSD_HOST, port=STATSD_EXPORTER_INGEST_PORT)
     )
