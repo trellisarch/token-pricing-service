@@ -29,6 +29,17 @@ class SafeStats:
         return self._safe(self._c.gauge, *a, **kw)
 
 
+class NoOpStatsClient:
+    def timing(self, *a, **kw):
+        return None
+
+    def incr(self, *a, **kw):
+        return None
+
+    def gauge(self, *a, **kw):
+        return None
+
+
 class Config:
     RADIX_TOKEN = "XRD"
 
@@ -134,6 +145,10 @@ class Config:
     STATSD_EXPORTER_INGEST_PORT = int(getenv("STATSD_EXPORTER_INGEST_PORT", "9125"))
     STATSD_HOST = getenv("STATSD_HOST", "airflow-statsd")
 
-    statsDClient = SafeStats(
-        statsd.StatsClient(host=STATSD_HOST, port=STATSD_EXPORTER_INGEST_PORT)
-    )
+    try:
+        _client = statsd.StatsClient(host=STATSD_HOST, port=STATSD_EXPORTER_INGEST_PORT)
+    except Exception:
+        logging.exception("Failed to initialize StatsD client; using NoOpStatsClient")
+        _client = NoOpStatsClient()
+
+    statsDClient = SafeStats(_client)
