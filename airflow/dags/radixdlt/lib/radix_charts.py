@@ -34,7 +34,16 @@ class RadixChartsPriceProvider(BasePriceProvider):
 
             if response.status_code not in (200, 204):
                 Config.statsDClient.incr("dag_oracle.radixchart.failed")
-                raise Exception("Radixchart returned error")
+                logging.error(
+                    f"Radixchart API failed with status code: {response.status_code}"
+                )
+                logging.error(f"Request URL: {current_price_endpoint}")
+                logging.error(f"Request params: {params}")
+                logging.error(f"Response headers: {dict(response.headers)}")
+                logging.error(f"Response content: {response.text}")
+                raise Exception(
+                    f"Radixchart returned error: HTTP {response.status_code}"
+                )
 
             Config.statsDClient.incr("dag_oracle.radixchart.passed")
             charts_prices = response.json()["data"]
@@ -53,10 +62,10 @@ class RadixChartsPriceProvider(BasePriceProvider):
 
             logging.info(self.prices)
         except Exception as e:
-
             # Increment the failure counter
             Config.statsDClient.incr("dag_oracle.radixchart.failed")
-            print(f"Error fetching data from external service radixchart: {e}")
+            logging.error(f"Error fetching data from external service radixchart: {e}")
+            logging.exception("Full exception details:")
             raise
 
 
