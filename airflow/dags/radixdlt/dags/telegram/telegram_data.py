@@ -60,9 +60,34 @@ def get_telegram_info(user_name, bot_id, combot_id, combot_api_key):
 
         # Use this URL in your requests.get()
         combot_response = requests.get(combot_api_url)
+        combot_response.raise_for_status()
+
+        # Parse responses
+        bot_data = bot_response.json()
+        combot_data = combot_response.json()
+
+        # Log responses for debugging
+        logging.info(f"Bot API response for {user_name}: {bot_data}")
+        logging.info(f"Combot API response for {user_name}: {combot_data}")
+
+        # Handle combot response - check if it's a list and has elements
+        if isinstance(combot_data, list):
+            if len(combot_data) > 0:
+                combot_stats = combot_data[0]
+            else:
+                logging.warning(
+                    f"Combot API returned empty list for {user_name}, using empty dict"
+                )
+                combot_stats = {}
+        elif isinstance(combot_data, dict):
+            # If API changed to return dict directly instead of list
+            combot_stats = combot_data
+        else:
+            logging.error(f"Unexpected combot response type: {type(combot_data)}")
+            combot_stats = {}
 
         TelegramData.fetch_and_save_data(
-            user_name, bot_response.json()["result"], combot_response.json()[0]
+            user_name, bot_data.get("result"), combot_stats
         )
 
     except Exception as e:

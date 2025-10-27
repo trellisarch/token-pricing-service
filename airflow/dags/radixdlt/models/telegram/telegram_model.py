@@ -23,12 +23,18 @@ class TelegramData(Base):
     def fetch_and_save_data(cls, account, bot_response, combot_response):
         # Extract relevant user information
         members_total = bot_response
-        combot_data = combot_response
+        combot_data = combot_response if combot_response else {}
 
-        messages_total = combot_data["messages"][0][1]
-        new_users_total = combot_data["new_users_total"]
-        left_users_total = combot_data["left_users_total"]
-        active_users_total = combot_data["active_users_total"]
+        # Handle combot data with defaults for missing fields
+        messages = combot_data.get("messages", [])
+        messages_total = (
+            messages[0][1]
+            if messages and len(messages) > 0 and len(messages[0]) > 1
+            else None
+        )
+        new_users_total = combot_data.get("new_users_total")
+        left_users_total = combot_data.get("left_users_total")
+        active_users_total = combot_data.get("active_users_total")
 
         logging.info(
             f"""Member Count: {members_total}, 
