@@ -23,7 +23,7 @@ class RedditSubredditData(Base):
     def fetch_and_save_data(cls, account, api_response):
         # Extract relevant user information
         subscribers_count = api_response.subscribers
-        active_user_count = api_response.active_user_count
+        active_user_count = getattr(api_response, "accounts_active", 0)
 
         try:
             traffic = api_response.traffic()
