@@ -143,6 +143,9 @@ class Config:
     )
 
     # Account Component Monitoring DAG
+    ACC_COMP_MONITORING_NETWORK_GATEWAY = getenv(
+        "ACC_COMP_MONITORING_NETWORK_GATEWAY", "https://mainnet.radixdlt.com"
+    )
     ACC_COMP_MONITORING_SCHEDULE_INTERVAL = getenv(
         "ACC_COMP_MONITORING_SCHEDULE_INTERVAL", None
     )

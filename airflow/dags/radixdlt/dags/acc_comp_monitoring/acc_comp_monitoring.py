@@ -19,7 +19,7 @@ default_args = {
 
 def get_account_details(account_address: str) -> dict:
     """Call the Radix Gateway state/entity/details endpoint."""
-    url = f"{Config.NETWORK_GATEWAY}/state/entity/details"
+    url = f"{Config.ACC_COMP_MONITORING_NETWORK_GATEWAY}/state/entity/details"
     response = requests.post(
         url,
         json={"addresses": [account_address]},
