@@ -142,6 +142,15 @@ class Config:
         "sei-network,elrond-erd-2,the-open-network"
     )
 
+    # Account Component Monitoring DAG
+    ACC_COMP_MONITORING_SCHEDULE_INTERVAL = getenv(
+        "ACC_COMP_MONITORING_SCHEDULE_INTERVAL", None
+    )
+    ACC_COMP_MONITORING_SLACK_WEBHOOK_URL = getenv("ACC_COMP_MONITORING_SLACK_WEBHOOK_URL")
+    ACC_COMP_MONITORING_SLACK_USER_IDS = getenv("ACC_COMP_MONITORING_SLACK_USER_IDS", "")
+    # JSON config: {"accounts": [{"address": "...", "name": "...", "resources": [{"address": "...", "name": "..."}]}]}
+    ACC_COMP_MONITORING_CONFIG = getenv("ACC_COMP_MONITORING_CONFIG", "{}")
+
     STATSD_EXPORTER_INGEST_PORT = int(getenv("STATSD_EXPORTER_INGEST_PORT", "9125"))
     STATSD_HOST = getenv("STATSD_HOST", "airflow-statsd")
 
