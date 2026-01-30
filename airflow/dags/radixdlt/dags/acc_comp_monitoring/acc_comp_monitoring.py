@@ -20,14 +20,18 @@ default_args = {
 def get_account_details(account_address: str) -> dict:
     """Call the Radix Gateway state/entity/details endpoint."""
     url = f"{Config.ACC_COMP_MONITORING_NETWORK_GATEWAY}/state/entity/details"
-    response = requests.post(
-        url,
-        json={"addresses": [account_address]},
-        headers={"accept": "application/json", "Content-Type": "application/json"},
-        timeout=30,
-    )
-    response.raise_for_status()
-    return response.json()
+    try:
+        response = requests.post(
+            url,
+            json={"addresses": [account_address]},
+            headers={"accept": "application/json", "Content-Type": "application/json"},
+            timeout=30,
+        )
+        response.raise_for_status()
+        return response.json()
+    except requests.RequestException as e:
+        logging.error(f"Gateway API error for account {account_address}: {e}")
+        raise
 
 
 def get_balance(resource_address: str, account_address: str) -> float:
@@ -162,14 +166,18 @@ def acc_comp_monitoring_dag():
             )
         }
 
-        response = requests.post(
-            webhook_url,
-            json=message,
-            headers={"Content-Type": "application/json"},
-            timeout=30,
-        )
-        response.raise_for_status()
-        logging.info(f"Slack notification sent for {len(changes)} balance changes")
+        try:
+            response = requests.post(
+                webhook_url,
+                json=message,
+                headers={"Content-Type": "application/json"},
+                timeout=30,
+            )
+            response.raise_for_status()
+            logging.info(f"Slack notification sent for {len(changes)} balance changes")
+        except requests.RequestException as e:
+            logging.error(f"Slack webhook error: {e}")
+            raise
 
     changes = check_balances()
     send_slack_notification(changes)

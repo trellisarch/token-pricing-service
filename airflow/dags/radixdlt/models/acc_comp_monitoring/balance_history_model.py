@@ -24,8 +24,8 @@ class BalanceHistory(Base):
     @classmethod
     def get_previous_balance(cls, account_address: str, resource_address: str) -> float:
         """Get the most recent balance for an account/resource pair."""
+        session = get_session()
         try:
-            session = get_session()
             result = (
                 session.query(cls)
                 .filter(
@@ -35,11 +35,12 @@ class BalanceHistory(Base):
                 .order_by(desc(cls.timestamp))
                 .first()
             )
-            session.close()
             return result.balance if result else None
         except SQLAlchemyError as e:
-            logging.error(f"Error getting previous balance: {e}")
-            return None
+            logging.error(f"Database error getting previous balance: {e}")
+            raise
+        finally:
+            session.close()
 
     @classmethod
     def save_balance(
@@ -55,8 +56,8 @@ class BalanceHistory(Base):
         if previous_balance is not None:
             balance_change = balance - previous_balance
 
+        session = get_session()
         try:
-            session = get_session()
             new_record = cls(
                 account_address=account_address,
                 resource_address=resource_address,
@@ -70,7 +71,9 @@ class BalanceHistory(Base):
             logging.info(
                 f"Balance saved: {account_address[:20]}... {resource_name} = {balance} (change: {balance_change})"
             )
-            session.close()
         except SQLAlchemyError as e:
             session.rollback()
-            logging.error(f"Error saving balance: {e}")
+            logging.error(f"Database error saving balance: {e}")
+            raise
+        finally:
+            session.close()
