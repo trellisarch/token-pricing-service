@@ -17,6 +17,7 @@ permissions:
   contents: read
   deployments: write
   packages: write
+  issues: write
 
 jobs:
   tags:
