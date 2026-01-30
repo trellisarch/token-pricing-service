@@ -148,7 +148,7 @@ class Config:
     )
     ACC_COMP_MONITORING_SLACK_WEBHOOK_URL = getenv("ACC_COMP_MONITORING_SLACK_WEBHOOK_URL")
     ACC_COMP_MONITORING_SLACK_USER_IDS = getenv("ACC_COMP_MONITORING_SLACK_USER_IDS", "")
-    # JSON config: {"accounts": [{"address": "...", "name": "...", "resources": [{"address": "...", "name": "..."}]}]}
+    # JSON config: {"accounts": [{"address": "...", "name": "...", "resources": [{"address": "...", "name": "...", "threshold": 0}]}]}
     ACC_COMP_MONITORING_CONFIG = getenv("ACC_COMP_MONITORING_CONFIG", "{}")
 
     STATSD_EXPORTER_INGEST_PORT = int(getenv("STATSD_EXPORTER_INGEST_PORT", "9125"))

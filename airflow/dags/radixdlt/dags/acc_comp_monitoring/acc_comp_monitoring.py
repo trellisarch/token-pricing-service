@@ -76,6 +76,7 @@ def acc_comp_monitoring_dag():
             for resource in resources:
                 resource_address = resource.get("address")
                 resource_name = resource.get("name", resource_address[:20] + "...")
+                threshold = resource.get("threshold", 0)
 
                 # Get current balance from Gateway
                 current_balance = get_balance(resource_address, account_address)
@@ -94,24 +95,31 @@ def acc_comp_monitoring_dag():
                     previous_balance=previous_balance,
                 )
 
-                # Check for changes
-                if previous_balance is not None and current_balance != previous_balance:
+                # Check for changes exceeding threshold
+                if previous_balance is not None:
                     change = current_balance - previous_balance
-                    changes.append(
-                        {
-                            "account_name": account_name,
-                            "account_address": account_address,
-                            "resource_name": resource_name,
-                            "resource_address": resource_address,
-                            "previous_balance": previous_balance,
-                            "current_balance": current_balance,
-                            "change": change,
-                        }
-                    )
-                    logging.info(
-                        f"Balance change detected: {account_name} {resource_name} "
-                        f"{previous_balance} -> {current_balance} (change: {change})"
-                    )
+                    if abs(change) > threshold:
+                        changes.append(
+                            {
+                                "account_name": account_name,
+                                "account_address": account_address,
+                                "resource_name": resource_name,
+                                "resource_address": resource_address,
+                                "previous_balance": previous_balance,
+                                "current_balance": current_balance,
+                                "change": change,
+                                "threshold": threshold,
+                            }
+                        )
+                        logging.info(
+                            f"Balance change exceeds threshold: {account_name} {resource_name} "
+                            f"{previous_balance} -> {current_balance} (change: {change}, threshold: {threshold})"
+                        )
+                    else:
+                        logging.info(
+                            f"Balance change within threshold: {account_name} {resource_name} "
+                            f"change: {change}, threshold: {threshold}"
+                        )
 
         return changes
 
@@ -144,7 +152,7 @@ def acc_comp_monitoring_dag():
             change_lines.append(
                 f"• *{c['account_name']}* - {c['resource_name']}: "
                 f"{c['previous_balance']:,.2f} → {c['current_balance']:,.2f} "
-                f"({sign}{c['change']:,.2f})"
+                f"({sign}{c['change']:,.2f}, threshold: {c['threshold']:,.2f})"
             )
 
         message = {
