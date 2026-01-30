@@ -11,6 +11,8 @@ extraEnv: |
     value: 'https://stokenet.radixdlt.com'
   - name: ORACLE_CONFIG_FILE
     value: 'config-develop.json'
+  - name: ACC_COMP_MONITORING_SCHEDULE_INTERVAL
+    value: '*/1 * * * *'
 
 docker:
   secrets:
