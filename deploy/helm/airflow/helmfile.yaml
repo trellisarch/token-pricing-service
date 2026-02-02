@@ -42,6 +42,12 @@ releases:
           airflow:
             repository: radixdlt/airflow
             tag: {{ .StateValues.ci.tag }}
+      # Add PostgreSQL image configuration here
+      - postgresql:
+        image:
+          registry: public.ecr.aws
+          repository: u2o0d2a1/bitnami-postgresql
+          tag: 15.4.0-debian-11-r56
       - webserver:
           args: ["bash", "-c", "pip install airflow-exporter; exec airflow webserver"]
       - environments/{{ .Environment.Name }}/statsd-override-mappings.yaml.gotmpl
