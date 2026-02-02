@@ -65,11 +65,15 @@ releases:
   - name: postgres
     chart: bitnami/postgresql
     installed: {{ .StateValues | get "ci.INSTALL_DB" "false" }}
-    version: 12.1.5
+    version: 12.12.10
     values:
       - auth:
           postgresPassword: postgres
           database: "dags"
+        image:
+          registry: public.ecr.aws
+          repository: u2o0d2a1/bitnami-postgresql
+          tag: 15.4.0-debian-11-r56
       - primary:
           persistence:
             enabled: false
