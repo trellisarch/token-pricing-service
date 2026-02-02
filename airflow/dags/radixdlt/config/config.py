@@ -157,7 +157,7 @@ class Config:
     )
     ACC_COMP_MONITORING_CONFIG = getenv(
         "ACC_COMP_MONITORING_CONFIG",
-        '{"accounts": [{"address": "component_rdx1cpsdx6z53k5a3r5748pf2w0l5gyay8jxzlmgzpkd38pdpse6l8thge", "name": "component", "resources": [{"address": "resource_rdx1th9xpl0se8tyx9j9q4rdl54xdd2rrmaggjdlnzgl2tx3ttydjl724a", "name": "Rewards", "threshold": 10}]}]}',
+        '{"accounts": [{"address": "component_rdx1cp3fd5xmrdfh6pdgvcj3rx49utg0myleh73l2lak7hzedxugcdlrkc", "name": "component", "resources": [{"address": "resource_rdx1thepdew8awgkuzm60xvujvqx8tpdft8gtd2eghqrk2cusrn6eqrpct", "name": "Rewards", "threshold": 10}]}]}',
     )
 
     STATSD_EXPORTER_INGEST_PORT = int(getenv("STATSD_EXPORTER_INGEST_PORT", "9125"))
