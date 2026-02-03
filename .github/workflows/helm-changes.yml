@@ -17,6 +17,8 @@ permissions:
   pull-requests: read
   contents: read
   deployments: write
+  issues: write
+
 
 jobs:
   changed-files:
