@@ -105,6 +105,26 @@ def get_latest_prices(resource_addresses: List[str]) -> List[LatestTokenPrice]:
         return latest_prices
 
 
+class LedgerTokenPriceLatest(Base):
+    __tablename__ = "ledger_token_prices_latest"
+    id = Column(Integer, primary_key=True)
+    resource_address = Column(String, unique=True)
+    usd_price = Column(Float)
+    last_updated_at = Column(DateTime)
+
+
+def get_ledger_latest_prices(resource_addresses: List[str]) -> List[LedgerTokenPriceLatest]:
+    with Session(get_engine()) as session:
+        latest_prices = (
+            session.query(LedgerTokenPriceLatest)
+            .filter(LedgerTokenPriceLatest.resource_address.in_(resource_addresses))
+            .all()
+        )
+        for price in latest_prices:
+            price.usd_price = round(price.usd_price, 18)
+        return latest_prices
+
+
 class LsuPrice:
     resource_address: str
     xrd_redemption_value: float
