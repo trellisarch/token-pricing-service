@@ -5,7 +5,6 @@ from sqlalchemy import Column, String, DateTime, Integer
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.dialects.postgresql import DOUBLE_PRECISION, insert
 
-from radixdlt.lib.const import LEDGER_USD_POOL
 from radixdlt.lib.ledger import get_current_epoch, get_pool_price
 from radixdlt.models.base import get_session
 
@@ -38,10 +37,17 @@ class LedgerPriceFetcher:
             epoch = get_current_epoch()
             logging.info(f"Current epoch: {epoch}")
 
-            # Fetch XRD/hUSDC rate — get_price returns hUSDC per XRD
-            # Following notebook: husdc_per_xrd = get_price(hUSDC_pool)
+            # Fetch XRD/hUSDC rate from the C9 hUSDC pool in LEDGER_TOKENS
+            husdc_config = tokens.get("hUSDC")
+            if not husdc_config or not husdc_config["pools"]:
+                raise ValueError("hUSDC must be in LEDGER_TOKENS with at least one pool")
+            husdc_pool = next(
+                (p for p in husdc_config["pools"] if p["dex"] == "c9"),
+                husdc_config["pools"][0],
+            )
             husdc_per_xrd = get_pool_price(
-                LEDGER_USD_POOL["component"], LEDGER_USD_POOL["dex"], epoch,
+                husdc_pool["component"], husdc_pool["dex"], epoch,
+                husdc_pool["base"], husdc_pool["quote"],
             )
             logging.info(f"hUSDC per XRD: {husdc_per_xrd}")
 
@@ -50,7 +56,6 @@ class LedgerPriceFetcher:
                 pools = token_config["pools"]
 
                 if token_name == "XRD":
-                    # XRD price in hUSDC (USD proxy) is directly husdc_per_xrd
                     usd_price = float(husdc_per_xrd)
                     logging.info(f"XRD: usd_price={usd_price}")
                     cls._save_price(session, resource_address, usd_price, now)
@@ -62,20 +67,31 @@ class LedgerPriceFetcher:
                     continue
 
                 # Fetch price from each pool, log individually, then average
-                # get_price returns XRD per token (e.g. 1 FLOOP = 40988 XRD)
+                # get_pool_price returns XRD per token (normalized)
                 # USD price = xrd_per_token * husdc_per_xrd
                 pool_usd_prices = []
                 for pool in pools:
                     component = pool["component"]
                     dex = pool["dex"]
-                    logging.info(f"Fetching {token_name} from {dex} pool {component}")
-                    xrd_per_token = get_pool_price(component, dex, epoch)
-                    usd_price = xrd_per_token * husdc_per_xrd
-                    logging.info(
-                        f"{token_name} [{dex}]: xrd_per_token={xrd_per_token}, "
-                        f"usd_price={usd_price}"
-                    )
-                    pool_usd_prices.append(usd_price)
+                    base = pool["base"]
+                    quote = pool["quote"]
+                    logging.info(f"Fetching {token_name} from {dex} pool {component} ({base}/{quote})")
+                    try:
+                        xrd_per_token = get_pool_price(component, dex, epoch, base, quote)
+                        usd_price = xrd_per_token * husdc_per_xrd
+                        logging.info(
+                            f"{token_name} [{dex}]: xrd_per_token={xrd_per_token}, "
+                            f"usd_price={usd_price}"
+                        )
+                        pool_usd_prices.append(usd_price)
+                    except Exception as e:
+                        logging.error(
+                            f"Failed to fetch {token_name} from {dex} pool {component}: {e}"
+                        )
+
+                if not pool_usd_prices:
+                    logging.error(f"{token_name}: all pools failed, skipping")
+                    continue
 
                 avg_usd_price = float(
                     sum(pool_usd_prices) / len(pool_usd_prices)

@@ -6,25 +6,19 @@ services:
       context: .
     entrypoint: uvicorn app.main:app --workers 4 --host 0.0.0.0 --port 8000 --log-level info --reload
     environment:
+      DB_HOST: airflow-postgresql
+      DB_USER: postgres
       DB_PASSWORD: postgres
+      DB_NAME: dags
     ports:
       - 8000:8000
       - 5990:5990
     volumes:
       - ./app/:/app
-  postgres:
-    image: postgres:13
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
-    healthcheck:
-      test: ["CMD", "pg_isready", "-U", "postgres"]
-      interval: 10s
-      retries: 5
-      start_period: 5s
-    restart: always
-    volumes:
-      - ./sample_data/data_dump.sql:/docker-entrypoint-initdb.d/data_dump.sql
-    ports:
-      - 5432:5432
+    networks:
+      - airflow_network
+
+networks:
+  airflow_network:
+    external: true
+    name: airflow_default

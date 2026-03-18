@@ -64,13 +64,33 @@ def get_c9_price(component_address, epoch):
 def get_ociswap_price(component_address, epoch):
     manifest = f'CALL_METHOD\nAddress("{component_address}")\n"price_sqrt"\n;'
     data = preview_transaction(manifest, epoch)
-    price_sqrt = Decimal(data["receipt"]["output"][0]["programmatic_json"]["fields"][0]["value"])
+    output_json = data["receipt"]["output"][0]["programmatic_json"]
+
+    # Precision pools return PreciseDecimal directly at top level
+    # Basic pools return Enum with PreciseDecimal in fields[0]
+    if "fields" in output_json:
+        price_sqrt_str = output_json["fields"][0]["value"]
+    else:
+        price_sqrt_str = output_json["value"]
+
+    price_sqrt = Decimal(price_sqrt_str)
     price = price_sqrt ** 2
     logging.info(f"Ociswap pool {component_address} price_sqrt: {price_sqrt}, price: {price}")
     return price
 
 
-def get_pool_price(component_address, dex, epoch):
+def get_pool_price(component_address, dex, epoch, base, quote):
+    """Returns XRD per non-XRD token, regardless of pool base/quote arrangement.
+
+    If base is XRD, raw price is already XRD per token — returned as-is.
+    If quote is XRD (base is the token), raw price is tokens per XRD — return reciprocal.
+    """
     if dex == "ociswap":
-        return get_ociswap_price(component_address, epoch)
-    return get_c9_price(component_address, epoch)
+        raw_price = get_ociswap_price(component_address, epoch)
+    else:
+        raw_price = get_c9_price(component_address, epoch)
+
+    if base == "XRD":
+        return raw_price
+    else:
+        return Decimal(1) / raw_price

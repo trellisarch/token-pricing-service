@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Body, HTTPException, Depends, Header
 from app.config.config import Config
 from app.logger.log import get_logger
-from app.models.token_price import get_latest_prices, get_ledger_latest_prices, get_prices_closest_to_timestamp
+from app.models.token_price import get_latest_prices, get_ledger_latest_prices, get_ledger_prices_closest_to_timestamp, get_prices_closest_to_timestamp
 from app.schemas.token_price import (
     TokenPricesResponse,
     TokenPricesRequest,
@@ -125,6 +125,41 @@ async def get_historical_price(
         )
 
     prices = get_prices_closest_to_timestamp(data.tokens, data.timestamp)
+
+    missing_tokens = [
+        token for token in data.tokens if token not in prices or prices[token] is None
+    ]
+    if missing_tokens:
+        raise HTTPException(
+            status_code=424,
+            detail=f"Price missing for tokens: {', '.join(missing_tokens)}",
+        )
+
+    resp = {}
+    for token, price in prices.items():
+        resp[token] = HistoricalTokenPrice(
+            usd_price=price.usd_price,
+            last_updated_at=price.last_updated_at,
+        )
+    return HistoricalPriceResponse(prices=resp)
+
+
+@price_router.post("/ledger-historicalPrice", response_model=HistoricalPriceResponse)
+async def get_ledger_historical_price(
+    data: HistoricalPriceRequest = Body(...),
+    _: None = Depends(api_key_auth),
+):
+    """
+    Returns ledger price for each token at the time closest to the given timestamp.
+    """
+    if not data.tokens or not isinstance(data.tokens, list) or len(data.tokens) == 0:
+        raise HTTPException(status_code=400, detail="Token list must be provided.")
+    if not isinstance(data.timestamp, int):
+        raise HTTPException(
+            status_code=400, detail="Timestamp must be an integer (unix seconds)."
+        )
+
+    prices = get_ledger_prices_closest_to_timestamp(data.tokens, data.timestamp)
 
     missing_tokens = [
         token for token in data.tokens if token not in prices or prices[token] is None
