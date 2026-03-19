@@ -16,7 +16,6 @@ from app.logger.log import get_logger
 from app.models.base import Base, get_session, get_engine
 from app.models.token import Token
 
-
 logger = get_logger()
 
 
@@ -105,6 +104,64 @@ def get_latest_prices(resource_addresses: List[str]) -> List[LatestTokenPrice]:
         return latest_prices
 
 
+class LedgerTokenPrice(Base):
+    __tablename__ = "ledger_token_prices"
+    id = Column(Integer, primary_key=True)
+    resource_address = Column(String)
+    usd_price = Column(Float)
+    last_updated_at = Column(DateTime)
+
+
+class LedgerTokenPriceLatest(Base):
+    __tablename__ = "ledger_token_prices_latest"
+    id = Column(Integer, primary_key=True)
+    resource_address = Column(String, unique=True)
+    usd_price = Column(Float)
+    last_updated_at = Column(DateTime)
+
+
+def get_ledger_prices_closest_to_timestamp(resource_addresses: list, timestamp: int):
+    from datetime import datetime, timedelta
+
+    date = datetime.utcfromtimestamp(timestamp).date()
+    start_dt = datetime.combine(date - timedelta(days=1), datetime.min.time())
+    end_dt = datetime.combine(date + timedelta(days=1), datetime.max.time())
+
+    with Session(get_engine()) as session:
+        result = {}
+        for address in resource_addresses:
+            closest = (
+                session.query(LedgerTokenPrice)
+                .filter(LedgerTokenPrice.resource_address == address)
+                .filter(LedgerTokenPrice.last_updated_at > start_dt)
+                .filter(LedgerTokenPrice.last_updated_at < end_dt)
+                .order_by(
+                    func.abs(
+                        func.extract("epoch", LedgerTokenPrice.last_updated_at)
+                        - timestamp
+                    )
+                )
+                .first()
+            )
+            if closest:
+                result[address] = closest
+        return result
+
+
+def get_ledger_latest_prices(
+    resource_addresses: List[str],
+) -> List[LedgerTokenPriceLatest]:
+    with Session(get_engine()) as session:
+        latest_prices = (
+            session.query(LedgerTokenPriceLatest)
+            .filter(LedgerTokenPriceLatest.resource_address.in_(resource_addresses))
+            .all()
+        )
+        for price in latest_prices:
+            price.usd_price = round(price.usd_price, 18)
+        return latest_prices
+
+
 class LsuPrice:
     resource_address: str
     xrd_redemption_value: float
@@ -124,6 +181,16 @@ def get_latest_price(resource_address: str) -> float:
             session.query(TokenPrice)
             .filter_by(resource_address=resource_address)
             .order_by(TokenPrice.last_updated_at.desc())
+            .first()
+        )
+        return latest_price.usd_price
+
+
+def get_ledger_latest_price(resource_address: str) -> float:
+    with Session(get_engine()) as session:
+        latest_price = (
+            session.query(LedgerTokenPriceLatest)
+            .filter_by(resource_address=resource_address)
             .first()
         )
         return latest_price.usd_price

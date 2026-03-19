@@ -49,7 +49,7 @@ releases:
             repository: u2o0d2a1/bitnami-postgresql
             tag: 15.4.0-debian-11-r56
       - webserver:
-          args: ["bash", "-c", "pip install airflow-exporter; exec airflow webserver"]
+          args: ["bash", "-c", "exec airflow webserver"]
       - environments/{{ .Environment.Name }}/statsd-override-mappings.yaml.gotmpl
       - environments/{{ .Environment.Name }}/values.yaml.gotmpl
       - environments/{{ .Environment.Name }}/secrets.yaml.gotmpl

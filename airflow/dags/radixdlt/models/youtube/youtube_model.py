@@ -53,15 +53,13 @@ class YoutubeData(Base):
             header: value for header, value in zip(headers, response["rows"][0])
         }
 
-        logging.info(
-            f"""views: {data_dict['views']}, 
+        logging.info(f"""views: {data_dict['views']}, 
                 averageViewDuration: {data_dict['averageViewDuration']}, 
                 subscribersGained: {data_dict['subscribersGained']}, 
                 subscribersLost: {data_dict['subscribersLost']}, 
                 estimatedMinutesWatched: {data_dict['estimatedMinutesWatched']},
                 annotationImpressions: {data_dict['annotationImpressions']},
-                averageViewPercentage: {data_dict['averageViewPercentage']}"""
-        )
+                averageViewPercentage: {data_dict['averageViewPercentage']}""")
 
         try:
             with get_session() as session:

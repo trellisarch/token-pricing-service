@@ -4,7 +4,6 @@ from datetime import datetime, timedelta
 from radixdlt.config.config import Config
 from radixdlt.models.coingecko_api.token_prices import CoinGeckoTokenData
 
-
 logging.basicConfig(level=logging.INFO)
 
 default_args = {

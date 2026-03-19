@@ -42,15 +42,13 @@ class RedditSubredditData(Base):
             total_pageviews = 0
             subscribers = 0
 
-        logging.info(
-            f"""user: {account},
+        logging.info(f"""user: {account},
                 subscribers_count: {subscribers_count}, 
                 active_user_count: {active_user_count},
                 unique_pageviews: {unique_pageviews},
                 total_pageviews: {total_pageviews},
                 subscribers: {subscribers}
-            """
-        )
+            """)
 
         try:
             session = get_session()

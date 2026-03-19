@@ -36,13 +36,11 @@ class TelegramData(Base):
         left_users_total = combot_data.get("left_users_total")
         active_users_total = combot_data.get("active_users_total")
 
-        logging.info(
-            f"""Member Count: {members_total}, 
+        logging.info(f"""Member Count: {members_total}, 
                 Messages Total: {messages_total}, 
                 New Users Total: {new_users_total}, 
                 Left Users Total: {left_users_total}, 
-                Active Users Total: {active_users_total}"""
-        )
+                Active Users Total: {active_users_total}""")
 
         try:
             with get_session() as session:

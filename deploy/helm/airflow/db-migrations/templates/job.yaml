@@ -2,6 +2,9 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: radixdlt-db-migrations
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation
 spec:
   backoffLimit: 2
   template:
@@ -13,9 +16,13 @@ spec:
         image: "{{ .Values.image.repo }}:{{ .Values.image.tag }}"
         env:
           - name: DB_URI
+            {{- if .Values.dbUri }}
+            value: {{ .Values.dbUri | quote }}
+            {{- else }}
             valueFrom:
               secretKeyRef:
                 name: dags-db-connection-string
                 key: dags_db_connection_string
+            {{- end }}
         imagePullPolicy: IfNotPresent
       restartPolicy: Never

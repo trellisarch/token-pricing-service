@@ -20,8 +20,7 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    op.execute(
-        """
+    op.execute("""
         CREATE MATERIALIZED VIEW latest_token_prices AS
         SELECT
             tp.id,
@@ -43,8 +42,7 @@ def upgrade() -> None:
         JOIN radix_tokens t ON tp.resource_address = t.resource_address
                     WHERE
                         t.allowlist = TRUE;
-        """
-    )
+        """)
 
 
 def downgrade() -> None:

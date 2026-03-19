@@ -4,7 +4,6 @@ from time import sleep
 import pandas as pd
 import requests
 
-
 if __name__ == "__main__":
     prices = []
     pairs = "BTC/XRD,ETH/XRD,USDT/XRD,USDC/XRD".split(",")

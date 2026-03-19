@@ -24,11 +24,9 @@ class TwitterData(Base):
         friends_count = api_response.friends_count
         statuses_count = api_response.statuses_count
 
-        logging.info(
-            f"""Followers Count: {followers_count}, 
+        logging.info(f"""Followers Count: {followers_count}, 
                 Friends Count: {friends_count}, 
-                Statuses Count: {statuses_count}"""
-        )
+                Statuses Count: {statuses_count}""")
 
         try:
             session = get_session()

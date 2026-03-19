@@ -65,8 +65,7 @@ class GithubRepositoriesData(Base):
             views_traffic = 0
             views_traffic_unique = 0
 
-        logging.info(
-            f"""commits:{commits},
+        logging.info(f"""commits:{commits},
                 branches:{branches},
                 pr_all:{pr_all},
                 pr_open:{pr_open},
@@ -83,8 +82,7 @@ class GithubRepositoriesData(Base):
                 clones_traffic_unique:{clones_traffic_unique},
                 views_traffic:{views_traffic},
                 views_traffic_unique:{views_traffic_unique},
-                """
-        )
+                """)
 
         try:
             session = get_session()

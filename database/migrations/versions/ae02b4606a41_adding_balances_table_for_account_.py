@@ -5,6 +5,7 @@ Revises: 70dce8c50c36
 Create Date: 2026-01-30 17:07:26.539894
 
 """
+
 from typing import Sequence, Union
 
 from alembic import op
@@ -12,8 +13,8 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = 'ae02b4606a41'
-down_revision: Union[str, None] = '70dce8c50c36'
+revision: str = "ae02b4606a41"
+down_revision: Union[str, None] = "70dce8c50c36"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 

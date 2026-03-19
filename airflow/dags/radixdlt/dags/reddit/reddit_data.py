@@ -7,7 +7,6 @@ from radixdlt.config.config import Config
 from radixdlt.models.reddit.reddit_redditor_model import RedditRedditorData
 from radixdlt.models.reddit.reddit_subreddit_model import RedditSubredditData
 
-
 # DAG configuration
 default_args = {
     "owner": "airflow",

@@ -26,12 +26,10 @@ class GithubAccountsData(Base):
         gists_total = api_response.get_gists().totalCount
         following_total = api_response.get_following().totalCount
 
-        logging.info(
-            f"""public_repos_total: {public_repos_total}, 
+        logging.info(f"""public_repos_total: {public_repos_total}, 
                 followers_total: {followers_total}, 
                 gists_total: {gists_total}, 
-                following_total: {following_total}"""
-        )
+                following_total: {following_total}""")
 
         try:
             session = get_session()

@@ -1,13 +1,13 @@
 import requests
 from app.config.config import Config
 from app.logger.log import get_logger
-from app.models.token_price import LsuPrice, get_latest_price
+from app.models.token_price import LsuPrice, get_latest_price, get_ledger_latest_price
 from app.utils.request import get_headers
 
 logger = get_logger()
 
 
-def get_lsu_redemption_values(addresses=[]):
+def get_lsu_redemption_values(addresses=[], use_ledger=False):
     lsu_redemption_values = {}
 
     chunks = [addresses[i : i + 20] for i in range(0, len(addresses), 20)]
@@ -101,7 +101,10 @@ def get_lsu_redemption_values(addresses=[]):
             )
             return {}
     logger.info("Getting the latest XRD price")
-    xrd_price = get_latest_price(Config.XRD_RESOURCE_ADDRESS)
+    if use_ledger:
+        xrd_price = get_ledger_latest_price(Config.XRD_RESOURCE_ADDRESS)
+    else:
+        xrd_price = get_latest_price(Config.XRD_RESOURCE_ADDRESS)
     logger.info(f"Latest XRD price: {xrd_price}")
     logger.info(f"LSUs redemption values: {lsu_redemption_values}")
     return [
