@@ -13,9 +13,13 @@ spec:
         image: "{{ .Values.image.repo }}:{{ .Values.image.tag }}"
         env:
           - name: DB_URI
+            {{- if .Values.dbUri }}
+            value: {{ .Values.dbUri | quote }}
+            {{- else }}
             valueFrom:
               secretKeyRef:
                 name: dags-db-connection-string
                 key: dags_db_connection_string
+            {{- end }}
         imagePullPolicy: IfNotPresent
       restartPolicy: Never
