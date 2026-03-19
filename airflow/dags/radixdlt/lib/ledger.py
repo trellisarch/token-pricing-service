@@ -74,8 +74,10 @@ def get_ociswap_price(component_address, epoch):
         price_sqrt_str = output_json["value"]
 
     price_sqrt = Decimal(price_sqrt_str)
-    price = price_sqrt ** 2
-    logging.info(f"Ociswap pool {component_address} price_sqrt: {price_sqrt}, price: {price}")
+    price = price_sqrt**2
+    logging.info(
+        f"Ociswap pool {component_address} price_sqrt: {price_sqrt}, price: {price}"
+    )
     return price
 
 

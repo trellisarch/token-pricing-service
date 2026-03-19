@@ -1,7 +1,12 @@
 from fastapi import APIRouter, Body, HTTPException, Depends, Header
 from app.config.config import Config
 from app.logger.log import get_logger
-from app.models.token_price import get_latest_prices, get_ledger_latest_prices, get_ledger_prices_closest_to_timestamp, get_prices_closest_to_timestamp
+from app.models.token_price import (
+    get_latest_prices,
+    get_ledger_latest_prices,
+    get_ledger_prices_closest_to_timestamp,
+    get_prices_closest_to_timestamp,
+)
 from app.schemas.token_price import (
     TokenPricesResponse,
     TokenPricesRequest,

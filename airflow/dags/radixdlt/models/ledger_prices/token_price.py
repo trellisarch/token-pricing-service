@@ -40,14 +40,19 @@ class LedgerPriceFetcher:
             # Fetch XRD/hUSDC rate from the C9 hUSDC pool in LEDGER_TOKENS
             husdc_config = tokens.get("hUSDC")
             if not husdc_config or not husdc_config["pools"]:
-                raise ValueError("hUSDC must be in LEDGER_TOKENS with at least one pool")
+                raise ValueError(
+                    "hUSDC must be in LEDGER_TOKENS with at least one pool"
+                )
             husdc_pool = next(
                 (p for p in husdc_config["pools"] if p["dex"] == "c9"),
                 husdc_config["pools"][0],
             )
             husdc_per_xrd = get_pool_price(
-                husdc_pool["component"], husdc_pool["dex"], epoch,
-                husdc_pool["base"], husdc_pool["quote"],
+                husdc_pool["component"],
+                husdc_pool["dex"],
+                epoch,
+                husdc_pool["base"],
+                husdc_pool["quote"],
             )
             logging.info(f"hUSDC per XRD: {husdc_per_xrd}")
 
@@ -75,9 +80,13 @@ class LedgerPriceFetcher:
                     dex = pool["dex"]
                     base = pool["base"]
                     quote = pool["quote"]
-                    logging.info(f"Fetching {token_name} from {dex} pool {component} ({base}/{quote})")
+                    logging.info(
+                        f"Fetching {token_name} from {dex} pool {component} ({base}/{quote})"
+                    )
                     try:
-                        xrd_per_token = get_pool_price(component, dex, epoch, base, quote)
+                        xrd_per_token = get_pool_price(
+                            component, dex, epoch, base, quote
+                        )
                         usd_price = xrd_per_token * husdc_per_xrd
                         logging.info(
                             f"{token_name} [{dex}]: xrd_per_token={xrd_per_token}, "
@@ -93,9 +102,7 @@ class LedgerPriceFetcher:
                     logging.error(f"{token_name}: all pools failed, skipping")
                     continue
 
-                avg_usd_price = float(
-                    sum(pool_usd_prices) / len(pool_usd_prices)
-                )
+                avg_usd_price = float(sum(pool_usd_prices) / len(pool_usd_prices))
                 logging.info(
                     f"{token_name}: avg_usd_price={avg_usd_price} "
                     f"(from {len(pool_usd_prices)} pools)"

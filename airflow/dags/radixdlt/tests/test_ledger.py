@@ -10,6 +10,7 @@ from radixdlt.lib.ledger import get_pool_price, get_ociswap_price
 # get_pool_price: base/quote normalization
 # ---------------------------------------------------------------------------
 
+
 @patch("radixdlt.lib.ledger.get_c9_price")
 def test_get_pool_price_c9_xrd_base(mock_c9):
     """When XRD is the base token, raw price is XRD per token — returned as-is."""
@@ -65,6 +66,7 @@ def test_xrd_base_and_quote_give_same_xrd_per_token(mock_c9):
 # ---------------------------------------------------------------------------
 # get_ociswap_price: basic pool vs precision pool response parsing
 # ---------------------------------------------------------------------------
+
 
 @patch("radixdlt.lib.ledger.preview_transaction")
 def test_ociswap_basic_pool_response(mock_preview):
@@ -124,14 +126,29 @@ MOCK_TOKENS = {
     "FLOOP": {
         "resource_address": "resource_floop",
         "pools": [
-            {"component": "comp_c9_floop", "dex": "c9", "base": "XRD", "quote": "FLOOP"},
-            {"component": "comp_oci_floop", "dex": "ociswap", "base": "XRD", "quote": "FLOOP"},
+            {
+                "component": "comp_c9_floop",
+                "dex": "c9",
+                "base": "XRD",
+                "quote": "FLOOP",
+            },
+            {
+                "component": "comp_oci_floop",
+                "dex": "ociswap",
+                "base": "XRD",
+                "quote": "FLOOP",
+            },
         ],
     },
     "hUSDC": {
         "resource_address": "resource_husdc",
         "pools": [
-            {"component": "comp_c9_husdc", "dex": "c9", "base": "XRD", "quote": "hUSDC"},
+            {
+                "component": "comp_c9_husdc",
+                "dex": "c9",
+                "base": "XRD",
+                "quote": "hUSDC",
+            },
         ],
     },
 }
@@ -140,7 +157,9 @@ MOCK_TOKENS = {
 @patch("radixdlt.models.ledger_prices.token_price.get_session")
 @patch("radixdlt.models.ledger_prices.token_price.get_pool_price")
 @patch("radixdlt.models.ledger_prices.token_price.get_current_epoch")
-def test_fetch_and_save_prices_usd_conversion(mock_epoch, mock_pool_price, mock_session):
+def test_fetch_and_save_prices_usd_conversion(
+    mock_epoch, mock_pool_price, mock_session
+):
     """Verify USD conversion: usd_price = xrd_per_token * husdc_per_xrd."""
     from radixdlt.models.ledger_prices.token_price import LedgerPriceFetcher
 
@@ -189,7 +208,9 @@ def test_fetch_and_save_prices_usd_conversion(mock_epoch, mock_pool_price, mock_
 @patch("radixdlt.models.ledger_prices.token_price.get_session")
 @patch("radixdlt.models.ledger_prices.token_price.get_pool_price")
 @patch("radixdlt.models.ledger_prices.token_price.get_current_epoch")
-def test_fetch_and_save_prices_pool_failure_skips_token(mock_epoch, mock_pool_price, mock_session):
+def test_fetch_and_save_prices_pool_failure_skips_token(
+    mock_epoch, mock_pool_price, mock_session
+):
     """When all pools fail for a token, that token is skipped but others still saved."""
     from radixdlt.models.ledger_prices.token_price import LedgerPriceFetcher
 
@@ -219,7 +240,9 @@ def test_fetch_and_save_prices_pool_failure_skips_token(mock_epoch, mock_pool_pr
 @patch("radixdlt.models.ledger_prices.token_price.get_session")
 @patch("radixdlt.models.ledger_prices.token_price.get_pool_price")
 @patch("radixdlt.models.ledger_prices.token_price.get_current_epoch")
-def test_fetch_and_save_prices_partial_pool_failure(mock_epoch, mock_pool_price, mock_session):
+def test_fetch_and_save_prices_partial_pool_failure(
+    mock_epoch, mock_pool_price, mock_session
+):
     """When one pool fails but another succeeds, uses the successful pool's price."""
     from radixdlt.models.ledger_prices.token_price import LedgerPriceFetcher
 
@@ -255,7 +278,9 @@ def test_fetch_and_save_prices_partial_pool_failure(mock_epoch, mock_pool_price,
 @patch("radixdlt.models.ledger_prices.token_price.get_session")
 @patch("radixdlt.models.ledger_prices.token_price.get_pool_price")
 @patch("radixdlt.models.ledger_prices.token_price.get_current_epoch")
-def test_fetch_and_save_prices_prefers_c9_for_husdc(mock_epoch, mock_pool_price, mock_session):
+def test_fetch_and_save_prices_prefers_c9_for_husdc(
+    mock_epoch, mock_pool_price, mock_session
+):
     """Fetcher picks the C9 pool for the hUSDC rate even if ociswap is listed first."""
     from radixdlt.models.ledger_prices.token_price import LedgerPriceFetcher
 
@@ -268,8 +293,18 @@ def test_fetch_and_save_prices_prefers_c9_for_husdc(mock_epoch, mock_pool_price,
         "hUSDC": {
             "resource_address": "resource_husdc",
             "pools": [
-                {"component": "comp_oci_husdc", "dex": "ociswap", "base": "XRD", "quote": "hUSDC"},
-                {"component": "comp_c9_husdc", "dex": "c9", "base": "XRD", "quote": "hUSDC"},
+                {
+                    "component": "comp_oci_husdc",
+                    "dex": "ociswap",
+                    "base": "XRD",
+                    "quote": "hUSDC",
+                },
+                {
+                    "component": "comp_c9_husdc",
+                    "dex": "c9",
+                    "base": "XRD",
+                    "quote": "hUSDC",
+                },
             ],
         },
     }

@@ -138,7 +138,8 @@ def get_ledger_prices_closest_to_timestamp(resource_addresses: list, timestamp: 
                 .filter(LedgerTokenPrice.last_updated_at < end_dt)
                 .order_by(
                     func.abs(
-                        func.extract("epoch", LedgerTokenPrice.last_updated_at) - timestamp
+                        func.extract("epoch", LedgerTokenPrice.last_updated_at)
+                        - timestamp
                     )
                 )
                 .first()
@@ -148,7 +149,9 @@ def get_ledger_prices_closest_to_timestamp(resource_addresses: list, timestamp: 
         return result
 
 
-def get_ledger_latest_prices(resource_addresses: List[str]) -> List[LedgerTokenPriceLatest]:
+def get_ledger_latest_prices(
+    resource_addresses: List[str],
+) -> List[LedgerTokenPriceLatest]:
     with Session(get_engine()) as session:
         latest_prices = (
             session.query(LedgerTokenPriceLatest)
