@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+from decimal import Decimal
 
 from sqlalchemy import Column, String, DateTime, Integer
 from sqlalchemy.ext.declarative import declarative_base
@@ -47,13 +48,14 @@ class LedgerPriceFetcher:
                 (p for p in husdc_config["pools"] if p["dex"] == "c9"),
                 husdc_config["pools"][0],
             )
-            husdc_per_xrd = get_pool_price(
+            xrd_per_husdc = get_pool_price(
                 husdc_pool["component"],
                 husdc_pool["dex"],
                 epoch,
                 husdc_pool["base"],
                 husdc_pool["quote"],
             )
+            husdc_per_xrd = Decimal(1) / xrd_per_husdc
             logging.info(f"hUSDC per XRD: {husdc_per_xrd}")
 
             for token_name, token_config in tokens.items():
@@ -73,7 +75,7 @@ class LedgerPriceFetcher:
 
                 # Fetch price from each pool, log individually, then average
                 # get_pool_price returns XRD per token (normalized)
-                # USD price = xrd_per_token * husdc_per_xrd
+                # hUSDC price = xrd_per_token * husdc_per_xrd
                 pool_usd_prices = []
                 for pool in pools:
                     component = pool["component"]

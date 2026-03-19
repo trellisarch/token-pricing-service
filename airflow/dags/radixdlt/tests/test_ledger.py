@@ -159,20 +159,21 @@ MOCK_TOKENS = {
 def test_fetch_and_save_prices_usd_conversion(
     mock_epoch, mock_pool_price, mock_session
 ):
-    """Verify USD conversion: usd_price = xrd_per_token * husdc_per_xrd."""
+    """Verify hUSDC conversion: usd_price = xrd_per_token * (1 / xrd_per_husdc)."""
     from radixdlt.models.ledger_prices.token_price import LedgerPriceFetcher
 
     mock_epoch.return_value = 100
     session = MagicMock()
     mock_session.return_value = session
 
-    husdc_per_xrd = Decimal("0.00185")
+    xrd_per_husdc = Decimal("540")
+    husdc_per_xrd = Decimal(1) / xrd_per_husdc
     floop_c9_xrd = Decimal("40988")
     floop_oci_xrd = Decimal("41076")
 
     def pool_price_side_effect(component, dex, epoch, base, quote):
         if component == "comp_c9_husdc":
-            return husdc_per_xrd
+            return xrd_per_husdc
         if component == "comp_c9_floop":
             return floop_c9_xrd
         if component == "comp_oci_floop":
@@ -188,13 +189,13 @@ def test_fetch_and_save_prices_usd_conversion(
         obj = c[0][0]
         saved[obj.resource_address] = obj.usd_price
 
-    # XRD price = husdc_per_xrd
-    assert saved["resource_xrd"] == float(husdc_per_xrd)
+    # XRD price = husdc_per_xrd = 1/540
+    assert saved["resource_xrd"] == pytest.approx(float(husdc_per_xrd), rel=1e-6)
 
     # hUSDC price = 1.0
     assert saved["resource_husdc"] == 1.0
 
-    # FLOOP price = average of (c9_xrd * husdc) and (oci_xrd * husdc)
+    # FLOOP price = average of (c9_xrd * husdc_per_xrd) and (oci_xrd * husdc_per_xrd)
     expected_c9 = floop_c9_xrd * husdc_per_xrd
     expected_oci = floop_oci_xrd * husdc_per_xrd
     expected_avg = float((expected_c9 + expected_oci) / 2)
@@ -219,7 +220,7 @@ def test_fetch_and_save_prices_pool_failure_skips_token(
 
     def pool_price_side_effect(component, dex, epoch, base, quote):
         if component == "comp_c9_husdc":
-            return Decimal("0.00185")
+            return Decimal("540")
         # All FLOOP pools fail
         raise Exception("Gateway error")
 
@@ -249,12 +250,13 @@ def test_fetch_and_save_prices_partial_pool_failure(
     session = MagicMock()
     mock_session.return_value = session
 
-    husdc_per_xrd = Decimal("0.00185")
+    xrd_per_husdc = Decimal("540")
+    husdc_per_xrd = Decimal(1) / xrd_per_husdc
     floop_c9_xrd = Decimal("40988")
 
     def pool_price_side_effect(component, dex, epoch, base, quote):
         if component == "comp_c9_husdc":
-            return husdc_per_xrd
+            return xrd_per_husdc
         if component == "comp_c9_floop":
             return floop_c9_xrd
         if component == "comp_oci_floop":
@@ -310,9 +312,9 @@ def test_fetch_and_save_prices_prefers_c9_for_husdc(
 
     def pool_price_side_effect(component, dex, epoch, base, quote):
         if component == "comp_c9_husdc":
-            return Decimal("0.00185")
+            return Decimal("540")  # xrd_per_husdc
         if component == "comp_oci_husdc":
-            return Decimal("0.00190")
+            return Decimal("526")  # xrd_per_husdc (different rate)
 
     mock_pool_price.side_effect = pool_price_side_effect
 
@@ -323,8 +325,9 @@ def test_fetch_and_save_prices_prefers_c9_for_husdc(
         obj = c[0][0]
         saved[obj.resource_address] = obj.usd_price
 
-    # Should use C9 price (0.00185), not ociswap (0.00190)
-    assert saved["resource_xrd"] == float(Decimal("0.00185"))
+    # Should use C9 price (1/540), not ociswap (1/526)
+    expected = float(Decimal(1) / Decimal("540"))
+    assert saved["resource_xrd"] == pytest.approx(expected, rel=1e-6)
 
 
 @patch("radixdlt.models.ledger_prices.token_price.get_session")
