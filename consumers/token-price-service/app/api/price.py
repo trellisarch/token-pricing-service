@@ -91,7 +91,7 @@ async def get_ledger_tokens_prices(data: TokenPricesRequest = Body(...)):
     token_prices.extend(get_ledger_latest_prices(tokens))
 
     if len(lsus) > 0:
-        lsus_prices = get_lsu_redemption_values(addresses=lsus)
+        lsus_prices = get_lsu_redemption_values(addresses=lsus, use_ledger=True)
     else:
         lsus_prices = []
 

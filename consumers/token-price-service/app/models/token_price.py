@@ -186,6 +186,16 @@ def get_latest_price(resource_address: str) -> float:
         return latest_price.usd_price
 
 
+def get_ledger_latest_price(resource_address: str) -> float:
+    with Session(get_engine()) as session:
+        latest_price = (
+            session.query(LedgerTokenPriceLatest)
+            .filter_by(resource_address=resource_address)
+            .first()
+        )
+        return latest_price.usd_price
+
+
 def get_whitelisted_tokens():
     with Session(get_engine()) as session:
         latest_prices = {}
