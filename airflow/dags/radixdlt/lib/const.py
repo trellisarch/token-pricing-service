@@ -62,8 +62,8 @@ LEDGER_TOKENS = {
             {
                 "component": "component_rdx1cqjd5w6t5rr3zq0kc0ewpe2gy4f9vnqrq0fz3594ta7x9d04t2ttpk",
                 "dex": "ociswap",
-                "base": "XRD",
-                "quote": "MOX",
+                "base": "MOX",
+                "quote": "XRD",
                 "package_address": "package_rdx1p5l6dp3slnh9ycd7gk700czwlck9tujn0zpdnd0efw09n2zdnn0lzx",
                 "blueprint_name": "BasicPool",
             }
@@ -182,16 +182,16 @@ LEDGER_TOKENS = {
             {
                 "component": "component_rdx1cz79xc57dpuhzd3wylnc88m3pyvfk7c5e03me2qv7x8wh9t6c3aw4g",
                 "dex": "ociswap",
-                "base": "XRD",
-                "quote": "xUSDT",
+                "base": "xUSDT",
+                "quote": "XRD",
                 "package_address": "package_rdx1pkrgvskdkglfd2ar4jkpw5r2tsptk85gap4hzr9h3qxw6ca40ts8dt",
                 "blueprint_name": "PrecisionPool",
             },
             {
                 "component": "component_rdx1cqs338cyje65rk44zgmjvvy42qcszrhk9ewznedtkqd8l3crtgnmh5",
                 "dex": "c9",
-                "base": "XRD",
-                "quote": "xUSDT",
+                "base": "xUSDT",
+                "quote": "XRD",
                 "package_address": "package_rdx1p4r9rkp0cq67wmlve544zgy0l45mswn6h798qdqm47x4762h383wa3",
                 "blueprint_name": "QuantaSwap",
             },
@@ -211,8 +211,8 @@ LEDGER_TOKENS = {
             {
                 "component": "component_rdx1cr6lxkr83gzhmyg4uxg49wkug5s4wwc3c7cgmhxuczxraa09a97wcu",
                 "dex": "c9",
-                "base": "XRD",
-                "quote": "xUSDC",
+                "base": "xUSDC",
+                "quote": "XRD",
                 "package_address": "package_rdx1p4r9rkp0cq67wmlve544zgy0l45mswn6h798qdqm47x4762h383wa3",
                 "blueprint_name": "QuantaSwap",
             },
@@ -237,8 +237,8 @@ LEDGER_TOKENS = {
             {
                 "component": "component_rdx1czfjhhkhtu0mkjd40vrd6mf3ef2thgf9l7mq5ryktu3ae3vu7tpmzn",
                 "dex": "ociswap",
-                "base": "XRD",
-                "quote": "DAN",
+                "base": "DAN",
+                "quote": "XRD",
                 "package_address": "package_rdx1p5l6dp3slnh9ycd7gk700czwlck9tujn0zpdnd0efw09n2zdnn0lzx",
                 "blueprint_name": "BasicPool",
             }
@@ -289,16 +289,16 @@ LEDGER_TOKENS = {
             {
                 "component": "component_rdx1czy2naejcqx8gv46zdsex2syuxrs4jnqzug58e66zr8wglxzvu97qr",
                 "dex": "ociswap",
-                "base": "XRD",
-                "quote": "hUSDC",
+                "base": "hUSDC",
+                "quote": "XRD",
                 "package_address": "package_rdx1pkl8tdw43xqx64etxwdf8rjtvptqurq4c3fky0kaj6vwa0zrkfmcmc",
                 "blueprint_name": "PrecisionPool",
             },
             {
                 "component": "component_rdx1cqelumvmmgwths34k9pp0htd2ykwq7d70m0r389etwh39ul3j5tyj5",
                 "dex": "c9",
-                "base": "XRD",
-                "quote": "hUSDC",
+                "base": "hUSDC",
+                "quote": "XRD",
                 "package_address": "package_rdx1p4r9rkp0cq67wmlve544zgy0l45mswn6h798qdqm47x4762h383wa3",
                 "blueprint_name": "QuantaSwap",
             },
@@ -310,8 +310,8 @@ LEDGER_TOKENS = {
             {
                 "component": "component_rdx1czykap0neh96zhjr26a0jwce7wqa4w75tdu6aavqs92dtnztu4kuvw",
                 "dex": "ociswap",
-                "base": "XRD",
-                "quote": "cassie",
+                "base": "cassie",
+                "quote": "XRD",
                 "package_address": "package_rdx1p5l6dp3slnh9ycd7gk700czwlck9tujn0zpdnd0efw09n2zdnn0lzx",
                 "blueprint_name": "BasicPool",
             }
@@ -323,8 +323,8 @@ LEDGER_TOKENS = {
             {
                 "component": "component_rdx1czzh0zy3fk6vtgjyhurhqfq6dek7qzgw68v30s62v3krrexkkau7d4",
                 "dex": "ociswap",
-                "base": "XRD",
-                "quote": "JWLXRD",
+                "base": "JWLXRD",
+                "quote": "XRD",
                 "package_address": "package_rdx1pkl8tdw43xqx64etxwdf8rjtvptqurq4c3fky0kaj6vwa0zrkfmcmc",
                 "blueprint_name": "PrecisionPool",
             }
@@ -396,8 +396,8 @@ LEDGER_TOKENS = {
             {
                 "component": "component_rdx1crumqsy0nu4pl3fwah3nkf8eg8qhltxenk83wh9tzlmr5jnsqs3x4c",
                 "dex": "ociswap",
-                "base": "XRD",
-                "quote": "hETH",
+                "base": "hETH",
+                "quote": "XRD",
                 "package_address": "package_rdx1pkl8tdw43xqx64etxwdf8rjtvptqurq4c3fky0kaj6vwa0zrkfmcmc",
                 "blueprint_name": "PrecisionPool",
             },
