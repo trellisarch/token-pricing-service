@@ -3,9 +3,9 @@ from decimal import Decimal
 
 import requests
 
-from radixdlt.config.config import Config
-
 HEADERS = {"Content-Type": "application/json"}
+
+MAINNET_GATEWAY = "https://mainnet.radixdlt.com"
 
 PREVIEW_FLAGS = {
     "use_free_credit": True,
@@ -24,7 +24,7 @@ SIGNER_PUBLIC_KEYS = [
 
 def get_current_epoch():
     response = requests.post(
-        url=f"{Config.NETWORK_GATEWAY}/status/gateway-status",
+        url=f"{MAINNET_GATEWAY}/status/gateway-status",
         headers=HEADERS,
         json={},
         timeout=10,
@@ -44,7 +44,7 @@ def preview_transaction(manifest, epoch):
         "flags": PREVIEW_FLAGS,
     }
     response = requests.post(
-        url=f"{Config.NETWORK_GATEWAY}/transaction/preview",
+        url=f"{MAINNET_GATEWAY}/transaction/preview",
         headers=HEADERS,
         json=payload,
         timeout=10,
