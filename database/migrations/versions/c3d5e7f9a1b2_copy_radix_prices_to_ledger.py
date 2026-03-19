@@ -18,16 +18,14 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    op.execute(
-        """
+    op.execute("""
         INSERT INTO ledger_token_prices (resource_address, usd_price, last_updated_at)
         SELECT resource_address, usd_price, last_updated_at
         FROM radix_token_prices
         WHERE resource_address IS NOT NULL
           AND usd_price IS NOT NULL
         ORDER BY last_updated_at
-    """
-    )
+    """)
 
 
 def downgrade() -> None:

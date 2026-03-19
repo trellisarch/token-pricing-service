@@ -5,7 +5,6 @@ import pytest
 
 from radixdlt.lib.ledger import get_pool_price, get_ociswap_price
 
-
 # ---------------------------------------------------------------------------
 # get_pool_price: base/quote normalization
 # ---------------------------------------------------------------------------

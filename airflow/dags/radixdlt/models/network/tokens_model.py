@@ -5,7 +5,6 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.exc import SQLAlchemyError
 from radixdlt.models.base import get_session
 
-
 Base = declarative_base()
 
 
@@ -98,8 +97,7 @@ class TokensData(Base):
         except Exception as traffic_error:
             logging.error(f"Could not retrieve traffic information: {traffic_error}")
 
-        logging.info(
-            f"""
+        logging.info(f"""
                 token_id: {token_id},
                 symbol: {symbol},
                 token_market_cap_usd: {market_cap_usd},
@@ -124,8 +122,7 @@ class TokensData(Base):
                 high_24h: {high_24h}, 
                 low_24h: {low_24h}, 
                 circulating_supply: {circulating_supply},
-            """
-        )
+            """)
 
         try:
             session = get_session()

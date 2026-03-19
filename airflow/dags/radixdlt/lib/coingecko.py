@@ -5,7 +5,6 @@ import requests
 from radixdlt.config.config import Config
 from radixdlt.lib.price_provider import BasePriceProvider
 
-
 COIN_DICT = {
     "defiplaza": "$DFP2",
     "hug": "$HUG",

@@ -5,7 +5,6 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.exc import SQLAlchemyError
 from radixdlt.models.base import get_session
 
-
 Base = declarative_base()
 
 

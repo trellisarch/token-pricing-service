@@ -6,7 +6,6 @@ import requests
 from radixdlt.config.config import Config
 from radixdlt.models.telegram.telegram_model import TelegramData
 
-
 # DAG configuration
 default_args = {
     "owner": "airflow",

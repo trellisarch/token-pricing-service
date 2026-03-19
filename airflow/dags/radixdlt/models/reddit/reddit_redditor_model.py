@@ -26,13 +26,11 @@ class RedditRedditorData(Base):
         total_karma = comment_karma + link_karma
         trophy_count = len([trophy.name for trophy in api_response.trophies()])
 
-        logging.info(
-            f"""user: {account},
+        logging.info(f"""user: {account},
                      comment_karma: {comment_karma}, 
                      link_karma: {link_karma}, 
                      total_karma: {total_karma},
-                     trophy_count: {trophy_count}"""
-        )
+                     trophy_count: {trophy_count}""")
 
         try:
             session = get_session()

@@ -16,7 +16,6 @@ from app.logger.log import get_logger
 from app.models.base import Base, get_session, get_engine
 from app.models.token import Token
 
-
 logger = get_logger()
 
 

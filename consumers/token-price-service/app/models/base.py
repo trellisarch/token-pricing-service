@@ -2,7 +2,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 from app.config.config import Config
 
-
 engine = create_engine(
     url=Config.DB_URI,
     pool_size=0,

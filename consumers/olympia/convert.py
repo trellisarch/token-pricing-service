@@ -10,7 +10,6 @@ from radix_engine_toolkit import (
 )
 import pandas as pd
 
-
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 

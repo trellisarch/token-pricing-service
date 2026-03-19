@@ -1,7 +1,6 @@
 import csv
 import matplotlib.pyplot as plt
 
-
 if __name__ == "__main__":
     timestamps = {}
     age_in_seconds = {}

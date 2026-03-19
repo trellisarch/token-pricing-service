@@ -4,7 +4,6 @@ import glob
 
 import pytest
 
-
 DAG_DIRS = os.path.join(os.path.dirname(__file__), os.pardir, "dags")
 
 LIB_DIR = os.path.join(os.path.dirname(__file__), os.pardir, "lib")

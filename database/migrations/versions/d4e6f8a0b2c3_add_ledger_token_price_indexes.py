@@ -18,18 +18,14 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    op.execute(
-        """
+    op.execute("""
         CREATE INDEX ledger_token_price_idx
         ON ledger_token_prices USING btree (resource_address, last_updated_at DESC)
-    """
-    )
-    op.execute(
-        """
+    """)
+    op.execute("""
         CREATE INDEX idx_ledger_token_prices_resource_ts_id
         ON ledger_token_prices USING btree (resource_address, last_updated_at DESC, id DESC)
-    """
-    )
+    """)
 
 
 def downgrade() -> None:

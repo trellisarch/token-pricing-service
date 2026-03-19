@@ -3,7 +3,6 @@ from time import sleep
 import pandas as pd
 import requests
 
-
 COIN_DICT = {
     "radix": "XRD",
     "bitcoin": "BTC",

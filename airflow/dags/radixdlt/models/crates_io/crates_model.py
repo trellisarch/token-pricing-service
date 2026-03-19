@@ -27,10 +27,8 @@ class CratesData(Base):
                     downloads=downloads,
                     package=package,
                 )
-                logging.info(
-                    f"""downloads: {new_info.downloads}, 
-                        package: {new_info.package},"""
-                )
+                logging.info(f"""downloads: {new_info.downloads}, 
+                        package: {new_info.package},""")
                 session.add(new_info)
                 logging.info("Data inserted successfully.")
                 session.commit()
@@ -49,10 +47,8 @@ def get_crate_downloads(crate_name):
     if response.status_code == 200:
         data = response.json()
         downloads = data["crate"]["downloads"]
-        logging.info(
-            f"""downloads: {downloads}, 
-                crate_name: {crate_name}"""
-        )
+        logging.info(f"""downloads: {downloads}, 
+                crate_name: {crate_name}""")
         return downloads
     else:
         print(

@@ -5,7 +5,6 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.exc import SQLAlchemyError
 from radixdlt.models.base import get_session
 
-
 Base = declarative_base()
 
 
@@ -93,8 +92,7 @@ class NetworkData(Base):
         created_accounts_total = radixapi_stats["data"]["total"]["created_accounts"]
         staked_xrd = radixapi_stats["data"]["total"]["staked_xrd"]
 
-        logging.info(
-            f"""tx_count_24h: {tx_count_24h},
+        logging.info(f"""tx_count_24h: {tx_count_24h},
                 created_accounts_24h: {created_accounts_24h},
                 tx_count_7d: {tx_count_7d},
                 created_accounts_7d: {created_accounts_7d},
@@ -104,8 +102,7 @@ class NetworkData(Base):
                 created_accounts_total: {created_accounts_total},
                 tvl: {tvl},
                 staked_xrd: {staked_xrd}
-            """
-        )
+            """)
 
         ##Deleted logging
         # hourly_burnt_amount: {hourly_burnt_amount},
