@@ -35,8 +35,8 @@ request_duration_without_lsus = Histogram(
 )
 
 
-@price_router.post("/tokens", response_model=TokenPricesResponse)
-async def get_tokens_prices(data: TokenPricesRequest = Body(...)):
+@price_router.post("/tokens-legacy", response_model=TokenPricesResponse)
+async def get_tokens_prices_legacy(data: TokenPricesRequest = Body(...)):
     start_time = time.time()
 
     currency = data.currency
@@ -72,8 +72,8 @@ async def get_tokens_prices(data: TokenPricesRequest = Body(...)):
     return token_price_response
 
 
-@price_router.post("/ledger-tokens", response_model=TokenPricesResponse)
-async def get_ledger_tokens_prices(data: TokenPricesRequest = Body(...)):
+@price_router.post("/tokens", response_model=TokenPricesResponse)
+async def get_tokens_prices(data: TokenPricesRequest = Body(...)):
     start_time = time.time()
 
     currency = data.currency
@@ -114,8 +114,8 @@ def api_key_auth(x_api_key: str = Header(...)):
         raise HTTPException(status_code=401, detail="Invalid or missing API Key")
 
 
-@price_router.post("/historicalPrice", response_model=HistoricalPriceResponse)
-async def get_historical_price(
+@price_router.post("/historicalPrice-legacy", response_model=HistoricalPriceResponse)
+async def get_historical_price_legacy(
     data: HistoricalPriceRequest = Body(...),
     _: None = Depends(api_key_auth),
 ):
@@ -149,8 +149,8 @@ async def get_historical_price(
     return HistoricalPriceResponse(prices=resp)
 
 
-@price_router.post("/ledger-historicalPrice", response_model=HistoricalPriceResponse)
-async def get_ledger_historical_price(
+@price_router.post("/historicalPrice", response_model=HistoricalPriceResponse)
+async def get_historical_price(
     data: HistoricalPriceRequest = Body(...),
     _: None = Depends(api_key_auth),
 ):

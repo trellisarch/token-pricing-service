@@ -1,16 +1,19 @@
 import json
+from os import getenv
 
 import requests
+
+API_URL = getenv("API_URL", "https://token-price-service.radixdlt.com")
 
 
 def test_api_return_prices():
     body = {"currency": "USD", "lsus": [], "tokens": []}
-    tokens = requests.post("https://dev-token-price.extratools.works/tokens").json()
+    tokens = requests.post(f"{API_URL}/tokens").json()
 
     for token in tokens:
         body["tokens"] = [token["resource_address"]]
         token_price = requests.post(
-            url="https://dev-token-price.extratools.works/price/tokens",
+            url=f"{API_URL}/price/tokens",
             json=body,
         )
         assert token_price.status_code == 200
