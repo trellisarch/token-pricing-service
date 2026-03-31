@@ -88,8 +88,12 @@ class LedgerPriceFetcher:
                     cg_id = mapping["coingecko_id"]
                     weight = mapping.get("weight", Config.COINGECKO_DEFAULT_WEIGHT)
                     cg_price, cg_source = cls._resolve_coingecko_price(
-                        token_name, cg_id, coingecko_prices, cached_cg,
-                        ledger_price, now,
+                        token_name,
+                        cg_id,
+                        coingecko_prices,
+                        cached_cg,
+                        ledger_price,
+                        now,
                     )
 
                     if cg_price is not None and ledger_price is not None:
@@ -97,7 +101,11 @@ class LedgerPriceFetcher:
                             (1 - weight) * ledger_price
                         )
                         price_source = cg_source
-                        fetched_at = now if cg_source == "coingecko_weighted" else cached_cg.get(cg_id, {}).get("fetched_at")
+                        fetched_at = (
+                            now
+                            if cg_source == "coingecko_weighted"
+                            else cached_cg.get(cg_id, {}).get("fetched_at")
+                        )
                         logging.info(
                             f"{token_name}: cg={cg_price}, ledger={ledger_price}, "
                             f"weight={weight}, final={final_price}, source={price_source}"
@@ -105,7 +113,11 @@ class LedgerPriceFetcher:
                     elif cg_price is not None:
                         final_price = cg_price
                         price_source = cg_source
-                        fetched_at = now if cg_source == "coingecko_weighted" else cached_cg.get(cg_id, {}).get("fetched_at")
+                        fetched_at = (
+                            now
+                            if cg_source == "coingecko_weighted"
+                            else cached_cg.get(cg_id, {}).get("fetched_at")
+                        )
                         logging.warning(
                             f"{token_name}: no ledger price, using CoinGecko only: {final_price}"
                         )
@@ -121,8 +133,12 @@ class LedgerPriceFetcher:
                         continue
 
                     cls._save_price(
-                        session, resource_address, final_price, now,
-                        price_source, fetched_at,
+                        session,
+                        resource_address,
+                        final_price,
+                        now,
+                        price_source,
+                        fetched_at,
                     )
                 else:
                     # Ledger-only token
@@ -132,8 +148,12 @@ class LedgerPriceFetcher:
 
                     logging.info(f"{token_name}: ledger_only usd_price={ledger_price}")
                     cls._save_price(
-                        session, resource_address, ledger_price, now,
-                        "ledger_only", None,
+                        session,
+                        resource_address,
+                        ledger_price,
+                        now,
+                        "ledger_only",
+                        None,
                     )
 
             session.commit()
@@ -169,7 +189,9 @@ class LedgerPriceFetcher:
                 logging.info(f"CoinGecko prices fetched: {prices}")
                 return prices
             else:
-                logging.error(f"CoinGecko API error: {response.status_code} {response.text}")
+                logging.error(
+                    f"CoinGecko API error: {response.status_code} {response.text}"
+                )
                 return {}
         except Exception as e:
             logging.error(f"CoinGecko API request failed: {e}")
@@ -188,6 +210,7 @@ class LedgerPriceFetcher:
         addr_to_cg_id = {}
         for token_name, mapping in COINGECKO_MAPPING.items():
             from radixdlt.lib.const import LEDGER_TOKENS
+
             if token_name in LEDGER_TOKENS:
                 addr = LEDGER_TOKENS[token_name]["resource_address"]
                 addr_to_cg_id[addr] = mapping["coingecko_id"]
@@ -203,7 +226,13 @@ class LedgerPriceFetcher:
 
     @classmethod
     def _resolve_coingecko_price(
-        cls, token_name, cg_id, coingecko_prices, cached_cg, ledger_price, now,
+        cls,
+        token_name,
+        cg_id,
+        coingecko_prices,
+        cached_cg,
+        ledger_price,
+        now,
     ):
         """Resolve the CoinGecko price to use: fresh, cached, or None."""
         threshold = Config.COINGECKO_DIVERGENCE_THRESHOLD
@@ -283,8 +312,13 @@ class LedgerPriceFetcher:
 
     @classmethod
     def _save_price(
-        cls, session, resource_address, usd_price, last_updated_at,
-        price_source=None, fetched_at=None,
+        cls,
+        session,
+        resource_address,
+        usd_price,
+        last_updated_at,
+        price_source=None,
+        fetched_at=None,
     ):
         # Append to historical table
         session.add(

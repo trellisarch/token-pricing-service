@@ -149,9 +149,7 @@ class Config:
     COINGECKO_DIVERGENCE_THRESHOLD = float(
         getenv("COINGECKO_DIVERGENCE_THRESHOLD", "0.5")
     )
-    COINGECKO_DEFAULT_WEIGHT = float(
-        getenv("COINGECKO_DEFAULT_WEIGHT", "0.8")
-    )
+    COINGECKO_DEFAULT_WEIGHT = float(getenv("COINGECKO_DEFAULT_WEIGHT", "0.8"))
 
     # Account Component Monitoring DAG
     ACC_COMP_MONITORING_NETWORK_GATEWAY = getenv(
