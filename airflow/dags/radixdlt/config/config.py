@@ -143,6 +143,16 @@ class Config:
         "sei-network,elrond-erd-2,the-open-network"
     )
 
+    COINGECKO_STALENESS_THRESHOLD_SECS = int(
+        getenv("COINGECKO_STALENESS_THRESHOLD_SECS", "300")
+    )
+    COINGECKO_DIVERGENCE_THRESHOLD = float(
+        getenv("COINGECKO_DIVERGENCE_THRESHOLD", "0.5")
+    )
+    COINGECKO_DEFAULT_WEIGHT = float(
+        getenv("COINGECKO_DEFAULT_WEIGHT", "0.8")
+    )
+
     # Account Component Monitoring DAG
     ACC_COMP_MONITORING_NETWORK_GATEWAY = getenv(
         "ACC_COMP_MONITORING_NETWORK_GATEWAY", "https://mainnet.radixdlt.com"

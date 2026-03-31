@@ -153,13 +153,22 @@ MOCK_TOKENS = {
 }
 
 
+@patch(
+    "radixdlt.models.ledger_prices.token_price.LedgerPriceFetcher._load_cached_coingecko_prices",
+    return_value={},
+)
+@patch(
+    "radixdlt.models.ledger_prices.token_price.LedgerPriceFetcher._fetch_coingecko_prices",
+    return_value={},
+)
 @patch("radixdlt.models.ledger_prices.token_price.get_session")
 @patch("radixdlt.models.ledger_prices.token_price.get_pool_price")
 @patch("radixdlt.models.ledger_prices.token_price.get_current_epoch")
 def test_fetch_and_save_prices_usd_conversion(
-    mock_epoch, mock_pool_price, mock_session
+    mock_epoch, mock_pool_price, mock_session, _mock_cg, _mock_cached
 ):
-    """Verify hUSDC conversion: usd_price = xrd_per_token * (1 / xrd_per_husdc)."""
+    """Verify hUSDC conversion: usd_price = xrd_per_token * (1 / xrd_per_husdc).
+    With no CoinGecko data, mapped tokens fall back to ledger_only."""
     from radixdlt.models.ledger_prices.token_price import LedgerPriceFetcher
 
     mock_epoch.return_value = 100
@@ -189,11 +198,12 @@ def test_fetch_and_save_prices_usd_conversion(
         obj = c[0][0]
         saved[obj.resource_address] = obj.usd_price
 
-    # XRD price = husdc_per_xrd = 1/540
+    # XRD price = husdc_per_xrd = 1/540 (ledger_only fallback, no CoinGecko)
     assert saved["resource_xrd"] == pytest.approx(float(husdc_per_xrd), rel=1e-6)
 
-    # hUSDC price = 1.0
-    assert saved["resource_husdc"] == 1.0
+    # hUSDC: ledger_only fallback — averaged across its pools
+    # With one C9 pool returning xrd_per_husdc=540, usd = 540 * (1/540) = 1.0
+    assert saved["resource_husdc"] == pytest.approx(1.0, rel=1e-6)
 
     # FLOOP price = average of (c9_xrd * husdc_per_xrd) and (oci_xrd * husdc_per_xrd)
     expected_c9 = floop_c9_xrd * husdc_per_xrd
@@ -205,11 +215,19 @@ def test_fetch_and_save_prices_usd_conversion(
     session.close.assert_called_once()
 
 
+@patch(
+    "radixdlt.models.ledger_prices.token_price.LedgerPriceFetcher._load_cached_coingecko_prices",
+    return_value={},
+)
+@patch(
+    "radixdlt.models.ledger_prices.token_price.LedgerPriceFetcher._fetch_coingecko_prices",
+    return_value={},
+)
 @patch("radixdlt.models.ledger_prices.token_price.get_session")
 @patch("radixdlt.models.ledger_prices.token_price.get_pool_price")
 @patch("radixdlt.models.ledger_prices.token_price.get_current_epoch")
 def test_fetch_and_save_prices_pool_failure_skips_token(
-    mock_epoch, mock_pool_price, mock_session
+    mock_epoch, mock_pool_price, mock_session, _mock_cg, _mock_cached
 ):
     """When all pools fail for a token, that token is skipped but others still saved."""
     from radixdlt.models.ledger_prices.token_price import LedgerPriceFetcher
@@ -237,11 +255,19 @@ def test_fetch_and_save_prices_pool_failure_skips_token(
     session.commit.assert_called_once()
 
 
+@patch(
+    "radixdlt.models.ledger_prices.token_price.LedgerPriceFetcher._load_cached_coingecko_prices",
+    return_value={},
+)
+@patch(
+    "radixdlt.models.ledger_prices.token_price.LedgerPriceFetcher._fetch_coingecko_prices",
+    return_value={},
+)
 @patch("radixdlt.models.ledger_prices.token_price.get_session")
 @patch("radixdlt.models.ledger_prices.token_price.get_pool_price")
 @patch("radixdlt.models.ledger_prices.token_price.get_current_epoch")
 def test_fetch_and_save_prices_partial_pool_failure(
-    mock_epoch, mock_pool_price, mock_session
+    mock_epoch, mock_pool_price, mock_session, _mock_cg, _mock_cached
 ):
     """When one pool fails but another succeeds, uses the successful pool's price."""
     from radixdlt.models.ledger_prices.token_price import LedgerPriceFetcher
@@ -276,11 +302,19 @@ def test_fetch_and_save_prices_partial_pool_failure(
     assert saved["resource_floop"] == pytest.approx(expected, rel=1e-6)
 
 
+@patch(
+    "radixdlt.models.ledger_prices.token_price.LedgerPriceFetcher._load_cached_coingecko_prices",
+    return_value={},
+)
+@patch(
+    "radixdlt.models.ledger_prices.token_price.LedgerPriceFetcher._fetch_coingecko_prices",
+    return_value={},
+)
 @patch("radixdlt.models.ledger_prices.token_price.get_session")
 @patch("radixdlt.models.ledger_prices.token_price.get_pool_price")
 @patch("radixdlt.models.ledger_prices.token_price.get_current_epoch")
 def test_fetch_and_save_prices_prefers_c9_for_husdc(
-    mock_epoch, mock_pool_price, mock_session
+    mock_epoch, mock_pool_price, mock_session, _mock_cg, _mock_cached
 ):
     """Fetcher picks the C9 pool for the hUSDC rate even if ociswap is listed first."""
     from radixdlt.models.ledger_prices.token_price import LedgerPriceFetcher
@@ -330,10 +364,20 @@ def test_fetch_and_save_prices_prefers_c9_for_husdc(
     assert saved["resource_xrd"] == pytest.approx(expected, rel=1e-6)
 
 
+@patch(
+    "radixdlt.models.ledger_prices.token_price.LedgerPriceFetcher._load_cached_coingecko_prices",
+    return_value={},
+)
+@patch(
+    "radixdlt.models.ledger_prices.token_price.LedgerPriceFetcher._fetch_coingecko_prices",
+    return_value={},
+)
 @patch("radixdlt.models.ledger_prices.token_price.get_session")
 @patch("radixdlt.models.ledger_prices.token_price.get_pool_price")
 @patch("radixdlt.models.ledger_prices.token_price.get_current_epoch")
-def test_fetch_and_save_missing_husdc_raises(mock_epoch, mock_pool_price, mock_session):
+def test_fetch_and_save_missing_husdc_raises(
+    mock_epoch, mock_pool_price, mock_session, _mock_cg, _mock_cached
+):
     """Raises ValueError if hUSDC is not in the tokens config."""
     from radixdlt.models.ledger_prices.token_price import LedgerPriceFetcher
 
@@ -349,3 +393,105 @@ def test_fetch_and_save_missing_husdc_raises(mock_epoch, mock_pool_price, mock_s
         LedgerPriceFetcher.fetch_and_save_prices(tokens_no_husdc)
 
     session.rollback.assert_called_once()
+
+
+# ---------------------------------------------------------------------------
+# CoinGecko weighting
+# ---------------------------------------------------------------------------
+
+
+@patch(
+    "radixdlt.models.ledger_prices.token_price.LedgerPriceFetcher._load_cached_coingecko_prices",
+    return_value={},
+)
+@patch(
+    "radixdlt.models.ledger_prices.token_price.LedgerPriceFetcher._fetch_coingecko_prices",
+)
+@patch("radixdlt.models.ledger_prices.token_price.get_session")
+@patch("radixdlt.models.ledger_prices.token_price.get_pool_price")
+@patch("radixdlt.models.ledger_prices.token_price.get_current_epoch")
+def test_coingecko_weighted_price(
+    mock_epoch, mock_pool_price, mock_session, mock_cg, _mock_cached
+):
+    """CoinGecko-mapped tokens get 80/20 weighted price."""
+    from radixdlt.models.ledger_prices.token_price import LedgerPriceFetcher
+
+    mock_epoch.return_value = 100
+    session = MagicMock()
+    mock_session.return_value = session
+
+    # Use hUSDC rate that gives XRD ≈ $0.002, then set CoinGecko within 50%
+    xrd_per_husdc = Decimal("540")
+    husdc_per_xrd = Decimal(1) / xrd_per_husdc
+    ledger_xrd = float(husdc_per_xrd)  # ≈ 0.001852
+    cg_xrd = ledger_xrd * 1.2  # 20% higher, well within 50% threshold
+    cg_usdc = 1.001
+
+    mock_cg.return_value = {"radix": cg_xrd, "usd-coin": cg_usdc}
+
+    def pool_price_side_effect(component, dex, epoch, base, quote):
+        if component == "comp_c9_husdc":
+            return xrd_per_husdc
+
+    mock_pool_price.side_effect = pool_price_side_effect
+
+    LedgerPriceFetcher.fetch_and_save_prices(MOCK_TOKENS)
+
+    saved = {}
+    for c in session.add.call_args_list:
+        obj = c[0][0]
+        saved[obj.resource_address] = obj.usd_price
+
+    # XRD: 80% CoinGecko + 20% ledger
+    expected_xrd = 0.8 * cg_xrd + 0.2 * ledger_xrd
+    assert saved["resource_xrd"] == pytest.approx(expected_xrd, rel=1e-6)
+
+    # hUSDC: 80% CoinGecko (1.001) + 20% ledger (540 * 1/540 = 1.0)
+    expected_husdc = 0.8 * cg_usdc + 0.2 * 1.0
+    assert saved["resource_husdc"] == pytest.approx(expected_husdc, rel=1e-6)
+
+
+@patch(
+    "radixdlt.models.ledger_prices.token_price.LedgerPriceFetcher._load_cached_coingecko_prices",
+    return_value={},
+)
+@patch(
+    "radixdlt.models.ledger_prices.token_price.LedgerPriceFetcher._fetch_coingecko_prices",
+    return_value={"radix": 100.0},  # wildly divergent from ledger
+)
+@patch("radixdlt.models.ledger_prices.token_price.get_session")
+@patch("radixdlt.models.ledger_prices.token_price.get_pool_price")
+@patch("radixdlt.models.ledger_prices.token_price.get_current_epoch")
+def test_coingecko_divergence_rejection(
+    mock_epoch, mock_pool_price, mock_session, _mock_cg, _mock_cached
+):
+    """CoinGecko price diverging >50% from ledger is rejected, falls to ledger_only."""
+    from radixdlt.models.ledger_prices.token_price import LedgerPriceFetcher
+
+    mock_epoch.return_value = 100
+    session = MagicMock()
+    mock_session.return_value = session
+
+    xrd_per_husdc = Decimal("540")
+    husdc_per_xrd = Decimal(1) / xrd_per_husdc
+
+    def pool_price_side_effect(component, dex, epoch, base, quote):
+        if component == "comp_c9_husdc":
+            return xrd_per_husdc
+
+    mock_pool_price.side_effect = pool_price_side_effect
+
+    LedgerPriceFetcher.fetch_and_save_prices(MOCK_TOKENS)
+
+    saved = {}
+    saved_source = {}
+    for c in session.execute.call_args_list:
+        stmt = c[0][0]
+        # Extract values from the upsert statement
+        params = stmt.compile().params
+        if "resource_address" in params:
+            saved[params["resource_address"]] = params["usd_price"]
+            saved_source[params["resource_address"]] = params["price_source"]
+
+    # XRD: CoinGecko 100.0 vs ledger ~0.00185 => >50% divergence => ledger_only
+    assert saved_source.get("resource_xrd") == "ledger_only"

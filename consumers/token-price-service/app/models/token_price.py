@@ -118,6 +118,8 @@ class LedgerTokenPriceLatest(Base):
     resource_address = Column(String, unique=True)
     usd_price = Column(Float)
     last_updated_at = Column(DateTime)
+    price_source = Column(String, nullable=True)
+    fetched_at = Column(DateTime, nullable=True)
 
 
 def get_ledger_prices_closest_to_timestamp(resource_addresses: list, timestamp: int):

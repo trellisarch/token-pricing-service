@@ -17,6 +17,22 @@ RADIX_CHARTS_TOKENS = {
     },
 }
 
+# Maps LEDGER_TOKENS keys to CoinGecko coin IDs with optional weight override.
+# Tokens not listed here use 100% ledger price.
+# Weight is the CoinGecko portion (0.0–1.0); ledger portion = 1 - weight.
+COINGECKO_MAPPING = {
+    "XRD": {"coingecko_id": "radix"},
+    "hETH": {"coingecko_id": "ethereum"},
+    "xETH": {"coingecko_id": "ethereum"},
+    "hWBTC": {"coingecko_id": "bitcoin"},
+    "xWBTC": {"coingecko_id": "bitcoin"},
+    "hSOL": {"coingecko_id": "solana"},
+    "xUSDT": {"coingecko_id": "tether"},
+    "xUSDC": {"coingecko_id": "usd-coin"},
+    "hUSDC": {"coingecko_id": "usd-coin"},
+    "hBNB": {"coingecko_id": "binancecoin"},
+}
+
 LEDGER_TOKENS = {
     "DFP2": {
         "resource_address": "resource_rdx1t5ywq4c6nd2lxkemkv4uzt8v7x7smjcguzq5sgafwtasa6luq7fclq",
