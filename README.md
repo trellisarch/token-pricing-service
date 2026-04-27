@@ -2,43 +2,31 @@
 
 ## Overview
 
-This project employs Apache Airflow to gather data from multiple APIs such as Coingecko, Radix Charts, YouTube, Telegram, X, etc. The ingested data is then stored in a PostgreSQL database. This stored information serves two primary purposes:
+This project employs Apache Airflow to fetch token prices from Radix ledger DEX pools and CoinGecko, storing them in a PostgreSQL database. The data powers the Token Price Service used by the Radix wallet.
 
-- **Dashboard Creation**: Utilizing PostgreSQL data to generate dashboards via either Grafana or Metabase.
-- **Token Price Service**: A service named `token_price_service` consumes PostgreSQL data, providing functionality for the Radix wallet.
+## Active DAGs
 
-## Workflow Diagram
-
-![Workflow Diagram](resources/radix-airflow.png)
+- **ledger_current_price**: Fetches token prices from Radix ledger DEX pools with CoinGecko-weighted pricing for major tokens.
+- **watchdog**: Health-check DAG that monitors Airflow scheduler liveness.
+- **acc_comp_monitoring**: Monitors account component balances on the Radix network and sends Slack alerts on threshold breaches.
 
 ## Components
 
 ### Apache Airflow
 
-- Manages data ingestion from various APIs.
+- Manages data ingestion from Radix Gateway and CoinGecko APIs.
 - Orchestrates data pipelines and scheduling.
 
 ### PostgreSQL
 
 - Acts as the central repository for ingested data.
-- Stores information for further utilization.
-
-### Dashboarding Tool (Grafana/Metabase)
-
-- Utilizes PostgreSQL data to create visual dashboards.
-- Offers insights and analytics based on stored information.
+- Stores token prices for the Token Price Service.
 
 ### Token Price Service
 
 - Consumes PostgreSQL data for Radix wallet functionalities.
-- Provides essential token-related services.
+- Provides token price endpoints.
 
 ## Setup and Configuration
 
-## Oracle Price DAG Environments
-
-- Pull-request: Is connected to Stokenet via /airflow/dags/radixdlt/dags/config-develop.json, although tokens addresses on that config file are from mainnet network, this will cause failure in case of running oracle_price dag on pull-request environment.
-
-- Dev: Is connected to Stokenet via /airflow/dags/radixdlt/dags/config-develop.json, although tokens addresses on that config file are from mainnet network, this will cause failure in case of running oracle_price dag on dev environment.
-
-- Prod: Connects to mainnet, should be working properly.
+See [docs/ledger_prices.md](docs/ledger_prices.md) for detailed documentation on the ledger pricing DAG and consumer service.

@@ -10,7 +10,7 @@ spec:
   - name: Airflow
     rules:
     - alert: AirflowTaskFailure
-      expr: (changes(airflow_task_status{dag_id!~"oracle_price|radix_charts_current_price|radix_charts_tokens_list",status="failed"}[1d]) > 0) unless (changes(airflow_task_status{dag_id!~"oracle_price|radix_charts_current_price|radix_charts_tokens_list",status="success"}[1d]) > 0)
+      expr: (changes(airflow_task_status{status="failed"}[1d]) > 0) unless (changes(airflow_task_status{status="success"}[1d]) > 0)
       for: 1m
       labels:
         severity: warning
@@ -26,41 +26,8 @@ spec:
         dashboard: {{ .Values.alerts.dashboard_url }}
         app_url: "{{ .Values.ui_url }}/dags/{{ "{{$labels.dag_id}}" }}/grid?num_runs=25"
 
-    - alert: OracleTaskFailure
-      expr: (changes(airflow_task_status{dag_id="oracle_price",status="failed"}[2m]) > 0) unless (changes(airflow_task_status{dag_id="oracle_price",status="success"}[1m]) > 0)
-      for: 2m
-      labels:
-        severity: warning
-        tier: application
-        application: airflow
-        namespace: {{ .Release.Namespace }}
-        cluster: {{ .Values.alerts.labels.cluster }}
-        env: {{ .Values.alerts.labels.env }}
-      annotations:
-        summary: "Oracle task failed: {{ "{{$labels.task_name}}" }}"
-        description: "Task '{{ "{{$labels.task_id}}" }}' in DAG '{{ "{{$labels.dag_id}}" }}' failed."
-        runbook_url: https://runbooks.extratools.works
-        dashboard: {{ .Values.alerts.dashboard_url }}
-        app_url: "{{ .Values.ui_url }}/dags/{{ "{{$labels.dag_id}}" }}/grid?num_runs=25"
-    
-    - alert: RadixChartsCurrentPriceTaskFailure
-      expr: (changes(airflow_task_status{dag_id="radix_charts_current_price",status="failed"}[2m]) > 0) unless (changes(airflow_task_status{dag_id="radix_charts_current_price",status="success"}[1m]) > 0)
-      for: 2m
-      labels:
-        severity: warning
-        tier: application
-        application: airflow
-        namespace: {{ .Release.Namespace }}
-        cluster: {{ .Values.alerts.labels.cluster }}
-        env: {{ .Values.alerts.labels.env }}
-      annotations:
-        summary: "Radix Charts current price task failed: {{ "{{$labels.task_name}}" }}"
-        description: "Task '{{ "{{$labels.task_id}}" }}' in DAG '{{ "{{$labels.dag_id}}" }}' failed."
-        runbook_url: https://runbooks.extratools.works
-        dashboard: {{ .Values.alerts.dashboard_url }}
-        app_url: "{{ .Values.ui_url }}/dags/{{ "{{$labels.dag_id}}" }}/grid?num_runs=25"
     - alert: AirflowDAGFailure
-      expr: (airflow_dag_last_status{dag_id!="oracle_price",status="failed"} > 0)
+      expr: (airflow_dag_last_status{status="failed"} > 0)
       for: 1m
       labels:
         severity: warning
@@ -71,22 +38,6 @@ spec:
         env: {{ .Values.alerts.labels.env }}
       annotations:
         summary: "Airflow DAG failed: {{ "{{$labels.dag_id}}" }}"
-        description: "DAG '{{ "{{$labels.dag_id}}" }}' failed."
-        app_url: "{{ .Values.ui_url }}/dags/{{ "{{$labels.dag_id}}" }}/grid?num_runs=25"
-        dashboard: {{ .Values.alerts.dashboard_url }}
-
-    - alert: OraclePriceDAGFailure
-      expr: (airflow_dag_last_status{dag_id="oracle_price",status="failed"} > 0)
-      for: 2m
-      labels:
-        severity: warning
-        tier: application
-        application: airflow
-        namespace: {{ .Release.Namespace }}
-        cluster: {{ .Values.alerts.labels.cluster }}
-        env: {{ .Values.alerts.labels.env }}
-      annotations:
-        summary: "Oracle Price DAG failed: {{ "{{$labels.dag_id}}" }}"
         description: "DAG '{{ "{{$labels.dag_id}}" }}' failed."
         app_url: "{{ .Values.ui_url }}/dags/{{ "{{$labels.dag_id}}" }}/grid?num_runs=25"
         dashboard: {{ .Values.alerts.dashboard_url }}
@@ -235,37 +186,6 @@ spec:
         description: "There are more than 500 req/s on token price"
         runbook_url: https://runbooks.extratools.works
         dashboard: {{ .Values.alerts.dashboard_url }}
-    - alert: OracleDAGExternalServiceFetchFailed
-      expr: sum by (external_service) (rate(oracle_fetch_api_status{namespace="{{ .Release.Namespace }}", status="failed"}[5m])) > 0
-      for: 5m
-      labels:
-        severity: critical
-        tier: application
-        application: token-price
-        namespace: {{ .Release.Namespace }}
-        cluster: {{ .Values.alerts.labels.cluster }}
-        env: {{ .Values.alerts.labels.env }}
-      annotations:
-        summary: "Oracle DAG, call to external service {{ "{{$labels.external_service}}" }} "
-        description: "Oracle DAG, call to external service {{ "{{$labels.external_service}}" }} "
-        runbook_url: https://runbooks.extratools.works
-        dashboard: {{ .Values.alerts.dashboard_url }} 
-    - alert: OracleDAGTokenUpdateFailures
-      expr: sum by (symbol) (rate(oracle_update_token_status{status="missed"}[5m])) > 2
-      for: 5m
-      labels:
-        severity: critical
-        tier: application
-        application: token-price
-        namespace: {{ .Release.Namespace }}
-        cluster: {{ .Values.alerts.labels.cluster }}
-        env: {{ .Values.alerts.labels.env }}
-      annotations:
-        summary: "Oracle DAG, call to external service {{ "{{$labels.symbol}}" }} "
-        description: "Oracle DAG, call to external service {{ "{{$labels.symbol}}" }} "
-        runbook_url: https://runbooks.extratools.works
-        dashboard: {{ .Values.alerts.dashboard_url }} 
-
 {{- if .Values.alerts.aws_infrastructure_enabled }}
 
   - name: TokenPriceRDS
