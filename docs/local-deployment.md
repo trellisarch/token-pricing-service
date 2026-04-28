@@ -79,7 +79,13 @@ All DAGs are paused by default. In the Airflow UI, toggle on the DAGs you want t
 
 ## Configuration
 
-Environment variables are set in `airflow/.env`:
+Copy the example env file and adjust as needed:
+
+```bash
+cp airflow/.env.example airflow/.env
+```
+
+Environment variables in `airflow/.env`:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
