@@ -170,7 +170,6 @@ class LedgerPriceFetcher:
         coin_ids = list({m["coingecko_id"] for m in COINGECKO_MAPPING.values()})
         headers = {
             "accept": "application/json",
-            "x-cg-pro-api-key": Config.COIN_GECKO_API_KEY,
         }
         try:
             response = requests.get(

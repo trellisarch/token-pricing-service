@@ -19,9 +19,6 @@ env:
     value: "True"
   - name: AIRFLOW__CELERY_BROKER_TRANSPORT_OPTIONS__SOCKET_KEEPALIVE
     value: "True"
-  - name: GOOGLE_APPLICATION_CREDENTIALS
-    value: "/opt/airflow/service-account.json"
-
 extraEnv: |
   - name: NETWORK_ID
     value: "2"
@@ -29,8 +26,6 @@ extraEnv: |
     value: 'https://stokenet.radixdlt.com'
   - name: LEDGER_PRICE_SCHEDULE_INTERVAL
     value: '*/1 * * * *'
-  - name: ORACLE_CONFIG_FILE
-    value: 'config-develop.json'
   - name: ACC_COMP_MONITORING_CONFIG
     value:  '{"accounts": [{"address": "component_rdx1cptwph6dnf4sqv8fgs8wg03l6dv5h6hu47fr78lhs3wasanll8ukzg", "name": "component", "resources": [{"address": "resource_rdx1tk8wzyckjje4t6pz35m54ygdj4sfqkpgv8953l6w7rejhzq3nmxu9f", "name": "Rewards", "threshold": 500000}]}]}'
 
