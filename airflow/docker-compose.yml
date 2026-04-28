@@ -108,6 +108,8 @@ services:
       retries: 5
       start_period: 5s
     restart: always
+    ports:
+      - "5532:5432"
   airflow-postgresql:
     image: postgres:13
     environment:
@@ -122,7 +124,7 @@ services:
       start_period: 5s
     restart: always
     ports:
-      - 5432:5432
+      - "5533:5432"
   redis:
     image: redis:latest
     expose:
