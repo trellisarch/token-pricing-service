@@ -96,6 +96,9 @@ services:
     image: migrations
     environment:
       DB_URI: postgresql+psycopg2://postgres:postgres@airflow-postgresql/dags
+    depends_on:
+      airflow-postgresql:
+        condition: service_healthy
   postgres_airflow:
     image: postgres:13
     environment:

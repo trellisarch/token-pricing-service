@@ -51,10 +51,19 @@ docker compose up --build -d
 This will:
 - Build the Airflow image from `airflow/Dockerfile`
 - Start PostgreSQL (x2), Redis, and all Airflow services
-- Run DB migrations via the `migrations` service
 - Initialize Airflow with a default admin user
 
-### 3. Wait for services to be healthy
+### 3. Run database migrations
+
+The migrations container needs to run after the database is healthy:
+
+```bash
+docker compose run --rm migrations
+```
+
+This applies all alembic migrations to create the required tables (e.g. `ledger_token_prices_latest`).
+
+### 4. Wait for services to be healthy
 
 ```bash
 docker compose ps
@@ -62,14 +71,14 @@ docker compose ps
 
 Wait until all services show `healthy` status. The initial startup takes 1-2 minutes.
 
-### 4. Access the Airflow UI
+### 5. Access the Airflow UI
 
 Open http://localhost:8080 and log in:
 
 - **Username**: `airflow`
 - **Password**: `airflow`
 
-### 5. Unpause DAGs
+### 6. Unpause DAGs
 
 All DAGs are paused by default. In the Airflow UI, toggle on the DAGs you want to test:
 
