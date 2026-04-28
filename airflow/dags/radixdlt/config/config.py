@@ -47,7 +47,6 @@ class Config:
     NETWORK_GATEWAY = getenv("NETWORK_GATEWAY", "https://mainnet.radixdlt.com")
 
     COIN_GECKO_API = getenv("COIN_GECKO_API", "https://api.coingecko.com/api/v3")
-    COIN_GECKO_API_KEY = getenv("COIN_GECKO_API_KEY", "")
 
     LEDGER_PRICE_SCHEDULE_INTERVAL = getenv("LEDGER_PRICE_SCHEDULE_INTERVAL", None)
 

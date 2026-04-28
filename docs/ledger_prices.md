@@ -126,6 +126,5 @@ Queries `ledger_token_prices_latest` by `resource_address` (no allowlist filter 
 | `NETWORK_GATEWAY` | Radix Gateway URL | `https://mainnet.radixdlt.com` |
 | `DB_URI` | PostgreSQL connection string | `sqlite:///app.db` |
 | `COIN_GECKO_API` | CoinGecko API base URL | `https://api.coingecko.com/api/v3` |
-| `COIN_GECKO_API_KEY` | CoinGecko API key | `""` |
 | `COINGECKO_STALENESS_THRESHOLD_SECS` | Max age of cached CoinGecko price before ledger fallback | `300` (5 min) |
 | `COINGECKO_DIVERGENCE_THRESHOLD` | Max allowed divergence between CoinGecko and ledger | `0.5` (50%) |
