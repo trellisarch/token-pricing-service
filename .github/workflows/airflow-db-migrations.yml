@@ -43,7 +43,7 @@ jobs:
   build-airflow-migrations:
     needs:
     - tags
-    uses: radixdlt/public-iac-resuable-artifacts/.github/workflows/docker-build.yml@main
+    uses: trellisarch/public-iac-resuable-artifacts/.github/workflows/docker-build.yml@main
     with:
       runs_on: ubuntu-latest
       image_registry: ${{ vars.AWS_ECR_REGISTRY }}
@@ -65,7 +65,7 @@ jobs:
   deploy-airflow-migrations-prod:
     if: github.event.inputs.environment == 'prod'
     name: "(PROD) Deploy Airflow Migrations"
-    uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@main
+    uses: trellisarch/iac-resuable-artifacts/.github/workflows/deploy.yml@main
     needs:
       - tags
       - build-airflow-migrations
