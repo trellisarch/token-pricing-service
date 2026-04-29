@@ -11,10 +11,6 @@ extraEnv: |
   - name: ACC_COMP_MONITORING_CONFIG
     value:  '{"accounts": [{"address": "component_rdx1cptwph6dnf4sqv8fgs8wg03l6dv5h6hu47fr78lhs3wasanll8ukzg", "name": "component", "resources": [{"address": "resource_rdx1tk8wzyckjje4t6pz35m54ygdj4sfqkpgv8953l6w7rejhzq3nmxu9f", "name": "Rewards", "threshold": 500000}]}]}'
 
-docker:
-  secrets:
-    region: eu-west-1
-    name: docker.io/radixdlt
 ingress:
   enabled: true
   annotations:
@@ -30,15 +26,13 @@ ingress:
                   number: 8080
   tls: []
 
-registry:
-  secretName: docker-hub-dev
 localDB:
   enabled: true
 
 workers:
   extraInitContainers:
     - name: db-migrations
-      image: radixdlt/airflow-migration:{{ .StateValues.ci.AIRFLOW_MIGRATION_IMAGE_TAG }}
+      image: {{ .StateValues.ci.ecr_registry }}/airflow-migration:{{ .StateValues.ci.AIRFLOW_MIGRATION_IMAGE_TAG }}
       env:
         - name: DB_URI
           value: "postgresql://postgres:postgres@postgres-postgresql:5432/dags"

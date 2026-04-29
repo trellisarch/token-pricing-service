@@ -35,7 +35,7 @@ jobs:
         uses: docker/metadata-action@57396166ad8aefe6098280995947635806a0e6ea
         with:
           images: |
-            docker.io/radixdlt/airflow-service
+            ${{ vars.AWS_ECR_REGISTRY }}/airflow-service
           tags: |
             type=sha,event=pr
             type=sha,event=branch
@@ -47,8 +47,8 @@ jobs:
     uses: radixdlt/public-iac-resuable-artifacts/.github/workflows/docker-build.yml@main
     with:
       runs_on: ubuntu-latest
-      image_registry: "docker.io"
-      image_organization: "radixdlt"
+      image_registry: ${{ vars.AWS_ECR_REGISTRY }}
+      image_organization: ""
       image_name: "airflow-migration"
       tags: |
           type=sha,event=pr
@@ -61,7 +61,7 @@ jobs:
       scan_image: false
       snyk_target_ref: ${{ github.ref_name }}
     secrets:
-      role_to_assume: ${{ secrets.DOCKERHUB_RELEASER_ROLE }}
+      role_to_assume: ${{ secrets.ECR_PUSHER_ROLE }}
 
   deploy-airflow-migrations-prod:
     if: github.event.inputs.environment == 'prod'
@@ -85,6 +85,7 @@ jobs:
       helm_chart: "db-migrations"
       helmfile_extra_vars: >-
         ci.tag=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
+        ci.ecr_registry=${{ vars.AWS_ECR_REGISTRY }},
         ci.environment=prod,
         ci.HF_CREATE_NAMESPACES=false,
         ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
@@ -112,6 +113,7 @@ jobs:
       helm_chart: "db-migrations"
       helmfile_extra_vars: >-
         ci.tag=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
+        ci.ecr_registry=${{ vars.AWS_ECR_REGISTRY }},
         ci.environment=dev,
         ci.HF_CREATE_NAMESPACES=false,
         ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},

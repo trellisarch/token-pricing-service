@@ -38,10 +38,6 @@ ingress:
         - path: /
           pathType: ImplementationSpecific
   tls: []
-docker:
-  secrets:
-    region: eu-west-1
-    name: docker.io/radixdlt
 pgbouncer:
   enabled: true
 postgresql:
@@ -52,13 +48,10 @@ data:
 localDB:
   enabled: false
 
-registry:
-  secretName: docker-hub-dev
-
 workers:
   extraInitContainers:
     - name: db-migrations
-      image: radixdlt/airflow-migration:{{ .StateValues.ci.AIRFLOW_MIGRATION_IMAGE_TAG }}
+      image: {{ .StateValues.ci.ecr_registry }}/airflow-migration:{{ .StateValues.ci.AIRFLOW_MIGRATION_IMAGE_TAG }}
       env:
         - name: DB_URI
           valueFrom:

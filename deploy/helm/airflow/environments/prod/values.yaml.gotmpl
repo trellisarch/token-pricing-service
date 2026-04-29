@@ -52,10 +52,6 @@ ingress:
                 number: 8080
   tls: []
 
-docker:
-  secrets:
-    region: eu-west-1
-    name: docker.io/radixdlt
 pgbouncer:
   enabled: true
 postgresql:
@@ -66,9 +62,6 @@ data:
 
 localDB:
   enabled: false
-
-registry:
-  secretName: docker-hub-dev
 
 ui_url: https://airflow-ui.radixdlt.com
 

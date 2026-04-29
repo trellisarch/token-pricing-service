@@ -8,13 +8,11 @@ alerts:
   enabled: true
 
 image:
-  repository: docker.io/radixdlt/airflow
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
 
-imagePullSecrets:
-  - name: docker-hub-dev
+imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
@@ -37,11 +35,6 @@ livenessProbe:
   timeoutSeconds: 5
   failureThreshold: 5
   periodSeconds: 10
-
-docker:
-  secrets:
-    region: eu-west-1
-    name: docker.io/radixdlt
 
 ingress:
   className: nginx

@@ -45,20 +45,20 @@ jobs:
         uses: docker/metadata-action@57396166ad8aefe6098280995947635806a0e6ea
         with:
           images: |
-            docker.io/radixdlt/airflow-service
+            ${{ vars.AWS_ECR_REGISTRY }}/airflow-service
           tags: |
             type=sha,event=pr
             type=sha,event=branch
             type=semver,pattern={{version}}
 
   build-airflow:
-    needs: 
+    needs:
     - tags
     uses: radixdlt/public-iac-resuable-artifacts/.github/workflows/docker-build.yml@main
     with:
       runs_on: ubuntu-latest
-      image_registry: "docker.io"
-      image_organization: "radixdlt"
+      image_registry: ${{ vars.AWS_ECR_REGISTRY }}
+      image_organization: ""
       image_name: "airflow"
       tags: |
           type=sha,event=pr
@@ -71,16 +71,16 @@ jobs:
       scan_image: false
       snyk_target_ref: ${{ github.ref_name }}
     secrets:
-      role_to_assume: ${{ secrets.DOCKERHUB_RELEASER_ROLE }}
+      role_to_assume: ${{ secrets.ECR_PUSHER_ROLE }}
 
   build-token-service:
-    needs: 
+    needs:
     - tags
     uses: radixdlt/public-iac-resuable-artifacts/.github/workflows/docker-build.yml@main
     with:
       runs_on: ubuntu-latest
-      image_registry: "docker.io"
-      image_organization: "radixdlt"
+      image_registry: ${{ vars.AWS_ECR_REGISTRY }}
+      image_organization: ""
       image_name: "token-price-service"
       tags: |
           type=sha,event=pr
@@ -93,16 +93,16 @@ jobs:
       scan_image: false
       snyk_target_ref: ${{ github.ref_name }}
     secrets:
-      role_to_assume: ${{ secrets.DOCKERHUB_RELEASER_ROLE }}
+      role_to_assume: ${{ secrets.ECR_PUSHER_ROLE }}
 
   build-airflow-migrations:
-    needs: 
+    needs:
     - tags
     uses: radixdlt/public-iac-resuable-artifacts/.github/workflows/docker-build.yml@main
     with:
       runs_on: ubuntu-latest
-      image_registry: "docker.io"
-      image_organization: "radixdlt"
+      image_registry: ${{ vars.AWS_ECR_REGISTRY }}
+      image_organization: ""
       image_name: "airflow-migration"
       tags: |
           type=sha,event=pr
@@ -115,7 +115,7 @@ jobs:
       scan_image: false
       snyk_target_ref: ${{ github.ref_name }}
     secrets:
-      role_to_assume: ${{ secrets.DOCKERHUB_RELEASER_ROLE }}
+      role_to_assume: ${{ secrets.ECR_PUSHER_ROLE }}
   
   deploy-airflow-dev:
     if:  github.ref == 'refs/heads/main'
@@ -140,6 +140,7 @@ jobs:
       helm_folder: "deploy/helm/airflow"
       helmfile_extra_vars: >-
         ci.tag=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
+        ci.ecr_registry=${{ vars.AWS_ECR_REGISTRY }},
         ci.INSTALL_DB=${{ false }},
         ci.INSTALL_AIRFLOW=${{ true }},
         ci.INSTALL_TOKEN_SERVICE=${{ true }},
@@ -193,6 +194,7 @@ jobs:
       helm_folder: "deploy/helm/airflow"
       helmfile_extra_vars: >-
         ci.tag=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
+        ci.ecr_registry=${{ vars.AWS_ECR_REGISTRY }},
         ci.INSTALL_DB=${{ false }},
         ci.INSTALL_AIRFLOW=${{ true }},
         ci.INSTALL_TOKEN_SERVICE=${{ true }},
@@ -235,6 +237,7 @@ jobs:
       helm_folder: "deploy/helm/airflow/"
       helmfile_extra_vars: >-
         ci.tag=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
+        ci.ecr_registry=${{ vars.AWS_ECR_REGISTRY }},
         ci.prNumber=${{ github.event.number }},
         ci.INSTALL_DB=${{ contains(github.event.pull_request.labels.*.name, 'deploy-db') || contains(github.event.pull_request.labels.*.name, 'deploy-airflow') || contains(github.event.pull_request.labels.*.name, 'deploy-token-service') }},
         ci.INSTALL_AIRFLOW=${{ contains(github.event.pull_request.labels.*.name, 'deploy-airflow') }},
