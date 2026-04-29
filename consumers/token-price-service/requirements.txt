@@ -5,3 +5,4 @@ uvicorn==0.24.0.post1
 SQLAlchemy==2.0.22
 psycopg2==2.9.9
 prometheus-fastapi-instrumentator==6.1.0
+cachetools==5.3.2

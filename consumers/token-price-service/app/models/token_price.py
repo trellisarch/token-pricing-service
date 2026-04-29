@@ -1,107 +1,18 @@
-from datetime import datetime, timezone
 from typing import List
-from sqlalchemy import (
-    Column,
-    Integer,
-    String,
-    Float,
-    DateTime,
-    ForeignKey,
-    Boolean,
-    func,
-)
-from sqlalchemy.orm import relationship, Session
+from sqlalchemy import Column, Integer, String, Float, DateTime, func
+from sqlalchemy.orm import Session
+from cachetools import TTLCache
+import threading
 
 from app.logger.log import get_logger
-from app.models.base import Base, get_session, get_engine
+from app.models.base import Base, get_engine
 from app.models.token import Token
 
+# In-memory cache with 60-second TTL — caches all rows per table as a single entry
+_price_cache = TTLCache(maxsize=4, ttl=60)
+_price_cache_lock = threading.Lock()
+
 logger = get_logger()
-
-
-def get_prices_closest_to_timestamp(resource_addresses: list, timestamp: int):
-    """
-    For each resource_address, find the price record from radix_token_prices
-    with the closest last_updated_at to the given timestamp.
-    Returns a dict: {resource_address: TokenPrice}
-    """
-    from datetime import datetime, timedelta
-
-    # Convert timestamp to date (YYYY-MM-DD)
-    date = datetime.utcfromtimestamp(timestamp).date()
-    start_dt = datetime.combine(date - timedelta(days=1), datetime.min.time())
-    end_dt = datetime.combine(date + timedelta(days=1), datetime.max.time())
-
-    with Session(get_engine()) as session:
-        result = {}
-        for address in resource_addresses:
-            # Only consider records within +/- 1 day of the date
-            closest = (
-                session.query(TokenPrice)
-                .filter(TokenPrice.resource_address == address)
-                .filter(TokenPrice.last_updated_at > start_dt)
-                .filter(TokenPrice.last_updated_at < end_dt)
-                .order_by(
-                    func.abs(
-                        func.extract("epoch", TokenPrice.last_updated_at) - timestamp
-                    )
-                )
-                .first()
-            )
-            if closest:
-                result[address] = closest
-        return result
-
-
-class TokenPrice(Base):
-    __tablename__ = "radix_token_prices"
-
-    id = Column(Integer, primary_key=True)
-    resource_address = Column(String, ForeignKey("radix_tokens.resource_address"))
-    usd_price = Column(Float)
-    usd_market_cap = Column(Float)
-    usd_vol_24h = Column(Float)
-    last_updated_at = Column(DateTime)
-
-    token = relationship("Token", back_populates="prices")
-
-    @classmethod
-    def insert_new(cls, resource_address: str, usd_price: float):
-        session = get_session()
-        new_price = cls(
-            resource_address=resource_address,
-            usd_price=usd_price,
-            usd_market_cap=0,
-            usd_vol_24h=0,
-            last_updated_at=datetime.now(timezone.utc),
-        )
-
-        session.add(new_price)
-        session.commit()
-        return new_price
-
-
-class LatestTokenPrice(Base):
-    __tablename__ = "latest_token_prices"
-    id = Column(Integer, primary_key=True)
-    resource_address = Column(String)
-    usd_price = Column(Float)
-    last_updated_at = Column(DateTime)
-    allowlist = Column(Boolean)
-
-
-def get_latest_prices(resource_addresses: List[str]) -> List[LatestTokenPrice]:
-    with Session(get_engine()) as session:
-        # Query to get the latest prices filtered by resource addresses
-        latest_prices = (
-            session.query(LatestTokenPrice)
-            .filter(LatestTokenPrice.resource_address.in_(resource_addresses))
-            .filter(LatestTokenPrice.allowlist == True)
-            .all()
-        )
-        for price in latest_prices:
-            price.usd_price = round(price.usd_price, 18)
-        return latest_prices
 
 
 class LedgerTokenPrice(Base):
@@ -150,18 +61,33 @@ def get_ledger_prices_closest_to_timestamp(resource_addresses: list, timestamp: 
         return result
 
 
+def _load_all_ledger_prices() -> dict:
+    """Fetch all ledger latest prices, return as {resource_address: LedgerTokenPriceLatest}."""
+    with _price_cache_lock:
+        cached = _price_cache.get("all_ledger")
+    if cached is not None:
+        return cached
+
+    with Session(get_engine()) as session:
+        all_prices = (
+            session.query(LedgerTokenPriceLatest)
+            .all()
+        )
+        for price in all_prices:
+            price.usd_price = round(price.usd_price, 18)
+        session.expunge_all()
+
+    prices_by_address = {p.resource_address: p for p in all_prices}
+    with _price_cache_lock:
+        _price_cache["all_ledger"] = prices_by_address
+    return prices_by_address
+
+
 def get_ledger_latest_prices(
     resource_addresses: List[str],
 ) -> List[LedgerTokenPriceLatest]:
-    with Session(get_engine()) as session:
-        latest_prices = (
-            session.query(LedgerTokenPriceLatest)
-            .filter(LedgerTokenPriceLatest.resource_address.in_(resource_addresses))
-            .all()
-        )
-        for price in latest_prices:
-            price.usd_price = round(price.usd_price, 18)
-        return latest_prices
+    all_prices = _load_all_ledger_prices()
+    return [all_prices[addr] for addr in resource_addresses if addr in all_prices]
 
 
 class LsuPrice:
@@ -177,18 +103,10 @@ class LsuPrice:
         self.usd_price = xrd_price * self.xrd_redemption_value
 
 
-def get_latest_price(resource_address: str) -> float:
-    with Session(get_engine()) as session:
-        latest_price = (
-            session.query(TokenPrice)
-            .filter_by(resource_address=resource_address)
-            .order_by(TokenPrice.last_updated_at.desc())
-            .first()
-        )
-        return latest_price.usd_price
-
-
 def get_ledger_latest_price(resource_address: str) -> float:
+    all_prices = _load_all_ledger_prices()
+    if resource_address in all_prices:
+        return all_prices[resource_address].usd_price
     with Session(get_engine()) as session:
         latest_price = (
             session.query(LedgerTokenPriceLatest)
@@ -202,13 +120,12 @@ def get_whitelisted_tokens():
     with Session(get_engine()) as session:
         latest_prices = {}
         tokens_with_latest_price = (
-            session.query(Token, LatestTokenPrice)
+            session.query(Token, LedgerTokenPriceLatest)
             .filter(Token.allowlist == True)
-            .filter(Token.resource_address == LatestTokenPrice.resource_address)
+            .filter(Token.resource_address == LedgerTokenPriceLatest.resource_address)
             .all()
         )
 
-        # Populate the dictionary with the results
         for token, token_price in tokens_with_latest_price:
             latest_prices[token.id] = {
                 "symbol": token.symbol,
@@ -222,3 +139,5 @@ def get_whitelisted_tokens():
             }
 
         return latest_prices
+
+

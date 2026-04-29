@@ -56,7 +56,7 @@ jobs:
           type=semver,pattern={{version}}
       context: "airflow"
       dockerfile: "airflow/Dockerfile"
-      platforms: "linux/amd64"
+      platforms: " linux/arm64"
       provenance: "false"
       scan_image: false
       snyk_target_ref: ${{ github.ref_name }}
@@ -78,7 +78,7 @@ jobs:
           type=semver,pattern={{version}}
       context: "consumers/token-price-service"
       dockerfile: "consumers/token-price-service/Dockerfile"
-      platforms: "linux/amd64"
+      platforms: "linux/arm64"
       provenance: "false"
       scan_image: false
       snyk_target_ref: ${{ github.ref_name }}
@@ -100,7 +100,7 @@ jobs:
           type=semver,pattern={{version}}
       context: "database"
       dockerfile: "database/Dockerfile"
-      platforms: "linux/amd64"
+      platforms: "linux/arm64"
       provenance: "false"
       scan_image: false
       snyk_target_ref: ${{ github.ref_name }}
