@@ -65,7 +65,7 @@ jobs:
   deploy-airflow-migrations-prod:
     if: github.event.inputs.environment == 'prod'
     name: "(PROD) Deploy Airflow Migrations"
-    uses: trellisarch/iac-reusable-artifacts/.github/workflows/deploy.yml@main
+    uses: trellisarch/public-iac-reusable-artifacts/.github/workflows/deploy.yml@main
     needs:
       - tags
       - build-airflow-migrations

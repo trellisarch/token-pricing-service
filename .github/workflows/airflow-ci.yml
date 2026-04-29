@@ -123,7 +123,7 @@ jobs:
   deploy-airflow-prod:
     if: github.event_name == 'release' && !github.event.release.prerelease
     name: "Deploy Airflow Prod"
-    uses: trellisarch/iac-reusable-artifacts/.github/workflows/deploy.yml@main
+    uses: trellisarch/public-iac-reusable-artifacts/.github/workflows/deploy.yml@main
     needs:
       - tags
       - build-airflow
