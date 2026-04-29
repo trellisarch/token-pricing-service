@@ -1,6 +1,5 @@
 from sqlalchemy import Column, Integer, String, Boolean
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import relationship
 from app.logger.log import get_logger
 from app.models.base import Base, get_session
 
@@ -15,8 +14,6 @@ class Token(Base):
     symbol = Column(String)
     name = Column(String)
     allowlist = Column(Boolean)
-
-    prices = relationship("TokenPrice", back_populates="token")
 
     @classmethod
     def insert_new(cls, resource_address: str, symbol: str, name: str):
