@@ -12,11 +12,8 @@ on:
 
 permissions:
   id-token: write
-  pull-requests: write
   contents: read
-  deployments: write
   packages: write
-  issues: write
 
 jobs:
   tags:
@@ -62,31 +59,4 @@ jobs:
     secrets:
       role_to_assume: ${{ secrets.ECR_PUSHER_REPO_ROLE_MAIN }}
 
-  deploy-airflow-migrations-prod:
-    if: github.event.inputs.environment == 'prod'
-    name: "(PROD) Deploy Airflow Migrations"
-    uses: trellisarch/public-iac-reusable-artifacts/.github/workflows/deploy.yml@main
-    needs:
-      - tags
-      - build-airflow-migrations
-    with:
-      app_name: 'airflow'
-      step_name: 'deploy-airflow-prod'
-      env_name: prod
-      namespace: airflow-prod
-      helm_command: "apply"
-      create_subns: false
-      restart_pods: false
-      aws_region: eu-west-2
-      role_to_assume: arn:aws:iam::821496737932:role/gh-airflow-prod-deployer
-      eks_cluster: rtlj-prod
-      helm_folder: "deploy/helm/airflow"
-      helm_chart: "db-migrations"
-      helmfile_extra_vars: >-
-        ci.tag=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
-        ci.ecr_registry=${{ vars.AWS_ECR_REGISTRY }},
-        ci.environment=prod,
-        ci.HF_CREATE_NAMESPACES=false,
-        ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
-        ci.RUN_DB_MIGRATIONS=true
 

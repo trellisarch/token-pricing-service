@@ -8,11 +8,8 @@ on:
     types: [published]
 permissions:
   id-token: write
-  pull-requests: write
   contents: read
-  deployments: write
   packages: write
-  issues: write
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -120,46 +117,4 @@ jobs:
           cd airflow
           make ci-test
 
-  deploy-airflow-prod:
-    if: github.event_name == 'release' && !github.event.release.prerelease
-    name: "Deploy Airflow Prod"
-    uses: trellisarch/public-iac-reusable-artifacts/.github/workflows/deploy.yml@main
-    needs:
-      - tags
-      - build-airflow
-      - build-token-service
-    with:
-      app_name: 'airflow'
-      step_name: 'deploy-airflow-prod'
-      env_name: prod
-      namespace: airflow-prod
-      helm_command: "apply"
-      create_subns: false
-      restart_pods: false
-      aws_region: eu-west-2
-      role_to_assume: arn:aws:iam::821496737932:role/gh-airflow-prod-deployer
-      eks_cluster: rtlj-prod
-      helm_folder: "deploy/helm/airflow"
-      helmfile_extra_vars: >-
-        ci.tag=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
-        ci.ecr_registry=${{ vars.AWS_ECR_REGISTRY }},
-        ci.INSTALL_DB=${{ false }},
-        ci.INSTALL_AIRFLOW=${{ true }},
-        ci.INSTALL_TOKEN_SERVICE=${{ true }},
-        ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }}
-
-  api-tests-prod:
-    name: "(PROD) Tests"
-    needs: deploy-airflow-prod
-    runs-on: ubuntu-latest
-    container:
-      image: python:3.10
-    steps:
-      - uses: RDXWorks-actions/checkout@main
-      - name: api tests
-        run: |
-          cd consumers/token-price-service 
-          pip install pytest requests
-          export API_URL=https://token-price-service.radixdlt.com
-          pytest --log-cli-level=INFO -v tests/api
 
