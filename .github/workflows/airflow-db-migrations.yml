@@ -8,7 +8,6 @@ on:
         required: true
         type: choice
         options:
-          - dev
           - prod
 
 permissions:
@@ -91,30 +90,3 @@ jobs:
         ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
         ci.RUN_DB_MIGRATIONS=true
 
-  deploy-airflow-migrations-dev:
-    if: github.event.inputs.environment == 'dev'
-    name: "(DEV) Deploy Airflow Migrations"
-    uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@main
-    needs:
-      - tags
-      - build-airflow-migrations
-    with:
-      app_name: 'airflow'
-      step_name: 'deploy-airflow-dev'
-      env_name: dev
-      namespace: airflow-dev
-      helm_command: "apply"
-      create_subns: false
-      restart_pods: false
-      aws_region: eu-west-2
-      role_to_assume: arn:aws:iam::308190735829:role/gh-airflow-dev-deployer
-      eks_cluster: rdx-works-main-dev
-      helm_folder: "deploy/helm/airflow"
-      helm_chart: "db-migrations"
-      helmfile_extra_vars: >-
-        ci.tag=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
-        ci.ecr_registry=${{ vars.AWS_ECR_REGISTRY }},
-        ci.environment=dev,
-        ci.HF_CREATE_NAMESPACES=false,
-        ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
-        ci.RUN_DB_MIGRATIONS=true

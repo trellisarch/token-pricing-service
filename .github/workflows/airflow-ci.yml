@@ -4,14 +4,6 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
-    types:
-      - opened
-      - synchronize
-      - reopened
-      - labeled
   release:
     types: [published]
 permissions:
@@ -117,50 +109,6 @@ jobs:
     secrets:
       role_to_assume: ${{ secrets.ECR_PUSHER_ROLE }}
   
-  deploy-airflow-dev:
-    if:  github.ref == 'refs/heads/main'
-    name: "Deploy Airflow Dev"
-    uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@main
-    needs:
-      - tags
-      - build-airflow
-      - build-airflow-migrations
-      - build-token-service
-    with:
-      app_name: 'airflow'
-      step_name: 'deploy-airflow-dev'
-      env_name: dev
-      namespace: airflow-dev
-      helm_command: "apply"
-      create_subns: false
-      restart_pods: false
-      aws_region: eu-west-2
-      role_to_assume: arn:aws:iam::308190735829:role/gh-airflow-dev-deployer
-      eks_cluster: rdx-works-main-dev
-      helm_folder: "deploy/helm/airflow"
-      helmfile_extra_vars: >-
-        ci.tag=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
-        ci.ecr_registry=${{ vars.AWS_ECR_REGISTRY }},
-        ci.INSTALL_DB=${{ false }},
-        ci.INSTALL_AIRFLOW=${{ true }},
-        ci.INSTALL_TOKEN_SERVICE=${{ true }},
-        ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
-        ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }}
-
-  api-tests-dev:
-    needs: deploy-airflow-dev
-    runs-on: ubuntu-latest
-    container:
-      image: python:3.10
-    steps:
-      - uses: RDXWorks-actions/checkout@main
-      - name: api tests
-        run: |
-          cd consumers/token-price-service 
-          pip install pytest requests
-          export API_URL=https://dev-token-price.extratools.works
-          pytest --log-cli-level=INFO -v tests/api
-  
   run_unit_tests:
     runs-on: ubuntu-latest
     container:
@@ -215,35 +163,3 @@ jobs:
           export API_URL=https://token-price-service.radixdlt.com
           pytest --log-cli-level=INFO -v tests/api
 
-  deploy_pull_request_airflow:
-    if: ${{ github.event.pull_request }}
-    name: "Deploy PR airflow"
-    uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@main
-    needs:
-      - tags
-      - build-airflow
-      - build-airflow-migrations
-      - build-token-service
-    with:
-      env_name: pr
-      hierarchical_namespace: airflow-ci-pr
-      namespace: airflow-pr-${{ github.event.number }}
-      helm_command: "apply"
-      create_subns: true
-      restart_pods: false
-      aws_region: eu-west-2
-      role_to_assume: 'arn:aws:iam::308190735829:role/gh-airflow-pr-deployer'
-      eks_cluster: rdx-works-main-dev
-      helm_folder: "deploy/helm/airflow/"
-      helmfile_extra_vars: >-
-        ci.tag=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
-        ci.ecr_registry=${{ vars.AWS_ECR_REGISTRY }},
-        ci.prNumber=${{ github.event.number }},
-        ci.INSTALL_DB=${{ contains(github.event.pull_request.labels.*.name, 'deploy-db') || contains(github.event.pull_request.labels.*.name, 'deploy-airflow') || contains(github.event.pull_request.labels.*.name, 'deploy-token-service') }},
-        ci.INSTALL_AIRFLOW=${{ contains(github.event.pull_request.labels.*.name, 'deploy-airflow') }},
-        ci.INSTALL_TOKEN_SERVICE=${{ contains(github.event.pull_request.labels.*.name, 'deploy-token-service') }},
-        ci.RUN_DB_MIGRATIONS=${{ contains(github.event.pull_request.labels.*.name, 'deploy-airflow') }},
-        ci.AIRFLOW_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }},
-        ci.AIRFLOW_MIGRATION_IMAGE_TAG=${{ fromJSON(needs.tags.outputs.airflow-json).labels['org.opencontainers.image.version'] }}
-      app_name: 'airflow'
-      step_name: 'deploy-pr'
