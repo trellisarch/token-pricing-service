@@ -1,4 +1,4 @@
 image:
-  repo: radixdlt/airflow-migration
+  repo: {{ .StateValues.ci.ecr_registry }}/airflow-migration
   tag: {{ .StateValues.ci.AIRFLOW_MIGRATION_IMAGE_TAG }}
 dbUri: "postgresql://postgres:postgres@postgres-postgresql:5432/dags"

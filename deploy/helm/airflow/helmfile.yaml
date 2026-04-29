@@ -40,7 +40,7 @@ releases:
       - airflowVersion: "2.9.3"
       - images:
           airflow:
-            repository: radixdlt/airflow
+            repository: {{ .StateValues.ci.ecr_registry }}/airflow
             tag: {{ .StateValues.ci.tag }}
       # Add PostgreSQL image configuration here
       - postgresql:

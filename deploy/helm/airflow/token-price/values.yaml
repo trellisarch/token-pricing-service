@@ -1,18 +1,12 @@
 replicaCount: 1
 
 image:
-  repository: docker.io/radixdlt/token-price-service
   pullPolicy: IfNotPresent
 
-imagePullSecrets:
-  - name: dockerhub-dev
+imagePullSecrets: []
 
 nameOverride: "token-price"
 fullnameOverride: "token-price"
-
-docker:
-  secrets:
-    name: docker.io/radixdlt
 
 metrics:
   enabled: false

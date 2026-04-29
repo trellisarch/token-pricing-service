@@ -86,6 +86,7 @@ jobs:
       helm_folder: "deploy/helm/airflow"
       helmfile_extra_vars: >-
         ci.tag=${{ needs.fetch-dev-tags.outputs.DOCKER_TAG }},
+        ci.ecr_registry=${{ vars.AWS_ECR_REGISTRY }},
         ci.environment=dev,
         ci.HF_CREATE_NAMESPACES=false,
         ci.INSTALL_DB=${{ false }},
@@ -126,6 +127,7 @@ jobs:
       helm_folder: "deploy/helm/airflow"
       helmfile_extra_vars: >-
         ci.tag=${{ needs.fetch-prod-tags.outputs.DOCKER_TAG }},
+        ci.ecr_registry=${{ vars.AWS_ECR_REGISTRY }},
         ci.environment=prod,
         ci.HF_CREATE_NAMESPACES=false,
         ci.INSTALL_DB=${{ false }},
@@ -154,6 +156,7 @@ jobs:
       helm_folder: "deploy/helm/airflow"
       helmfile_extra_vars: >-
         ci.tag=${{ needs.fetch-prod-tags.outputs.DOCKER_TAG }},
+        ci.ecr_registry=${{ vars.AWS_ECR_REGISTRY }},
         ci.environment=prod,
         ci.HF_CREATE_NAMESPACES=false,
         ci.INSTALL_DB=${{ false }},
