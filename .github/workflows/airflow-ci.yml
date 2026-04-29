@@ -63,7 +63,7 @@ jobs:
       scan_image: false
       snyk_target_ref: ${{ github.ref_name }}
     secrets:
-      role_to_assume: ${{ secrets.ECR_PUSHER_ROLE }}
+      role_to_assume: ${{ github.event_name == 'release' && secrets.ECR_PUSHER_REPO_ROLE_RELEASE || secrets.ECR_PUSHER_REPO_ROLE_MAIN }}
 
   build-token-service:
     needs:
@@ -85,7 +85,7 @@ jobs:
       scan_image: false
       snyk_target_ref: ${{ github.ref_name }}
     secrets:
-      role_to_assume: ${{ secrets.ECR_PUSHER_ROLE }}
+      role_to_assume: ${{ github.event_name == 'release' && secrets.ECR_PUSHER_REPO_ROLE_RELEASE || secrets.ECR_PUSHER_REPO_ROLE_MAIN }}
 
   build-airflow-migrations:
     needs:
@@ -107,7 +107,7 @@ jobs:
       scan_image: false
       snyk_target_ref: ${{ github.ref_name }}
     secrets:
-      role_to_assume: ${{ secrets.ECR_PUSHER_ROLE }}
+      role_to_assume: ${{ github.event_name == 'release' && secrets.ECR_PUSHER_REPO_ROLE_RELEASE || secrets.ECR_PUSHER_REPO_ROLE_MAIN }}
   
   run_unit_tests:
     runs-on: ubuntu-latest

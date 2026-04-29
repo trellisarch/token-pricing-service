@@ -60,7 +60,7 @@ jobs:
       scan_image: false
       snyk_target_ref: ${{ github.ref_name }}
     secrets:
-      role_to_assume: ${{ secrets.ECR_PUSHER_ROLE }}
+      role_to_assume: ${{ secrets.ECR_PUSHER_REPO_ROLE_MAIN }}
 
   deploy-airflow-migrations-prod:
     if: github.event.inputs.environment == 'prod'
