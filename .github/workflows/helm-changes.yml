@@ -58,7 +58,7 @@ jobs:
   fetch-dev-tags:
     name: DEV tags
     if: github.event.pull_request && github.base_ref == 'main' && needs.changed-files.outputs.dev == 'true'
-    uses: radixdlt/iac-resuable-artifacts/.github/workflows/fetch-deployment-tags.yml@main
+    uses: trellisarch/iac-resuable-artifacts/.github/workflows/fetch-deployment-tags.yml@main
     needs:
       - changed-files
     with:
@@ -70,7 +70,7 @@ jobs:
   diff-dev:
     name: DEV diff
     if: github.event.pull_request && github.base_ref == 'main' && needs.changed-files.outputs.dev == 'true'
-    uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@main
+    uses: trellisarch/iac-resuable-artifacts/.github/workflows/deploy.yml@main
     needs:
       - changed-files
       - fetch-dev-tags
@@ -99,7 +99,7 @@ jobs:
   fetch-prod-tags:
     name: PROD tags
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.changed-files.outputs.prod == 'true'
-    uses: radixdlt/iac-resuable-artifacts/.github/workflows/fetch-deployment-tags.yml@main
+    uses: trellisarch/iac-resuable-artifacts/.github/workflows/fetch-deployment-tags.yml@main
     needs:
       - changed-files
     with:
@@ -111,7 +111,7 @@ jobs:
   diff-prod:
     name: PROD diff
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.changed-files.outputs.prod == 'true'
-    uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@main
+    uses: trellisarch/iac-resuable-artifacts/.github/workflows/deploy.yml@main
     needs:
       - changed-files
       - fetch-prod-tags
@@ -139,7 +139,7 @@ jobs:
   deploy-prod:
     name: PROD deploy
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.changed-files.outputs.prod == 'true'
-    uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@main
+    uses: trellisarch/iac-resuable-artifacts/.github/workflows/deploy.yml@main
     needs:
       - changed-files
       - fetch-prod-tags

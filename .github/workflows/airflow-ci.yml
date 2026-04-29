@@ -46,7 +46,7 @@ jobs:
   build-airflow:
     needs:
     - tags
-    uses: radixdlt/public-iac-resuable-artifacts/.github/workflows/docker-build.yml@main
+    uses: trellisarch/public-iac-resuable-artifacts/.github/workflows/docker-build.yml@main
     with:
       runs_on: ubuntu-latest
       image_registry: ${{ vars.AWS_ECR_REGISTRY }}
@@ -68,7 +68,7 @@ jobs:
   build-token-service:
     needs:
     - tags
-    uses: radixdlt/public-iac-resuable-artifacts/.github/workflows/docker-build.yml@main
+    uses: trellisarch/public-iac-resuable-artifacts/.github/workflows/docker-build.yml@main
     with:
       runs_on: ubuntu-latest
       image_registry: ${{ vars.AWS_ECR_REGISTRY }}
@@ -90,7 +90,7 @@ jobs:
   build-airflow-migrations:
     needs:
     - tags
-    uses: radixdlt/public-iac-resuable-artifacts/.github/workflows/docker-build.yml@main
+    uses: trellisarch/public-iac-resuable-artifacts/.github/workflows/docker-build.yml@main
     with:
       runs_on: ubuntu-latest
       image_registry: ${{ vars.AWS_ECR_REGISTRY }}
@@ -123,7 +123,7 @@ jobs:
   deploy-airflow-prod:
     if: github.event_name == 'release' && !github.event.release.prerelease
     name: "Deploy Airflow Prod"
-    uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@main
+    uses: trellisarch/iac-resuable-artifacts/.github/workflows/deploy.yml@main
     needs:
       - tags
       - build-airflow
